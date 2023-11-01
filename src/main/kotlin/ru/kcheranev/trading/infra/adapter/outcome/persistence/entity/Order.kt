@@ -6,7 +6,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.ManyToOne
-import ru.kcheranev.trading.domain.TradeDirection
+import ru.kcheranev.trading.domain.entity.TradeDirection
 import java.math.BigDecimal
 import java.time.LocalDate
 

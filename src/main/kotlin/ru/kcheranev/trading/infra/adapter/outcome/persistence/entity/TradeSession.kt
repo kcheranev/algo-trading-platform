@@ -6,7 +6,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.ManyToOne
-import ru.kcheranev.trading.domain.TradeSessionStatus
+import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import java.time.LocalDate
 
 @Entity(name = "trade_session")
