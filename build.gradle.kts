@@ -5,9 +5,10 @@ plugins {
     id("io.spring.dependency-management") version "1.1.3"
     kotlin("jvm") version "1.8.22"
     kotlin("plugin.spring") version "1.8.22"
+    kotlin("plugin.jpa") version "1.9.10"
 }
 
-group = "ru"
+group = "ru.kcheranev"
 version = "0.0.1-SNAPSHOT"
 
 java {
@@ -20,14 +21,15 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.retry:spring-retry")
-
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("ru.tinkoff.piapi:java-sdk-core:1.5")
     implementation("org.ta4j:ta4j-core:0.15")
+
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     runtimeOnly("org.postgresql:postgresql")
 
@@ -36,7 +38,7 @@ dependencies {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        freeCompilerArgs += "-Xjsr305=strict"
+        freeCompilerArgs = freeCompilerArgs + "-Xjsr305=strict"
         jvmTarget = "17"
     }
 }
