@@ -1,5 +1,7 @@
 spring:
 
 application:
-  open-api:
-    ssoToken: ${SSO_TOKEN}
+  trading:
+    maxCandleDelay: 3
+    placeOrderRetryCount: 3
+  infra.broker: ${TOKEN}

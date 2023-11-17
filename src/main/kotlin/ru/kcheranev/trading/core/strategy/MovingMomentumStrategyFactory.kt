@@ -13,6 +13,7 @@ import org.ta4j.core.rules.OverIndicatorRule
 import org.ta4j.core.rules.UnderIndicatorRule
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.StrategyType
+import ru.kcheranev.trading.domain.model.TradeStrategy
 
 @Component
 class MovingMomentumStrategyFactory : StrategyFactory {
