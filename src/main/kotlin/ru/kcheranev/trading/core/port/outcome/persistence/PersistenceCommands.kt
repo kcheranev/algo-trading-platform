@@ -7,28 +7,28 @@ import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 
-sealed class PersistenceOutcomeCommand
+sealed class PersistenceCommand
 
-data class SaveOrderPersistenceOutcomeCommand(
+data class SaveOrderCommand(
     val order: Order
-) : PersistenceOutcomeCommand()
+) : PersistenceCommand()
 
-data class GetOrderPersistenceOutcomeCommand(
+data class GetOrderCommand(
     val orderId: OrderId
-) : PersistenceOutcomeCommand()
+) : PersistenceCommand()
 
-data class SaveTradeSessionPersistenceOutcomeCommand(
+data class SaveTradeSessionCommand(
     val tradeSession: TradeSession
-) : PersistenceOutcomeCommand()
+) : PersistenceCommand()
 
-data class GetTradeSessionPersistenceOutcomeCommand(
+data class GetTradeSessionCommand(
     val tradeSessionId: TradeSessionId
-) : PersistenceOutcomeCommand()
+) : PersistenceCommand()
 
-data class SaveStrategyConfigurationPersistenceOutcomeCommand(
+data class SaveStrategyConfigurationCommand(
     val strategyConfiguration: StrategyConfiguration
-) : PersistenceOutcomeCommand()
+) : PersistenceCommand()
 
-data class GetStrategyConfigurationPersistenceOutcomeCommand(
+data class GetStrategyConfigurationCommand(
     val strategyConfigurationId: StrategyConfigurationId
-) : PersistenceOutcomeCommand()
+) : PersistenceCommand()

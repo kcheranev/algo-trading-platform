@@ -6,12 +6,16 @@ class BrokerApi(token: String) {
 
     private val investApi: InvestApi = InvestApi.create(token)
 
+    val orderService = investApi.ordersService
+
+    val userService = investApi.userService
+
+    val marketDataStreamService = investApi.marketDataStreamService
+
+    val marketDataService = investApi.marketDataService
+
     fun destroy() {
         investApi.destroy(5)
     }
-
-    fun orderService() = investApi.ordersService
-
-    fun userService() = investApi.userService
 
 }

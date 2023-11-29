@@ -1,6 +1,6 @@
 package ru.kcheranev.trading.domain.entity
 
-import ru.kcheranev.trading.domain.AbstractEntity
+import org.springframework.data.domain.AbstractAggregateRoot
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.StrategyType
@@ -11,7 +11,7 @@ data class StrategyConfiguration(
     val initCandleAmount: Int,
     val candleInterval: CandleInterval,
     val params: StrategyParameters
-) : AbstractEntity() {
+) : AbstractAggregateRoot<StrategyConfiguration>() {
 }
 
 data class StrategyConfigurationId(

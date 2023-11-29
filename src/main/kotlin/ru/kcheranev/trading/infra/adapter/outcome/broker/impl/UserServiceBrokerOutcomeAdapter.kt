@@ -9,7 +9,7 @@ class UserServiceBrokerOutcomeAdapter(brokerApi: BrokerApi, brokerProperties: Br
 
     private val tradingAccountName = brokerProperties.tradingAccountName
 
-    private val userService = brokerApi.userService()
+    private val userService = brokerApi.userService
 
     fun getTradingAccountId(): String {
         return userService.accounts

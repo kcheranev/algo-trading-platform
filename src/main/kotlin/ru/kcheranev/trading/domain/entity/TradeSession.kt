@@ -1,10 +1,10 @@
 package ru.kcheranev.trading.domain.entity
 
+import org.springframework.data.domain.AbstractAggregateRoot
 import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseBarSeriesBuilder
 import ru.kcheranev.trading.common.LoggerDelegate
 import ru.kcheranev.trading.core.strategy.StrategyFactory
-import ru.kcheranev.trading.domain.AbstractEntity
 import ru.kcheranev.trading.domain.TradeSessionCreatedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionEnteredDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionExitedDomainEvent
@@ -33,11 +33,11 @@ data class TradeSession(
     var lastEventDate: LocalDateTime?,
     val strategy: TradeStrategy,
     val strategyConfigurationId: StrategyConfigurationId
-) : AbstractEntity() {
+) : AbstractAggregateRoot<TradeSession>() {
 
     fun addBar(candle: Candle) {
         strategy.addBar(domainModelMapper.map(candle))
-        lastEventDate = candle.time
+        lastEventDate = candle.endTime
     }
 
     fun shouldEnter() = status.transitionAvailable(PENDING_ENTER) && strategy.shouldEnter(strategy.series.endIndex)
@@ -83,7 +83,7 @@ data class TradeSession(
 
     companion object {
 
-        val logger by LoggerDelegate()
+        private val logger by LoggerDelegate()
 
         fun start(
             strategyConfiguration: StrategyConfiguration,
@@ -104,7 +104,7 @@ data class TradeSession(
                 status = WAITING,
                 startDate = LocalDateTime.now(),
                 candleInterval = candleInterval,
-                lastEventDate = candles.last().time,
+                lastEventDate = candles.last().endTime,
                 strategy = strategyFactory.initStrategy(strategyConfiguration.params, series),
                 strategyConfigurationId = strategyConfiguration.id
             )

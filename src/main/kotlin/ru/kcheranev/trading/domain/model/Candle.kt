@@ -9,6 +9,6 @@ data class Candle(
     val closePrice: BigDecimal,
     val highestPrice: BigDecimal,
     val lowestPrice: BigDecimal,
-    val tradesValue: BigDecimal,
-    val time: LocalDateTime
+    val volume: Long,
+    val endTime: LocalDateTime
 )

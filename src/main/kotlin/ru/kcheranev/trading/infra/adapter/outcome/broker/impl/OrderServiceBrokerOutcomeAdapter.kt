@@ -1,9 +1,10 @@
 package ru.kcheranev.trading.infra.adapter.outcome.broker.impl
 
 import org.springframework.stereotype.Component
-import ru.kcheranev.trading.core.port.outcome.broker.OrderServiceBrokerOutcomePort
-import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceBuyOrderBrokerOutcomeCommand
-import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceSellOrderBrokerOutcomeCommand
+import ru.kcheranev.trading.common.LoggerDelegate
+import ru.kcheranev.trading.core.port.outcome.broker.OrderServiceBrokerPort
+import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceBuyOrderCommand
+import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceSellOrderCommand
 import ru.kcheranev.trading.core.port.outcome.broker.model.PostOrderResponse
 import ru.kcheranev.trading.infra.adapter.outcome.broker.brokerOutcomeAdapterMapper
 import ru.kcheranev.trading.infra.config.BrokerApi
@@ -17,13 +18,14 @@ import java.util.concurrent.CompletableFuture
 class OrderServiceBrokerOutcomeAdapter(
     brokerApi: BrokerApi,
     private val userServiceBrokerOutcomeAdapter: UserServiceBrokerOutcomeAdapter,
-) : OrderServiceBrokerOutcomePort {
+) : OrderServiceBrokerPort {
 
-    private val orderService = brokerApi.orderService()
+    private val orderService = brokerApi.orderService
 
     override fun postBestPriceBuyOrder(
-        command: PostBestPriceBuyOrderBrokerOutcomeCommand
+        command: PostBestPriceBuyOrderCommand
     ): CompletableFuture<PostOrderResponse> {
+        logger.info("Post buy best price order for the ${command.ticker}")
         return orderService.postOrder(
             command.instrumentId,
             command.quantity,
@@ -36,8 +38,9 @@ class OrderServiceBrokerOutcomeAdapter(
     }
 
     override fun postBestPriceSellOrder(
-        command: PostBestPriceSellOrderBrokerOutcomeCommand
+        command: PostBestPriceSellOrderCommand
     ): CompletableFuture<PostOrderResponse> {
+        logger.info("Post sell best price order for the ${command.ticker}")
         return orderService.postOrder(
             command.instrumentId,
             command.quantity,
@@ -47,6 +50,12 @@ class OrderServiceBrokerOutcomeAdapter(
             OrderType.ORDER_TYPE_BESTPRICE,
             UUID.randomUUID().toString()
         ).thenApply { brokerOutcomeAdapterMapper.map(it) }
+    }
+
+    companion object {
+
+        private val logger by LoggerDelegate()
+
     }
 
 }

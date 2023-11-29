@@ -3,9 +3,9 @@ package ru.kcheranev.trading.infra.adapter.outcome.persistence.impl
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import ru.kcheranev.trading.core.port.outcome.persistence.GetStrategyConfigurationPersistenceOutcomeCommand
-import ru.kcheranev.trading.core.port.outcome.persistence.SaveStrategyConfigurationPersistenceOutcomeCommand
-import ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationPersistenceOutcomePort
+import ru.kcheranev.trading.core.port.outcome.persistence.GetStrategyConfigurationCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.SaveStrategyConfigurationCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationPersistencePort
 import ru.kcheranev.trading.domain.entity.StrategyConfiguration
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.StrategyConfigurationEntityNotExistsException
@@ -15,10 +15,10 @@ import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.Strateg
 @Component
 class StrategyConfigurationPersistenceOutcomeAdapter(
     private val strategyConfigurationRepository: StrategyConfigurationRepository
-) : StrategyConfigurationPersistenceOutcomePort {
+) : StrategyConfigurationPersistencePort {
 
     @Transactional(propagation = Propagation.MANDATORY)
-    override fun save(command: SaveStrategyConfigurationPersistenceOutcomeCommand): StrategyConfigurationId {
+    override fun save(command: SaveStrategyConfigurationCommand): StrategyConfigurationId {
         return StrategyConfigurationId(
             strategyConfigurationRepository.save(
                 persistenceOutcomeAdapterMapper.map(command.strategyConfiguration)
@@ -26,7 +26,7 @@ class StrategyConfigurationPersistenceOutcomeAdapter(
         )
     }
 
-    override fun get(command: GetStrategyConfigurationPersistenceOutcomeCommand): StrategyConfiguration {
+    override fun get(command: GetStrategyConfigurationCommand): StrategyConfiguration {
         return strategyConfigurationRepository.findById(command.strategyConfigurationId.value)
             .orElseThrow { StrategyConfigurationEntityNotExistsException(command.strategyConfigurationId) }
             .let { persistenceOutcomeAdapterMapper.map(it) }
