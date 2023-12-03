@@ -11,8 +11,8 @@ abstract class PersistenceOutcomeAdapterException(
 class TradeSessionEntityNotExistsException(tradeSessionId: TradeSessionId) :
     PersistenceOutcomeAdapterException("Trade session entity with id ${tradeSessionId.value} is not exists")
 
-class TradeStrategyCacheNotExistsException(tradeSessionId: TradeSessionId) :
-    PersistenceOutcomeAdapterException("Trade strategy cache with key ${tradeSessionId.value} is not exists")
+class TradeStrategyCacheNotExistsException(tradeSessionId: Long) :
+    PersistenceOutcomeAdapterException("Trade strategy cache with key $tradeSessionId is not exists")
 
 class OrderEntityNotExistsException(orderId: OrderId) :
     PersistenceOutcomeAdapterException("Order entity with id ${orderId.value} is not exists")

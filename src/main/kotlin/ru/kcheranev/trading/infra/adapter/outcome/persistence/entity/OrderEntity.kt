@@ -5,7 +5,7 @@ import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 import ru.kcheranev.trading.domain.entity.TradeDirection
 import java.math.BigDecimal
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Table(name = "order")
 data class OrderEntity(
@@ -13,8 +13,10 @@ data class OrderEntity(
     var id: Long? = null,
     @Column("ticker")
     val ticker: String,
+    @Column("instrument_id")
+    val instrumentId: String,
     @Column("date")
-    val date: LocalDate,
+    val date: LocalDateTime,
     @Column("quantity")
     val quantity: Int,
     @Column("price")

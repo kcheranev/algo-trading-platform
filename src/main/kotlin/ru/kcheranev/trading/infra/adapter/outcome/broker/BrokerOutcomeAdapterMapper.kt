@@ -28,7 +28,7 @@ interface BrokerOutcomeAdapterMapper {
             CandleInterval.FIVE_MIN -> ru.tinkoff.piapi.contract.v1.CandleInterval.CANDLE_INTERVAL_5_MIN
         }
 
-    fun map(historicCandle: HistoricCandle, candleInterval: CandleInterval): Candle {
+    fun map(historicCandle: HistoricCandle, candleInterval: CandleInterval, instrumentId: String): Candle {
         return Candle(
             interval = candleInterval,
             openPrice = commonBrokerMapper.map(historicCandle.open),
@@ -36,7 +36,8 @@ interface BrokerOutcomeAdapterMapper {
             highestPrice = commonBrokerMapper.map(historicCandle.high),
             lowestPrice = commonBrokerMapper.map(historicCandle.low),
             volume = historicCandle.volume,
-            endTime = commonBrokerMapper.map(historicCandle.time).plus(candleInterval.duration)
+            endTime = commonBrokerMapper.map(historicCandle.time).plus(candleInterval.duration),
+            instrumentId = instrumentId
         )
     }
 

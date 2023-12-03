@@ -2,12 +2,13 @@ package ru.kcheranev.trading.domain.entity
 
 import org.springframework.data.domain.AbstractAggregateRoot
 import java.math.BigDecimal
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class Order(
     val id: OrderId,
     val ticker: String,
-    val date: LocalDate,
+    val instrumentId: String,
+    val date: LocalDateTime,
     val quantity: Int,
     val price: BigDecimal,
     val direction: TradeDirection,
@@ -23,4 +24,8 @@ enum class TradeDirection {
 
     BUY, SELL
 
+}
+
+enum class OrderSort : SortField {
+    TICKER, DATE, PRICE, DIRECTION
 }

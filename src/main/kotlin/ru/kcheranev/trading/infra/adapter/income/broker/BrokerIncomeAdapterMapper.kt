@@ -20,7 +20,8 @@ interface BrokerIncomeAdapterMapper {
             highestPrice = commonBrokerMapper.map(source.high),
             lowestPrice = commonBrokerMapper.map(source.low),
             volume = source.volume,
-            endTime = commonBrokerMapper.map(source.time).plus(candleInterval.duration)
+            endTime = commonBrokerMapper.map(source.time).plus(candleInterval.duration),
+            instrumentId = source.instrumentUid
         )
     }
 

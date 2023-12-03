@@ -11,7 +11,7 @@ class TradeSessionNotExistsException :
     DomainException("Trade session is not exists")
 
 class UnexpectedTradeSessionTransitionException(
-    id: TradeSessionId,
+    tradeSessionId: TradeSessionId,
     from: TradeSessionStatus,
     to: TradeSessionStatus
-) : DomainException("Unexpected trade session ${id.value} status transition from $from to $to")
+) : DomainException("Unexpected trade session ${tradeSessionId.value} status transition from $from to $to")

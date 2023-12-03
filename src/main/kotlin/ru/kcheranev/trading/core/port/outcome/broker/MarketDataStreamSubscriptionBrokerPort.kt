@@ -6,6 +6,4 @@ interface MarketDataStreamSubscriptionBrokerPort {
 
     fun unsubscribeCandles(command: UnsubscribeCandlesOrderCommand)
 
-    fun checkCandlesSubscriptionExists(command: CheckCandlesSubscriptionExistsCommand): Boolean
-
 }

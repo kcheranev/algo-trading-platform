@@ -9,4 +9,6 @@ interface TradeSessionPersistencePort {
 
     fun get(command: GetTradeSessionCommand): TradeSession
 
+    fun getReadyToOrderTradeSessions(command: GetReadyToOrderTradeSessionsCommand): List<TradeSession>
+
 }

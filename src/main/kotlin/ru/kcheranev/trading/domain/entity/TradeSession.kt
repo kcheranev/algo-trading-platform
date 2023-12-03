@@ -19,6 +19,7 @@ import ru.kcheranev.trading.domain.entity.TradeSessionStatus.WAITING
 import ru.kcheranev.trading.domain.mapper.domainModelMapper
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
+import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.domain.model.TradeStrategy
 import java.time.LocalDateTime
 import java.util.function.Supplier
@@ -30,6 +31,7 @@ data class TradeSession(
     var status: TradeSessionStatus,
     val startDate: LocalDateTime,
     val candleInterval: CandleInterval,
+    val lotsQuantity: Int,
     var lastEventDate: LocalDateTime?,
     val strategy: TradeStrategy,
     val strategyConfigurationId: StrategyConfigurationId
@@ -47,28 +49,37 @@ data class TradeSession(
     fun pendingEnter() {
         checkTransition(PENDING_ENTER)
         status = PENDING_ENTER
-        registerEvent(TradeSessionPendedForEntryDomainEvent(id!!, ticker, candleInterval))
+        registerEvent(
+            TradeSessionPendedForEntryDomainEvent(id!!, Instrument(instrumentId, ticker), candleInterval, lotsQuantity)
+        )
         logger.info("Trade session ${id.value} is pended for entry")
     }
 
     fun enter() {
         checkTransition(IN_POSITION)
         status = IN_POSITION
-        registerEvent(TradeSessionEnteredDomainEvent(id!!, ticker, candleInterval))
+        registerEvent(TradeSessionEnteredDomainEvent(id!!, Instrument(instrumentId, ticker), candleInterval))
         logger.info("Trade session ${id.value} has been entered")
     }
 
     fun pendingExit() {
         checkTransition(PENDING_EXIT)
         status = PENDING_EXIT
-        registerEvent(TradeSessionPendedForExitDomainEvent(id!!, ticker, candleInterval))
+        registerEvent(
+            TradeSessionPendedForExitDomainEvent(
+                id!!,
+                Instrument(instrumentId, ticker),
+                candleInterval,
+                lotsQuantity
+            )
+        )
         logger.info("Trade session ${id.value} is pended for exit")
     }
 
     fun exit() {
         checkTransition(WAITING)
         status = WAITING
-        registerEvent(TradeSessionExitedDomainEvent(id!!, ticker, candleInterval))
+        registerEvent(TradeSessionExitedDomainEvent(id!!, Instrument(instrumentId, ticker), candleInterval))
         logger.info("Trade session ${id.value} has been exited")
     }
 
@@ -89,6 +100,7 @@ data class TradeSession(
             strategyConfiguration: StrategyConfiguration,
             ticker: String,
             instrumentId: String,
+            lotsQuantity: Int,
             candles: List<Candle>,
             strategyFactory: StrategyFactory
         ): TradeSession {
@@ -104,11 +116,12 @@ data class TradeSession(
                 status = WAITING,
                 startDate = LocalDateTime.now(),
                 candleInterval = candleInterval,
+                lotsQuantity = lotsQuantity,
                 lastEventDate = candles.last().endTime,
                 strategy = strategyFactory.initStrategy(strategyConfiguration.params, series),
                 strategyConfigurationId = strategyConfiguration.id
             )
-            tradeSession.registerEvent(TradeSessionCreatedDomainEvent(ticker, candleInterval))
+            tradeSession.registerEvent(TradeSessionCreatedDomainEvent(Instrument(instrumentId, ticker), candleInterval))
             logger.info("Trade session: ticker=$ticker, candleInterval=$candleInterval is starting...")
             return tradeSession
         }
@@ -133,5 +146,11 @@ enum class TradeSessionStatus(
     STOPPED({ emptySet() });
 
     fun transitionAvailable(transition: TradeSessionStatus) = transition in availableTransitions.get()
+
+}
+
+enum class TradeSessionSort : SortField {
+
+    TICKER, STATUS, START_DATE, CANDLE_INTERVAL
 
 }

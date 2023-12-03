@@ -6,6 +6,7 @@ import ru.kcheranev.trading.domain.entity.StrategyConfiguration
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
+import ru.kcheranev.trading.domain.model.CandleInterval
 
 sealed class PersistenceCommand
 
@@ -23,6 +24,11 @@ data class SaveTradeSessionCommand(
 
 data class GetTradeSessionCommand(
     val tradeSessionId: TradeSessionId
+) : PersistenceCommand()
+
+data class GetReadyToOrderTradeSessionsCommand(
+    val instrumentId: String,
+    val candleInterval: CandleInterval
 ) : PersistenceCommand()
 
 data class SaveStrategyConfigurationCommand(

@@ -30,6 +30,7 @@ interface PersistenceOutcomeAdapterMapper {
     @Mapping(source = "entity.status", target = "status")
     @Mapping(source = "entity.startDate", target = "startDate")
     @Mapping(source = "entity.candleInterval", target = "candleInterval")
+    @Mapping(source = "entity.lotsQuantity", target = "lotsQuantity")
     @Mapping(source = "entity.lastEventDate", target = "lastEventDate")
     @Mapping(source = "tradeStrategy", target = "strategy")
     @Mapping(source = "entity.strategyConfigurationId", target = "strategyConfigurationId")

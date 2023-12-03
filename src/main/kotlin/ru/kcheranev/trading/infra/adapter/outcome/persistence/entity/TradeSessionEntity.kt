@@ -19,6 +19,8 @@ data class TradeSessionEntity(
     val startDate: LocalDate,
     @Column("candle_interval")
     val candleInterval: CandleInterval,
+    @Column("lots_quantity")
+    val lotsQuantity: Int,
     @Column("last_event_date")
     val lastEventDate: LocalDate,
     @Column("strategy_configuration_id")

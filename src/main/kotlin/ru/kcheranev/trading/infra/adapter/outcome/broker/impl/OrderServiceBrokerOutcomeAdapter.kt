@@ -25,10 +25,10 @@ class OrderServiceBrokerOutcomeAdapter(
     override fun postBestPriceBuyOrder(
         command: PostBestPriceBuyOrderCommand
     ): CompletableFuture<PostOrderResponse> {
-        logger.info("Post buy best price order for the ${command.ticker}")
+        logger.info("Post buy best price order for the ${command.instrument.ticker}")
         return orderService.postOrder(
-            command.instrumentId,
-            command.quantity,
+            command.instrument.id,
+            command.quantity.toLong(),
             Quotation.getDefaultInstance(),
             OrderDirection.ORDER_DIRECTION_BUY,
             userServiceBrokerOutcomeAdapter.getTradingAccountId(),
@@ -40,10 +40,10 @@ class OrderServiceBrokerOutcomeAdapter(
     override fun postBestPriceSellOrder(
         command: PostBestPriceSellOrderCommand
     ): CompletableFuture<PostOrderResponse> {
-        logger.info("Post sell best price order for the ${command.ticker}")
+        logger.info("Post sell best price order for the ${command.instrument.ticker}")
         return orderService.postOrder(
-            command.instrumentId,
-            command.quantity,
+            command.instrument.id,
+            command.quantity.toLong(),
             Quotation.getDefaultInstance(),
             OrderDirection.ORDER_DIRECTION_SELL,
             userServiceBrokerOutcomeAdapter.getTradingAccountId(),

@@ -1,4 +1,4 @@
-package ru.kcheranev.trading.core.port.income
+package ru.kcheranev.trading.core.port.income.trading
 
 interface ReceiveCandleUseCase {
 
