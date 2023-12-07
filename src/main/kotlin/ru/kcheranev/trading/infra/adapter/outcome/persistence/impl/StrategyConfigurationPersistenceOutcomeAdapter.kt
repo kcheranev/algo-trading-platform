@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional
 import ru.kcheranev.trading.core.port.outcome.persistence.GetStrategyConfigurationCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.SaveStrategyConfigurationCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationPersistencePort
+import ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationSearchCommand
 import ru.kcheranev.trading.domain.entity.StrategyConfiguration
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.StrategyConfigurationEntityNotExistsException
@@ -31,5 +32,8 @@ class StrategyConfigurationPersistenceOutcomeAdapter(
             .orElseThrow { StrategyConfigurationEntityNotExistsException(command.strategyConfigurationId) }
             .let { persistenceOutcomeAdapterMapper.map(it) }
     }
+
+    override fun search(command: StrategyConfigurationSearchCommand): List<StrategyConfiguration> =
+        strategyConfigurationRepository.search(command).map { persistenceOutcomeAdapterMapper.map(it) }
 
 }

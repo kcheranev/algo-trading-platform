@@ -1,4 +1,4 @@
-package ru.kcheranev.trading.core.port.income.search.model
+package ru.kcheranev.trading.core.port.common.model
 
 data class Page(
     val limit: Int,

@@ -5,8 +5,9 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.CustomizedTradeSessionRepository
 
-interface TradeSessionRepository : CrudRepository<TradeSessionEntity, Long> {
+interface TradeSessionRepository : CrudRepository<TradeSessionEntity, Long>, CustomizedTradeSessionRepository {
 
     @Query(
         "SELECT * FROM trade_session WHERE instrument_id = :instrumentId AND candle_interval = :candleInterval " +

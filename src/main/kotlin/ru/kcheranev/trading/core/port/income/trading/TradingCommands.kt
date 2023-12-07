@@ -6,23 +6,23 @@ import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.domain.model.StrategyType
 
-sealed class TradingCommand
+sealed class TradingIncomeCommand
 
 data class StartTradeSessionCommand(
     val strategyConfigurationId: StrategyConfigurationId,
     val lotsQuantity: Int,
     val instrument: Instrument,
     val strategyType: StrategyType
-) : TradingCommand()
+) : TradingIncomeCommand()
 
 data class ProcessIncomeCandleCommand(
     val candle: Candle
-) : TradingCommand()
+) : TradingIncomeCommand()
 
 data class EnterTradeSessionCommand(
     val tradeSessionId: TradeSessionId
-) : TradingCommand()
+) : TradingIncomeCommand()
 
 data class ExitTradeSessionCommand(
     val tradeSessionId: TradeSessionId
-) : TradingCommand()
+) : TradingIncomeCommand()

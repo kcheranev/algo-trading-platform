@@ -1,14 +1,11 @@
-package ru.kcheranev.trading.core.port.income.search
+package ru.kcheranev.trading.infra.adapter.income.web.model.request
 
 import ru.kcheranev.trading.core.port.common.model.ComparedField
 import ru.kcheranev.trading.core.port.common.model.Page
 import ru.kcheranev.trading.core.port.common.model.Sort
-import ru.kcheranev.trading.domain.entity.OrderId
 import ru.kcheranev.trading.domain.entity.OrderSort
-import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationSort
 import ru.kcheranev.trading.domain.entity.TradeDirection
-import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.entity.TradeSessionSort
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
@@ -16,10 +13,10 @@ import ru.kcheranev.trading.domain.model.StrategyType
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
-sealed class SearchIncomeCommand
+sealed class SearchRequest
 
-data class TradeSessionSearchCommand(
-    val id: TradeSessionId?,
+data class TradeSessionSearchRequest(
+    val id: Long?,
     val ticker: String?,
     val instrumentId: String?,
     val status: TradeSessionStatus?,
@@ -27,25 +24,25 @@ data class TradeSessionSearchCommand(
     val candleInterval: CandleInterval?,
     val page: Page?,
     val sort: Sort<TradeSessionSort>?
-) : SearchIncomeCommand()
+) : SearchRequest()
 
-data class StrategyConfigurationSearchCommand(
-    val id: StrategyConfigurationId?,
+data class StrategyConfigurationSearchRequest(
+    val id: Long?,
     val type: StrategyType?,
     val candleInterval: CandleInterval?,
     val page: Page?,
     val sort: Sort<StrategyConfigurationSort>?
-) : SearchIncomeCommand()
+) : SearchRequest()
 
-data class OrderSearchCommand(
-    val id: OrderId?,
+data class OrderSearchRequest(
+    val id: Long?,
     val ticker: String?,
     val instrumentId: String?,
     val date: ComparedField<LocalDateTime>?,
     val quantity: ComparedField<Int>?,
     val price: ComparedField<BigDecimal>?,
     val direction: TradeDirection?,
-    val tradeSessionId: TradeSessionId?,
+    val tradeSessionId: Long?,
     val page: Page?,
     val sort: Sort<OrderSort>?
-) : SearchIncomeCommand()
+) : SearchRequest()

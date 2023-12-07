@@ -9,4 +9,6 @@ interface OrderPersistencePort {
 
     fun get(command: GetOrderCommand): Order
 
+    fun search(command: OrderSearchCommand): List<Order>
+
 }

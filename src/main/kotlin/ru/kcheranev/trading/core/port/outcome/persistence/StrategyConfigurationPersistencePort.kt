@@ -9,4 +9,6 @@ interface StrategyConfigurationPersistencePort {
 
     fun get(command: GetStrategyConfigurationCommand): StrategyConfiguration
 
+    fun search(command: StrategyConfigurationSearchCommand): List<StrategyConfiguration>
+
 }

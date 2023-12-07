@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Propagation.MANDATORY
 import org.springframework.transaction.annotation.Transactional
 import ru.kcheranev.trading.core.port.outcome.persistence.GetOrderCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.OrderPersistencePort
+import ru.kcheranev.trading.core.port.outcome.persistence.OrderSearchCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.SaveOrderCommand
 import ru.kcheranev.trading.domain.entity.Order
 import ru.kcheranev.trading.domain.entity.OrderId
@@ -27,5 +28,8 @@ class OrderPersistenceOutcomeAdapter(
             .orElseThrow { OrderEntityNotExistsException(command.orderId) }
             .let { persistenceOutcomeAdapterMapper.map(it) }
     }
+
+    override fun search(command: OrderSearchCommand): List<Order> =
+        orderRepository.search(command).map { persistenceOutcomeAdapterMapper.map(it) }
 
 }

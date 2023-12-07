@@ -4,37 +4,37 @@ import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
 import java.time.LocalDateTime
 
-sealed class BrokerCommand
+sealed class BrokerOutcomeCommand
 
 data class PostBestPriceBuyOrderCommand(
     val instrument: Instrument,
     val quantity: Int
-) : BrokerCommand()
+) : BrokerOutcomeCommand()
 
 data class PostBestPriceSellOrderCommand(
     val instrument: Instrument,
     val quantity: Int
-) : BrokerCommand()
+) : BrokerOutcomeCommand()
 
 data class SubscribeCandlesOrderCommand(
     val instrument: Instrument,
     val candleInterval: CandleInterval
-) : BrokerCommand()
+) : BrokerOutcomeCommand()
 
 data class UnsubscribeCandlesOrderCommand(
     val instrument: Instrument,
     val candleInterval: CandleInterval
-) : BrokerCommand()
+) : BrokerOutcomeCommand()
 
 data class GetHistoricCandlesCommand(
     val instrument: Instrument,
     val candleInterval: CandleInterval,
     val from: LocalDateTime,
     val to: LocalDateTime = LocalDateTime.now()
-) : BrokerCommand()
+) : BrokerOutcomeCommand()
 
 data class GetLastHistoricCandlesCommand(
     val instrument: Instrument,
     val candleInterval: CandleInterval,
     val quantity: Int
-) : BrokerCommand()
+) : BrokerOutcomeCommand()

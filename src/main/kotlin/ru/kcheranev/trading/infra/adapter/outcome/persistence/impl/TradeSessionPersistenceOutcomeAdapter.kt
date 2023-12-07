@@ -7,6 +7,7 @@ import ru.kcheranev.trading.core.port.outcome.persistence.GetReadyToOrderTradeSe
 import ru.kcheranev.trading.core.port.outcome.persistence.GetTradeSessionCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.SaveTradeSessionCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionPersistencePort
+import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionSearchCommand
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.model.TradeStrategy
@@ -43,6 +44,10 @@ class TradeSessionPersistenceOutcomeAdapter(
         val tradeStrategy = getTradeStrategy(tradeSessionId.value)
         return persistenceOutcomeAdapterMapper.map(tradeSessionEntity, tradeStrategy)
     }
+
+    override fun search(command: TradeSessionSearchCommand): List<TradeSession> =
+        tradeSessionRepository.search(command)
+            .map { persistenceOutcomeAdapterMapper.map(it, getTradeStrategy(it.id!!)) }
 
     override fun getReadyToOrderTradeSessions(command: GetReadyToOrderTradeSessionsCommand): List<TradeSession> =
         tradeSessionRepository.getReadyToOrderTradeSessions(command.instrumentId, command.candleInterval)
