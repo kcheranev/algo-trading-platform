@@ -3,7 +3,7 @@ package ru.kcheranev.trading.infra.adapter.outcome.persistence.entity
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
-import ru.kcheranev.trading.domain.entity.TradeDirection
+import ru.kcheranev.trading.domain.entity.OrderDirection
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -17,12 +17,12 @@ data class OrderEntity(
     val instrumentId: String,
     @Column("date")
     val date: LocalDateTime,
-    @Column("quantity")
-    val quantity: Int,
+    @Column("lots_quantity")
+    val lotsQuantity: Int,
     @Column("price")
     val price: BigDecimal,
     @Column("direction")
-    val direction: TradeDirection,
+    val direction: OrderDirection,
     @Column("trade_session_id")
     val tradeSessionId: Long
 )

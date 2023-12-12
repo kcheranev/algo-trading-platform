@@ -1,7 +1,15 @@
 spring:
+  application:
+    name: trading-app
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: postgres
+    password: postgres
 
 application:
   trading:
     maxCandleDelay: 3
     placeOrderRetryCount: 3
-  infra.broker: ${TOKEN}
+  infra.broker:
+    token: ${TOKEN}
+    tradingAccountName: account-name

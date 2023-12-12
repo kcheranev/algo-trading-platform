@@ -36,3 +36,9 @@ data class TradeSessionExitedDomainEvent(
     val instrument: Instrument,
     val candleInterval: CandleInterval
 ) : DomainEvent()
+
+data class TradeSessionStoppedDomainEvent(
+    val tradeSessionId: TradeSessionId,
+    val instrument: Instrument,
+    val candleInterval: CandleInterval
+) : DomainEvent()

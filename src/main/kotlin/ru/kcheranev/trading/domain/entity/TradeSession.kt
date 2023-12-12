@@ -11,10 +11,12 @@ import ru.kcheranev.trading.domain.TradeSessionExitedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionNotExistsException
 import ru.kcheranev.trading.domain.TradeSessionPendedForEntryDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionPendedForExitDomainEvent
+import ru.kcheranev.trading.domain.TradeSessionStoppedDomainEvent
 import ru.kcheranev.trading.domain.UnexpectedTradeSessionTransitionException
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus.IN_POSITION
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus.PENDING_ENTER
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus.PENDING_EXIT
+import ru.kcheranev.trading.domain.entity.TradeSessionStatus.STOPPED
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus.WAITING
 import ru.kcheranev.trading.domain.mapper.domainModelMapper
 import ru.kcheranev.trading.domain.model.Candle
@@ -83,6 +85,13 @@ data class TradeSession(
         logger.info("Trade session ${id.value} has been exited")
     }
 
+    fun stop() {
+        checkTransition(STOPPED)
+        status = STOPPED
+        registerEvent(TradeSessionStoppedDomainEvent(id!!, Instrument(instrumentId, ticker), candleInterval))
+        logger.info("Trade session ${id.value} has been stopped")
+    }
+
     private fun checkTransition(toStatus: TradeSessionStatus) {
         if (id == null) {
             throw TradeSessionNotExistsException()
@@ -119,7 +128,7 @@ data class TradeSession(
                 lotsQuantity = lotsQuantity,
                 lastEventDate = candles.last().endTime,
                 strategy = strategyFactory.initStrategy(strategyConfiguration.params, series),
-                strategyConfigurationId = strategyConfiguration.id
+                strategyConfigurationId = strategyConfiguration.id!!
             )
             tradeSession.registerEvent(TradeSessionCreatedDomainEvent(Instrument(instrumentId, ticker), candleInterval))
             logger.info("Trade session: ticker=$ticker, candleInterval=$candleInterval is starting...")

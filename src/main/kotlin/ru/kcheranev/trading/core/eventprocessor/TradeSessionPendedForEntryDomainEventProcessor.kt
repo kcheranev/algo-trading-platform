@@ -18,10 +18,22 @@ class TradeSessionPendedForEntryDomainEventProcessor(
     @TransactionalEventListener
     fun processTradeSessionPendedForEntryDomainEvent(event: TradeSessionPendedForEntryDomainEvent) {
         logger.info("Trading session ${event.tradeSessionId} ${event.instrument.ticker} ${event.candleInterval} is ready for entry")
-        orderServiceBrokerPort.postBestPriceBuyOrder(
-            PostBestPriceBuyOrderCommand(event.instrument, event.lotsQuantity)
+        val postOrderResponse =
+            orderServiceBrokerPort.postBestPriceBuyOrderSync(
+                PostBestPriceBuyOrderCommand(event.instrument, event.lotsQuantity)
+            )
+        enterTradeSessionUseCase.enterTradeSession(
+            with(postOrderResponse) {
+                EnterTradeSessionCommand(
+                    event.tradeSessionId,
+                    status = status,
+                    lotsRequested = lotsRequested,
+                    lotsExecuted = lotsExecuted,
+                    totalPrice = totalPrice,
+                    executedCommission = executedCommission
+                )
+            }
         )
-        enterTradeSessionUseCase.enterTradeSession(EnterTradeSessionCommand(event.tradeSessionId))
     }
 
     companion object {

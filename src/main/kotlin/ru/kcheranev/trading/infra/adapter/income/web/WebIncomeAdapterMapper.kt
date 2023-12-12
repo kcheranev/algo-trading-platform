@@ -6,6 +6,7 @@ import org.mapstruct.factory.Mappers
 import ru.kcheranev.trading.core.port.income.search.OrderSearchCommand
 import ru.kcheranev.trading.core.port.income.search.StrategyConfigurationSearchCommand
 import ru.kcheranev.trading.core.port.income.search.TradeSessionSearchCommand
+import ru.kcheranev.trading.core.port.income.trading.StartTradeSessionCommand
 import ru.kcheranev.trading.domain.entity.Order
 import ru.kcheranev.trading.domain.entity.OrderId
 import ru.kcheranev.trading.domain.entity.StrategyConfiguration
@@ -13,6 +14,7 @@ import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.OrderSearchRequest
+import ru.kcheranev.trading.infra.adapter.income.web.model.request.StartTradeSessionRequest
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.StrategyConfigurationSearchRequest
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.TradeSessionSearchRequest
 import ru.kcheranev.trading.infra.adapter.income.web.model.response.OrderDto
@@ -21,6 +23,8 @@ import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeSession
 
 @Mapper
 interface WebIncomeAdapterMapper {
+
+    fun map(source: StartTradeSessionRequest): StartTradeSessionCommand
 
     fun map(source: TradeSessionSearchRequest): TradeSessionSearchCommand
 

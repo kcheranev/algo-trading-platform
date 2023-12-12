@@ -5,13 +5,13 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 
 data class Order(
-    val id: OrderId,
+    val id: OrderId?,
     val ticker: String,
     val instrumentId: String,
     val date: LocalDateTime,
-    val quantity: Int,
+    val lotsQuantity: Int,
     val price: BigDecimal,
-    val direction: TradeDirection,
+    val direction: OrderDirection,
     val tradeSessionId: TradeSessionId
 ) : AbstractAggregateRoot<Order>() {
 }
@@ -20,7 +20,7 @@ data class OrderId(
     val value: Long
 )
 
-enum class TradeDirection {
+enum class OrderDirection {
 
     BUY, SELL
 

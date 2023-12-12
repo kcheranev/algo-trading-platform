@@ -10,27 +10,36 @@ import ru.kcheranev.trading.core.port.income.trading.ProcessIncomeCandleCommand
 import ru.kcheranev.trading.core.port.income.trading.ReceiveCandleUseCase
 import ru.kcheranev.trading.core.port.income.trading.StartTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.trading.StartTradeSessionUseCase
+import ru.kcheranev.trading.core.port.income.trading.StopTradeSessionCommand
+import ru.kcheranev.trading.core.port.income.trading.StopTradeSessionUseCase
 import ru.kcheranev.trading.core.port.outcome.broker.GetLastHistoricCandlesCommand
 import ru.kcheranev.trading.core.port.outcome.broker.HistoricCandleBrokerPort
 import ru.kcheranev.trading.core.port.outcome.persistence.GetReadyToOrderTradeSessionsCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.GetStrategyConfigurationCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.GetTradeSessionCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.OrderPersistencePort
+import ru.kcheranev.trading.core.port.outcome.persistence.SaveOrderCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.SaveTradeSessionCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationPersistencePort
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionPersistencePort
 import ru.kcheranev.trading.core.strategy.StrategyFactoryProvider
+import ru.kcheranev.trading.domain.entity.Order
+import ru.kcheranev.trading.domain.entity.OrderDirection
 import ru.kcheranev.trading.domain.entity.TradeSession
+import java.time.LocalDateTime
 
 @Service
 class TradeService(
     private val strategyConfigurationPersistencePort: StrategyConfigurationPersistencePort,
     private val tradeSessionPersistencePort: TradeSessionPersistencePort,
+    private val orderPersistencePort: OrderPersistencePort,
     private val historicCandleBrokerPort: HistoricCandleBrokerPort,
     private val strategyFactoryProvider: StrategyFactoryProvider
 ) : StartTradeSessionUseCase,
     ReceiveCandleUseCase,
     EnterTradeSessionUseCase,
-    ExitTradeSessionUseCase {
+    ExitTradeSessionUseCase,
+    StopTradeSessionUseCase {
 
     @Transactional
     override fun startTradeSession(command: StartTradeSessionCommand) {
@@ -68,6 +77,7 @@ class TradeService(
                 candle.interval
             )
         ).forEach { tradeSession ->
+            tradeSession.addBar(candle)
             if (tradeSession.shouldEnter()) {
                 tradeSession.pendingEnter()
                 tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
@@ -82,13 +92,48 @@ class TradeService(
     override fun enterTradeSession(command: EnterTradeSessionCommand) {
         val tradeSession = tradeSessionPersistencePort.get(GetTradeSessionCommand(command.tradeSessionId))
         tradeSession.enter()
+        val order =
+            with(tradeSession) {
+                Order(
+                    id = null,
+                    ticker = ticker,
+                    instrumentId = instrumentId,
+                    date = LocalDateTime.now(),
+                    lotsQuantity = lotsQuantity,
+                    price = command.totalPrice,
+                    direction = OrderDirection.BUY,
+                    tradeSessionId = id!!
+                )
+            }
         tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
+        orderPersistencePort.save(SaveOrderCommand(order))
     }
 
     @Transactional
     override fun exitTradeSession(command: ExitTradeSessionCommand) {
         val tradeSession = tradeSessionPersistencePort.get(GetTradeSessionCommand(command.tradeSessionId))
         tradeSession.exit()
+        val order =
+            with(tradeSession) {
+                Order(
+                    id = null,
+                    ticker = ticker,
+                    instrumentId = instrumentId,
+                    date = LocalDateTime.now(),
+                    lotsQuantity = lotsQuantity,
+                    price = command.totalPrice,
+                    direction = OrderDirection.SELL,
+                    tradeSessionId = id!!
+                )
+            }
+        tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
+        orderPersistencePort.save(SaveOrderCommand(order))
+    }
+
+    @Transactional
+    override fun stopTradeSession(command: StopTradeSessionCommand) {
+        val tradeSession = tradeSessionPersistencePort.get(GetTradeSessionCommand(command.tradeSessionId))
+        tradeSession.stop()
         tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
     }
 

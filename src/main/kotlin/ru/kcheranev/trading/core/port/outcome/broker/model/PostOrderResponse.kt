@@ -1,10 +1,14 @@
 package ru.kcheranev.trading.core.port.outcome.broker.model
 
+import java.math.BigDecimal
+
 data class PostOrderResponse(
     val orderId: String,
     val status: PostOrderStatus,
     val lotsRequested: Long,
-    val lotsExecuted: Long
+    val lotsExecuted: Long,
+    val totalPrice: BigDecimal,
+    val executedCommission: BigDecimal
 )
 
 enum class PostOrderStatus {
@@ -24,6 +28,8 @@ enum class PostOrderStatus {
     NEW,
 
     //Частично исполнена
-    PARTIALLYFILL
+    PARTIALLY_FILL,
+
+    UNRECOGNIZED
 
 }

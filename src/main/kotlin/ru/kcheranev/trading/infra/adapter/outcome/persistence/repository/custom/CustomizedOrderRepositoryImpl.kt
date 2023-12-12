@@ -28,8 +28,8 @@ class CustomizedOrderRepositoryImpl(
         if (command.date != null) {
             conditionsBuilder.addComparsionCondition("date", command.date)
         }
-        if (command.quantity != null) {
-            conditionsBuilder.addComparsionCondition("quantity", command.quantity)
+        if (command.lotsQuantity != null) {
+            conditionsBuilder.addComparsionCondition("lots_quantity", command.lotsQuantity)
         }
         if (command.price != null) {
             conditionsBuilder.addComparsionCondition("price", command.price)

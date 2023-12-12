@@ -11,19 +11,21 @@ import ru.tinkoff.piapi.contract.v1.SubscriptionInterval
 @Mapper(uses = [CommonBrokerMapper::class])
 interface BrokerIncomeAdapterMapper {
 
-    fun map(source: ru.tinkoff.piapi.contract.v1.Candle): Candle {
-        val candleInterval = map(source.interval)
-        return Candle(
-            interval = candleInterval,
-            openPrice = commonBrokerMapper.map(source.open),
-            closePrice = commonBrokerMapper.map(source.close),
-            highestPrice = commonBrokerMapper.map(source.high),
-            lowestPrice = commonBrokerMapper.map(source.low),
-            volume = source.volume,
-            endTime = commonBrokerMapper.map(source.time).plus(candleInterval.duration),
-            instrumentId = source.instrumentUid
-        )
-    }
+    fun map(source: ru.tinkoff.piapi.contract.v1.Candle): Candle =
+        with(source) {
+            val candleInterval = map(interval)
+            return Candle(
+                interval = candleInterval,
+                openPrice = commonBrokerMapper.map(open),
+                closePrice = commonBrokerMapper.map(close),
+                highestPrice = commonBrokerMapper.map(high),
+                lowestPrice = commonBrokerMapper.map(low),
+                volume = volume,
+                endTime = commonBrokerMapper.map(time).plus(candleInterval.duration),
+                instrumentId = instrumentUid
+            )
+        }
+
 
     fun map(source: SubscriptionInterval): CandleInterval =
         when (source) {

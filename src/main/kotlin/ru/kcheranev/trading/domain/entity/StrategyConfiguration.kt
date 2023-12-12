@@ -6,7 +6,7 @@ import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.StrategyType
 
 data class StrategyConfiguration(
-    val id: StrategyConfigurationId,
+    val id: StrategyConfigurationId?,
     val type: StrategyType,
     val initCandleAmount: Int,
     val candleInterval: CandleInterval,
