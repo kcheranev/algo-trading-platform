@@ -12,7 +12,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 
 @Mapper
-interface CommonBrokerMapper {
+abstract class CommonBrokerMapper {
 
     fun map(source: Quotation): BigDecimal =
         MapperUtils.quotationToBigDecimal(source)

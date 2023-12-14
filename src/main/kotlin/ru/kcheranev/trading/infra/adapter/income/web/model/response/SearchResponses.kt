@@ -2,8 +2,8 @@ package ru.kcheranev.trading.infra.adapter.income.web.model.response
 
 sealed class SearchResponse
 
-data class OrderSearchResponse(
-    var orders: List<OrderDto>
+data class TradeOrderSearchResponse(
+    var orders: List<TradeOrderDto>
 ) : SearchResponse()
 
 data class TradeSessionSearchResponse(

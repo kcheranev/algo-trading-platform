@@ -1,10 +1,15 @@
 package ru.kcheranev.trading
 
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*
 import org.springframework.test.context.ActiveProfiles
+import ru.kcheranev.trading.config.TradingAppTestConfiguration
 
 @Target(AnnotationTarget.CLASS)
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    webEnvironment = RANDOM_PORT,
+    classes = [TradingAppTestConfiguration::class]
+)
 @ActiveProfiles("test")
 annotation class IntegrationTest()

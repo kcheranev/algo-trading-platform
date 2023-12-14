@@ -4,11 +4,19 @@ import ru.kcheranev.trading.core.port.outcome.broker.model.PostOrderStatus
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.model.Candle
+import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.domain.model.StrategyType
 import java.math.BigDecimal
 
 sealed class TradingIncomeCommand
+
+data class CreateStrategyConfigurationCommand(
+    val type: StrategyType,
+    val initCandleAmount: Int,
+    val candleInterval: CandleInterval,
+    val params: Map<String, Any>
+) : TradingIncomeCommand()
 
 data class StartTradeSessionCommand(
     val strategyConfigurationId: StrategyConfigurationId,

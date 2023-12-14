@@ -3,9 +3,9 @@ package ru.kcheranev.trading.infra.adapter.income.web.model.request
 import ru.kcheranev.trading.core.port.common.model.ComparedField
 import ru.kcheranev.trading.core.port.common.model.Page
 import ru.kcheranev.trading.core.port.common.model.Sort
-import ru.kcheranev.trading.domain.entity.OrderDirection
 import ru.kcheranev.trading.domain.entity.OrderSort
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationSort
+import ru.kcheranev.trading.domain.entity.TradeDirection
 import ru.kcheranev.trading.domain.entity.TradeSessionSort
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
@@ -34,14 +34,14 @@ data class StrategyConfigurationSearchRequest(
     val sort: Sort<StrategyConfigurationSort>?
 ) : SearchRequest()
 
-data class OrderSearchRequest(
+data class TradeOrderSearchRequest(
     val id: Long?,
     val ticker: String?,
     val instrumentId: String?,
     val date: ComparedField<LocalDateTime>?,
     val lotsQuantity: ComparedField<Int>?,
     val price: ComparedField<BigDecimal>?,
-    val direction: OrderDirection?,
+    val direction: TradeDirection?,
     val tradeSessionId: Long?,
     val page: Page?,
     val sort: Sort<OrderSort>?

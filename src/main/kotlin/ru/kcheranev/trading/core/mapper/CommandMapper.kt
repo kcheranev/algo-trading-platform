@@ -2,8 +2,8 @@ package ru.kcheranev.trading.core.mapper
 
 import org.mapstruct.Mapper
 import org.mapstruct.factory.Mappers
-import ru.kcheranev.trading.core.port.income.search.OrderSearchCommand
 import ru.kcheranev.trading.core.port.income.search.StrategyConfigurationSearchCommand
+import ru.kcheranev.trading.core.port.income.search.TradeOrderSearchCommand
 import ru.kcheranev.trading.core.port.income.search.TradeSessionSearchCommand
 
 @Mapper
@@ -13,7 +13,7 @@ interface CommandMapper {
 
     fun map(command: StrategyConfigurationSearchCommand): ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationSearchCommand
 
-    fun map(command: OrderSearchCommand): ru.kcheranev.trading.core.port.outcome.persistence.OrderSearchCommand
+    fun map(command: TradeOrderSearchCommand): ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderSearchCommand
 
 }
 

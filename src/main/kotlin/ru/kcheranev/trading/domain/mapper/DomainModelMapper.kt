@@ -8,7 +8,7 @@ import ru.kcheranev.trading.domain.model.Candle
 import java.math.BigDecimal
 
 @Mapper
-interface DomainModelMapper {
+abstract class DomainModelMapper {
 
     fun map(candle: Candle): BaseBar {
         return with(candle) {

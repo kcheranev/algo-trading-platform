@@ -1,1 +1,8 @@
 spring:
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    url: jdbc:tc:postgresql:13.10-alpine:///db?preparedStatementCacheQueries=0
+
+wiremock:
+  reset-mappings-after-each-test: true

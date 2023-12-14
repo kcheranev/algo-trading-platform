@@ -1,6 +1,6 @@
 package ru.kcheranev.trading.domain.model
 
-abstract class StrategyParameters : HashMap<String, Any>() {
+class StrategyParameters(map: Map<String, Any>) : HashMap<String, Any>(map) {
 
     fun getAsString(key: String) = this[key] as String
 

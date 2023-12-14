@@ -2,6 +2,7 @@ package ru.kcheranev.trading.infra.adapter.income.web.impl
 
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.kcheranev.trading.core.port.income.search.TradeSessionSearchUseCase
@@ -23,21 +24,20 @@ class TradeSessionController(
 ) {
 
     @PostMapping
-    fun start(request: StartTradeSessionRequest) {
+    fun start(@RequestBody request: StartTradeSessionRequest) =
         startTradeSessionUseCase.startTradeSession(webIncomeAdapterMapper.map(request))
-    }
+
 
     @PostMapping("{id}/stop")
-    fun stop(@PathVariable id: Long) {
+    fun stop(@PathVariable id: Long) =
         stopTradeSessionUseCase.stopTradeSession(StopTradeSessionCommand(TradeSessionId(id)))
-    }
+
 
     @PostMapping("search")
-    fun search(request: TradeSessionSearchRequest): TradeSessionSearchResponse {
-        return TradeSessionSearchResponse(
+    fun search(@RequestBody request: TradeSessionSearchRequest): TradeSessionSearchResponse =
+        TradeSessionSearchResponse(
             tradeSessionSearchUseCase.search(webIncomeAdapterMapper.map(request))
                 .map { webIncomeAdapterMapper.map(it) }
         )
-    }
 
 }

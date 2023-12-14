@@ -2,9 +2,9 @@ package ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom
 
 import org.springframework.jdbc.core.BeanPropertyRowMapper
 import org.springframework.jdbc.core.JdbcTemplate
-import ru.kcheranev.trading.core.port.outcome.persistence.OrderSearchCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderSearchCommand
 import ru.kcheranev.trading.domain.entity.OrderSort
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.OrderEntity
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.addAndCondition
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.addComparsionCondition
 
@@ -12,7 +12,7 @@ class CustomizedOrderRepositoryImpl(
     private val jdbcTemplate: JdbcTemplate
 ) : CustomizedOrderRepository {
 
-    override fun search(command: OrderSearchCommand): List<OrderEntity> {
+    override fun search(command: TradeOrderSearchCommand): List<TradeOrderEntity> {
         val queryBuilder = StringBuilder()
         queryBuilder.append("SELECT * FROM order")
         val conditionsBuilder = StringBuilder()

@@ -6,14 +6,13 @@ import ru.kcheranev.trading.core.port.outcome.broker.model.PostOrderResponse
 import ru.kcheranev.trading.core.port.outcome.broker.model.PostOrderStatus
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.infra.adapter.mapper.CommonBrokerMapper
 import ru.kcheranev.trading.infra.adapter.mapper.commonBrokerMapper
 import ru.tinkoff.piapi.contract.v1.HistoricCandle
 import ru.tinkoff.piapi.contract.v1.OrderExecutionReportStatus
 import ru.tinkoff.piapi.contract.v1.SubscriptionInterval
 
-@Mapper(uses = [CommonBrokerMapper::class])
-interface BrokerOutcomeAdapterMapper {
+@Mapper
+abstract class BrokerOutcomeAdapterMapper {
 
     fun map(source: ru.tinkoff.piapi.contract.v1.PostOrderResponse): PostOrderResponse =
         with(source) {

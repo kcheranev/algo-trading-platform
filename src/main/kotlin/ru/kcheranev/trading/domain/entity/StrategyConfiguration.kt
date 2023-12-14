@@ -12,6 +12,25 @@ data class StrategyConfiguration(
     val candleInterval: CandleInterval,
     val params: StrategyParameters
 ) : AbstractAggregateRoot<StrategyConfiguration>() {
+
+    companion object {
+
+        fun create(
+            type: StrategyType,
+            initCandleAmount: Int,
+            candleInterval: CandleInterval,
+            params: Map<String, Any>
+        ): StrategyConfiguration =
+            StrategyConfiguration(
+                id = null,
+                type = type,
+                initCandleAmount = initCandleAmount,
+                candleInterval = candleInterval,
+                params = StrategyParameters(params)
+            )
+
+    }
+
 }
 
 data class StrategyConfigurationId(

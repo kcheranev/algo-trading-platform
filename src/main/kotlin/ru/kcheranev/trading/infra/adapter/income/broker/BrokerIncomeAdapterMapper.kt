@@ -4,12 +4,11 @@ import org.mapstruct.Mapper
 import org.mapstruct.factory.Mappers
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.infra.adapter.mapper.CommonBrokerMapper
 import ru.kcheranev.trading.infra.adapter.mapper.commonBrokerMapper
 import ru.tinkoff.piapi.contract.v1.SubscriptionInterval
 
-@Mapper(uses = [CommonBrokerMapper::class])
-interface BrokerIncomeAdapterMapper {
+@Mapper
+abstract class BrokerIncomeAdapterMapper {
 
     fun map(source: ru.tinkoff.piapi.contract.v1.Candle): Candle =
         with(source) {
