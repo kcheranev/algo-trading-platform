@@ -32,11 +32,10 @@ dependencies {
     implementation("ru.tinkoff.piapi:java-sdk-core:1.5")
     implementation("org.ta4j:ta4j-core:0.15")
     implementation("org.mapstruct:mapstruct:1.5.5.Final")
+    implementation("org.postgresql:postgresql")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     kapt("org.mapstruct:mapstruct-processor:1.5.5.Final")
-
-    runtimeOnly("org.postgresql:postgresql")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")

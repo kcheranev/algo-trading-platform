@@ -1,6 +1,6 @@
 CREATE TABLE strategy_configuration
 (
-    id                 bigint            NOT NULL,
+    id                 serial            NOT NULL,
     type               character varying NOT NULL,
     init_candle_amount integer           NOT NULL,
     candle_interval    character varying NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE strategy_configuration
 
 CREATE TABLE trade_session
 (
-    id                        bigint            NOT NULL,
+    id                        serial            NOT NULL,
     ticker                    character varying NOT NULL,
     instrument_id             character varying NOT NULL,
     status                    character varying NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE trade_session
 
 CREATE TABLE trade_order
 (
-    id               bigint            NOT NULL,
+    id               serial            NOT NULL,
     ticker           character varying NOT NULL,
     instrument_id    character varying NOT NULL,
     date             timestamp without time zone NOT NULL,

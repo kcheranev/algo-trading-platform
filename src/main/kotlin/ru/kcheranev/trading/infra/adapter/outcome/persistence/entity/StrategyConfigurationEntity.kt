@@ -4,8 +4,8 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.StrategyType
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 
 @Table("strategy_configuration")
 data class StrategyConfigurationEntity(
@@ -18,5 +18,5 @@ data class StrategyConfigurationEntity(
     @Column("candle_interval")
     val candleInterval: CandleInterval,
     @Column("params")
-    val params: StrategyParameters
+    val params: MapWrapper<String, Any>
 )

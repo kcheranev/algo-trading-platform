@@ -1,8 +1,10 @@
 package ru.kcheranev.trading.integration
 
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.IntegrationTest
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.StrategyType
@@ -10,7 +12,7 @@ import ru.kcheranev.trading.infra.adapter.income.web.model.request.CreateStrateg
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
 
 @IntegrationTest
-class CreateStrategyConfigurationTest(
+class CreateStrategyConfigurationIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
     private val strategyConfigurationRepository: StrategyConfigurationRepository
 ) : StringSpec({
@@ -27,10 +29,18 @@ class CreateStrategyConfigurationTest(
 
         //when
         val response = testRestTemplate.postForEntity("/strategy-configurations", request, Unit::class.java)
-        println(response)
 
         //then
-        strategyConfigurationRepository.findAll().count() shouldBe 1
+        response.statusCode shouldBe HttpStatus.OK
+
+        val persistenceResult = strategyConfigurationRepository.findAll().toList()
+        persistenceResult shouldHaveSize 1
+
+        val strategyConfiguration = persistenceResult.first()
+        strategyConfiguration.type shouldBe StrategyType.MOVING_MOMENTUM
+        strategyConfiguration.initCandleAmount shouldBe 10
+        strategyConfiguration.candleInterval shouldBe CandleInterval.ONE_MIN
+        strategyConfiguration.params.value shouldBe mapOf("paramKey" to "paramValue")
     }
 
 })

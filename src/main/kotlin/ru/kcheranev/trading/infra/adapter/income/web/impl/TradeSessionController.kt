@@ -27,7 +27,6 @@ class TradeSessionController(
     fun start(@RequestBody request: StartTradeSessionRequest) =
         startTradeSessionUseCase.startTradeSession(webIncomeAdapterMapper.map(request))
 
-
     @PostMapping("{id}/stop")
     fun stop(@PathVariable id: Long) =
         stopTradeSessionUseCase.stopTradeSession(StopTradeSessionCommand(TradeSessionId(id)))
