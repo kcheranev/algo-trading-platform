@@ -1,4 +1,4 @@
-package ru.kcheranev.trading.config
+package ru.kcheranev.trading.test.config
 
 import org.springframework.boot.test.context.TestConfiguration
 

@@ -3,19 +3,8 @@ package ru.kcheranev.trading.core.port.outcome.persistence
 import ru.kcheranev.trading.core.port.common.model.ComparedField
 import ru.kcheranev.trading.core.port.common.model.Page
 import ru.kcheranev.trading.core.port.common.model.Sort
-import ru.kcheranev.trading.domain.entity.OrderSort
-import ru.kcheranev.trading.domain.entity.StrategyConfiguration
-import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
-import ru.kcheranev.trading.domain.entity.StrategyConfigurationSort
-import ru.kcheranev.trading.domain.entity.TradeDirection
-import ru.kcheranev.trading.domain.entity.TradeOrder
-import ru.kcheranev.trading.domain.entity.TradeOrderId
-import ru.kcheranev.trading.domain.entity.TradeSession
-import ru.kcheranev.trading.domain.entity.TradeSessionId
-import ru.kcheranev.trading.domain.entity.TradeSessionSort
-import ru.kcheranev.trading.domain.entity.TradeSessionStatus
+import ru.kcheranev.trading.domain.entity.*
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.domain.model.StrategyType
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -76,7 +65,7 @@ data class GetStrategyConfigurationCommand(
 
 data class StrategyConfigurationSearchCommand(
     val id: StrategyConfigurationId?,
-    val type: StrategyType?,
+    val type: String?,
     val candleInterval: CandleInterval?,
     val page: Page?,
     val sort: Sort<StrategyConfigurationSort>?

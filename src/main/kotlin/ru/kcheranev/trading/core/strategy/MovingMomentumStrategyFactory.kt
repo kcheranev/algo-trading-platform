@@ -49,8 +49,8 @@ class MovingMomentumStrategyFactory : StrategyFactory {
         return TradeStrategy(series, BaseStrategy(entryRule, exitRule))
     }
 
-    override fun strategyType(): StrategyType {
-        return StrategyType.MOVING_MOMENTUM
+    override fun strategyType(): String {
+        return StrategyType.MOVING_MOMENTUM.name
     }
 
 }

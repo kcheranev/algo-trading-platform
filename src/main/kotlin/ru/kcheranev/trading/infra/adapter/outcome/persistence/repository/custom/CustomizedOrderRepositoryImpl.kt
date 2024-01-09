@@ -6,7 +6,8 @@ import ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderSearchComman
 import ru.kcheranev.trading.domain.entity.OrderSort
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.addAndCondition
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.addComparsionCondition
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.ComparstionCondition
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.EqualsCondition
 
 class CustomizedOrderRepositoryImpl(
     private val jdbcTemplate: JdbcTemplate
@@ -17,28 +18,28 @@ class CustomizedOrderRepositoryImpl(
         queryBuilder.append("SELECT * FROM order")
         val conditionsBuilder = StringBuilder()
         if (command.id != null) {
-            conditionsBuilder.addAndCondition("id = ${command.id.value}")
+            conditionsBuilder.addAndCondition(EqualsCondition("id", command.id.value))
         }
         if (command.ticker != null) {
-            conditionsBuilder.addAndCondition("ticker = ${command.ticker}")
+            conditionsBuilder.addAndCondition(EqualsCondition("ticker", command.ticker))
         }
         if (command.instrumentId != null) {
-            conditionsBuilder.addAndCondition("instrument_id = ${command.instrumentId}")
+            conditionsBuilder.addAndCondition(EqualsCondition("instrument_id", command.instrumentId))
         }
         if (command.date != null) {
-            conditionsBuilder.addComparsionCondition("date", command.date)
+            conditionsBuilder.addAndCondition(ComparstionCondition("date", command.date))
         }
         if (command.lotsQuantity != null) {
-            conditionsBuilder.addComparsionCondition("lots_quantity", command.lotsQuantity)
+            conditionsBuilder.addAndCondition(ComparstionCondition("lots_quantity", command.lotsQuantity))
         }
         if (command.price != null) {
-            conditionsBuilder.addComparsionCondition("price", command.price)
+            conditionsBuilder.addAndCondition(ComparstionCondition("price", command.price))
         }
         if (command.direction != null) {
-            conditionsBuilder.addAndCondition("direction = ${command.direction}")
+            conditionsBuilder.addAndCondition(EqualsCondition("direction", command.direction))
         }
         if (command.tradeSessionId != null) {
-            conditionsBuilder.addAndCondition("trade_session_id = ${command.tradeSessionId.value}")
+            conditionsBuilder.addAndCondition(EqualsCondition("trade_session_id", command.tradeSessionId.value))
         }
         if (conditionsBuilder.isNotEmpty()) {
             queryBuilder.append(" WHERE $conditionsBuilder")

@@ -5,8 +5,10 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import org.postgresql.util.PGobject
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.ReadingConverter
+import org.springframework.stereotype.Component
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 
+@Component
 @ReadingConverter
 class MapToJsonbReadConverter(
     private val objectMapper: ObjectMapper

@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.postgresql.util.PGobject
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.WritingConverter
+import org.springframework.stereotype.Component
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 
+@Component
 @WritingConverter
 class JsonbToMapWriteConverter(
     private val objectMapper: ObjectMapper

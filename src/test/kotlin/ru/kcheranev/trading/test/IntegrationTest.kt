@@ -1,9 +1,9 @@
-package ru.kcheranev.trading
+package ru.kcheranev.trading.test
 
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*
 import org.springframework.test.context.ActiveProfiles
-import ru.kcheranev.trading.config.TradingAppTestConfiguration
+import ru.kcheranev.trading.test.config.TradingAppTestConfiguration
 
 @Target(AnnotationTarget.CLASS)
 

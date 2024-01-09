@@ -6,13 +6,12 @@ import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
-import ru.kcheranev.trading.domain.model.StrategyType
 import java.math.BigDecimal
 
 sealed class TradingIncomeCommand
 
 data class CreateStrategyConfigurationCommand(
-    val type: StrategyType,
+    val type: String,
     val initCandleAmount: Int,
     val candleInterval: CandleInterval,
     val params: Map<String, Any>
@@ -21,8 +20,7 @@ data class CreateStrategyConfigurationCommand(
 data class StartTradeSessionCommand(
     val strategyConfigurationId: StrategyConfigurationId,
     val lotsQuantity: Int,
-    val instrument: Instrument,
-    val strategyType: StrategyType
+    val instrument: Instrument
 ) : TradingIncomeCommand()
 
 data class ProcessIncomeCandleCommand(

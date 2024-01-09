@@ -6,7 +6,8 @@ import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionSearchComm
 import ru.kcheranev.trading.domain.entity.TradeSessionSort
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.addAndCondition
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.addComparsionCondition
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.ComparstionCondition
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.EqualsCondition
 
 class CustomizedTradeSessionRepositoryImpl(
     private val jdbcTemplate: JdbcTemplate
@@ -17,22 +18,22 @@ class CustomizedTradeSessionRepositoryImpl(
         queryBuilder.append("SELECT * FROM trade_session")
         val conditionsBuilder = StringBuilder()
         if (command.id != null) {
-            conditionsBuilder.addAndCondition("id = ${command.id.value}")
+            conditionsBuilder.addAndCondition(EqualsCondition("id", command.id.value))
         }
         if (command.ticker != null) {
-            conditionsBuilder.addAndCondition("ticker = ${command.ticker}")
+            conditionsBuilder.addAndCondition(EqualsCondition("ticker", command.ticker))
         }
         if (command.instrumentId != null) {
-            conditionsBuilder.addAndCondition("instrument_id = ${command.instrumentId}")
+            conditionsBuilder.addAndCondition(EqualsCondition("instrument_id", command.instrumentId))
         }
         if (command.status != null) {
-            conditionsBuilder.addAndCondition("status = ${command.status}")
+            conditionsBuilder.addAndCondition(EqualsCondition("status", command.status))
         }
         if (command.startDate != null) {
-            conditionsBuilder.addComparsionCondition("start_date", command.startDate)
+            conditionsBuilder.addAndCondition(ComparstionCondition("start_date", command.startDate))
         }
         if (command.candleInterval != null) {
-            conditionsBuilder.addAndCondition("candle_interval = ${command.candleInterval}")
+            conditionsBuilder.addAndCondition(EqualsCondition("candle_interval", command.candleInterval))
         }
         if (conditionsBuilder.isNotEmpty()) {
             queryBuilder.append(" WHERE $conditionsBuilder")

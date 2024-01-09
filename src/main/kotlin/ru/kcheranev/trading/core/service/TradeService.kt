@@ -2,29 +2,10 @@ package ru.kcheranev.trading.core.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import ru.kcheranev.trading.core.port.income.trading.CreateStrategyConfigurationCommand
-import ru.kcheranev.trading.core.port.income.trading.CreateStrategyConfigurationUseCase
-import ru.kcheranev.trading.core.port.income.trading.EnterTradeSessionCommand
-import ru.kcheranev.trading.core.port.income.trading.EnterTradeSessionUseCase
-import ru.kcheranev.trading.core.port.income.trading.ExitTradeSessionCommand
-import ru.kcheranev.trading.core.port.income.trading.ExitTradeSessionUseCase
-import ru.kcheranev.trading.core.port.income.trading.ProcessIncomeCandleCommand
-import ru.kcheranev.trading.core.port.income.trading.ReceiveCandleUseCase
-import ru.kcheranev.trading.core.port.income.trading.StartTradeSessionCommand
-import ru.kcheranev.trading.core.port.income.trading.StartTradeSessionUseCase
-import ru.kcheranev.trading.core.port.income.trading.StopTradeSessionCommand
-import ru.kcheranev.trading.core.port.income.trading.StopTradeSessionUseCase
+import ru.kcheranev.trading.core.port.income.trading.*
 import ru.kcheranev.trading.core.port.outcome.broker.GetLastHistoricCandlesCommand
 import ru.kcheranev.trading.core.port.outcome.broker.HistoricCandleBrokerPort
-import ru.kcheranev.trading.core.port.outcome.persistence.GetReadyToOrderTradeSessionsCommand
-import ru.kcheranev.trading.core.port.outcome.persistence.GetStrategyConfigurationCommand
-import ru.kcheranev.trading.core.port.outcome.persistence.GetTradeSessionCommand
-import ru.kcheranev.trading.core.port.outcome.persistence.SaveOrderCommand
-import ru.kcheranev.trading.core.port.outcome.persistence.SaveStrategyConfigurationCommand
-import ru.kcheranev.trading.core.port.outcome.persistence.SaveTradeSessionCommand
-import ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationPersistencePort
-import ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderPersistencePort
-import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionPersistencePort
+import ru.kcheranev.trading.core.port.outcome.persistence.*
 import ru.kcheranev.trading.core.strategy.StrategyFactoryProvider
 import ru.kcheranev.trading.domain.entity.StrategyConfiguration
 import ru.kcheranev.trading.domain.entity.TradeDirection
@@ -64,7 +45,7 @@ class TradeService(
             strategyConfigurationPersistencePort.get(
                 GetStrategyConfigurationCommand(command.strategyConfigurationId)
             )
-        val strategyFactory = strategyFactoryProvider.getStrategyFactory(command.strategyType)
+        val strategyFactory = strategyFactoryProvider.getStrategyFactory(strategyConfiguration.type)
         val candles =
             historicCandleBrokerPort.getLastHistoricCandles(
                 GetLastHistoricCandlesCommand(
