@@ -9,12 +9,7 @@ class ComparstionCondition(
 ) : Condition() {
 
     override fun evaluate(): String {
-        val comparsionValue =
-            if (needWrapQuotes(comparedField.value)) {
-                "'$comparedField.value'"
-            } else {
-                "$comparedField.value"
-            }
+        val comparsionValue = maybeWrapQuotes(comparedField.value)
         return when (comparedField.comparsion) {
             Comparsion.GT -> "$fieldName > $comparsionValue"
             Comparsion.LT -> "$fieldName < $comparsionValue"

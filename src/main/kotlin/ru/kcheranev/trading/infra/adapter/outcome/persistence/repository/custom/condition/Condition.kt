@@ -3,14 +3,18 @@ package ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-sealed class Condition {
+abstract class Condition {
 
     private val needWrapQuotesClasses =
-        listOf(String::class, LocalDate::class, LocalDateTime::class)
+        listOf(String::class, LocalDate::class, LocalDateTime::class, Enum::class)
 
     abstract fun evaluate(): String
 
-    protected fun needWrapQuotes(value: Any): Boolean =
-        needWrapQuotesClasses.any { it.isInstance(value) }
+    protected fun maybeWrapQuotes(value: Any): String =
+        if (needWrapQuotesClasses.any { it.isInstance(value) }) {
+            "'$value'"
+        } else {
+            value.toString()
+        }
 
 }

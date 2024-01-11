@@ -5,11 +5,6 @@ class EqualsCondition(
     private val comparsionValue: Any
 ) : Condition() {
 
-    override fun evaluate() =
-        if (needWrapQuotes(comparsionValue)) {
-            "$fieldName = '$comparsionValue'"
-        } else {
-            "$fieldName = $comparsionValue"
-        }
+    override fun evaluate() = "$fieldName = " + maybeWrapQuotes(comparsionValue)
 
 }
