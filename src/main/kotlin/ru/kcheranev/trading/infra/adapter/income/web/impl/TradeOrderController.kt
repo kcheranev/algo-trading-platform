@@ -10,7 +10,7 @@ import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeOrderSe
 import ru.kcheranev.trading.infra.adapter.income.web.webIncomeAdapterMapper
 
 @RestController
-@RequestMapping("orders")
+@RequestMapping("trade-orders")
 class TradeOrderController(
     private val tradeOrderSearchUseCase: TradeOrderSearchUseCase
 ) {

@@ -3,7 +3,7 @@ package ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderSearchCommand
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
 
-interface CustomizedOrderRepository {
+interface CustomizedTradeOrderRepository {
 
     fun search(command: TradeOrderSearchCommand): List<TradeOrderEntity>
 

@@ -1,9 +1,9 @@
 package ru.kcheranev.trading.domain.entity
 
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.AbstractAggregateRoot
 import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseBarSeriesBuilder
-import ru.kcheranev.trading.common.LoggerDelegate
 import ru.kcheranev.trading.core.strategy.StrategyFactory
 import ru.kcheranev.trading.domain.TradeSessionCreatedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionEnteredDomainEvent
@@ -34,10 +34,12 @@ data class TradeSession(
     val startDate: LocalDateTime,
     val candleInterval: CandleInterval,
     val lotsQuantity: Int,
-    var lastEventDate: LocalDateTime?,
+    var lastEventDate: LocalDateTime,
     val strategy: TradeStrategy,
     val strategyConfigurationId: StrategyConfigurationId
 ) : AbstractAggregateRoot<TradeSession>() {
+
+    private val log = LoggerFactory.getLogger(javaClass)
 
     fun addBar(candle: Candle) {
         strategy.addBar(domainModelMapper.map(candle))
@@ -54,14 +56,14 @@ data class TradeSession(
         registerEvent(
             TradeSessionPendedForEntryDomainEvent(id!!, Instrument(instrumentId, ticker), candleInterval, lotsQuantity)
         )
-        logger.info("Trade session ${id.value} is pended for entry")
+        log.info("Trade session ${id.value} is pended for entry")
     }
 
     fun enter() {
         checkTransition(IN_POSITION)
         status = IN_POSITION
         registerEvent(TradeSessionEnteredDomainEvent(id!!, Instrument(instrumentId, ticker), candleInterval))
-        logger.info("Trade session ${id.value} has been entered")
+        log.info("Trade session ${id.value} has been entered")
     }
 
     fun pendingExit() {
@@ -75,21 +77,21 @@ data class TradeSession(
                 lotsQuantity
             )
         )
-        logger.info("Trade session ${id.value} is pended for exit")
+        log.info("Trade session ${id.value} is pended for exit")
     }
 
     fun exit() {
         checkTransition(WAITING)
         status = WAITING
         registerEvent(TradeSessionExitedDomainEvent(id!!, Instrument(instrumentId, ticker), candleInterval))
-        logger.info("Trade session ${id.value} has been exited")
+        log.info("Trade session ${id.value} has been exited")
     }
 
     fun stop() {
         checkTransition(STOPPED)
         status = STOPPED
         registerEvent(TradeSessionStoppedDomainEvent(id!!, Instrument(instrumentId, ticker), candleInterval))
-        logger.info("Trade session ${id.value} has been stopped")
+        log.info("Trade session ${id.value} has been stopped")
     }
 
     private fun checkTransition(toStatus: TradeSessionStatus) {
@@ -102,8 +104,6 @@ data class TradeSession(
     }
 
     companion object {
-
-        private val logger by LoggerDelegate()
 
         fun start(
             strategyConfiguration: StrategyConfiguration,
@@ -131,7 +131,6 @@ data class TradeSession(
                 strategyConfigurationId = strategyConfiguration.id!!
             )
             tradeSession.registerEvent(TradeSessionCreatedDomainEvent(Instrument(instrumentId, ticker), candleInterval))
-            logger.info("Trade session: ticker=$ticker, candleInterval=$candleInterval is starting...")
             return tradeSession
         }
 

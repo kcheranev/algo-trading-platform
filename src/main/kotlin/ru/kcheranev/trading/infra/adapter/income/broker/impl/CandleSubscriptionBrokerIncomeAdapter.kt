@@ -1,6 +1,6 @@
 package ru.kcheranev.trading.infra.adapter.income.broker.impl
 
-import ru.kcheranev.trading.common.LoggerDelegate
+import org.slf4j.LoggerFactory
 import ru.kcheranev.trading.core.port.income.trading.ProcessIncomeCandleCommand
 import ru.kcheranev.trading.core.port.income.trading.ReceiveCandleUseCase
 import ru.kcheranev.trading.infra.adapter.income.broker.brokerIncomeAdapterMapper
@@ -11,20 +11,16 @@ class CandleSubscriptionBrokerIncomeAdapter(
     private val receiveCandleUseCase: ReceiveCandleUseCase
 ) : StreamProcessor<MarketDataResponse> {
 
+    private val log = LoggerFactory.getLogger(javaClass)
+
     override fun process(response: MarketDataResponse) {
         if (response.hasCandle()) {
             val candle = response.candle
-            logger.info("New income candle for the instrument ${candle.instrumentUid}")
+            log.info("New income candle for the instrument ${candle.instrumentUid}")
             receiveCandleUseCase.processIncomeCandle(
                 ProcessIncomeCandleCommand(brokerIncomeAdapterMapper.map(candle))
             )
         }
-    }
-
-    companion object {
-
-        private val logger by LoggerDelegate()
-
     }
 
 }

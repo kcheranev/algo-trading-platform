@@ -3,7 +3,11 @@ package ru.kcheranev.trading.infra.adapter.income.web.model.request
 import ru.kcheranev.trading.core.port.common.model.ComparedField
 import ru.kcheranev.trading.core.port.common.model.Page
 import ru.kcheranev.trading.core.port.common.model.Sort
-import ru.kcheranev.trading.domain.entity.*
+import ru.kcheranev.trading.domain.entity.StrategyConfigurationSort
+import ru.kcheranev.trading.domain.entity.TradeDirection
+import ru.kcheranev.trading.domain.entity.TradeOrderSort
+import ru.kcheranev.trading.domain.entity.TradeSessionSort
+import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -39,5 +43,5 @@ data class TradeOrderSearchRequest(
     val direction: TradeDirection? = null,
     val tradeSessionId: Long? = null,
     val page: Page? = null,
-    val sort: Sort<OrderSort>? = null
+    val sort: Sort<TradeOrderSort>? = null
 ) : SearchRequest()

@@ -2,8 +2,8 @@ package ru.kcheranev.trading.infra.config
 
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.converter.JsonbToMapWriteConverter
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.converter.MapToJsonbReadConverter
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.converter.JsonbToMapWriteConverter
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.converter.MapToJsonbReadConverter
 
 @Configuration
 class JdbcConfiguration(

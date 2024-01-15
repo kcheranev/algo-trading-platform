@@ -1,8 +1,8 @@
 package ru.kcheranev.trading.core.eventprocessor
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
-import ru.kcheranev.trading.common.LoggerDelegate
 import ru.kcheranev.trading.core.port.income.trading.ExitTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.trading.ExitTradeSessionUseCase
 import ru.kcheranev.trading.core.port.outcome.broker.OrderServiceBrokerPort
@@ -15,9 +15,11 @@ class TradeSessionPendedForExitDomainEventProcessor(
     private val exitTradeSessionUseCase: ExitTradeSessionUseCase
 ) {
 
+    private val log = LoggerFactory.getLogger(javaClass)
+
     @TransactionalEventListener
     fun processTradeSessionPendedForExitDomainEvent(event: TradeSessionPendedForExitDomainEvent) {
-        logger.info("Trading session ${event.tradeSessionId} ${event.instrument.ticker} ${event.candleInterval} is ready for exit")
+        log.info("Trading session ${event.tradeSessionId} ${event.instrument.ticker} ${event.candleInterval} is ready for exit")
         val postOrderResponse =
             orderServiceBrokerPort.postBestPriceSellOrderSync(
                 PostBestPriceSellOrderCommand(event.instrument, event.lotsQuantity)
@@ -34,12 +36,6 @@ class TradeSessionPendedForExitDomainEventProcessor(
                 )
             }
         )
-    }
-
-    companion object {
-
-        private val logger by LoggerDelegate()
-
     }
 
 }

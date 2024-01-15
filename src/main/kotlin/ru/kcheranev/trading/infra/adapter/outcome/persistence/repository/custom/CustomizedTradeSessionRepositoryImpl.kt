@@ -1,6 +1,5 @@
 package ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom
 
-import org.springframework.jdbc.core.BeanPropertyRowMapper
 import org.springframework.jdbc.core.JdbcTemplate
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionSearchCommand
 import ru.kcheranev.trading.domain.entity.TradeSessionSort
@@ -8,9 +7,15 @@ import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessio
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.addAndCondition
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.ComparstionCondition
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.EqualsCondition
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.rowmapper.TradeSessionEntityRowMapper
+
+private const val DEFAULT_OFFSET = 0
+
+private const val DEFAULT_LIMIT = 10
 
 class CustomizedTradeSessionRepositoryImpl(
-    private val jdbcTemplate: JdbcTemplate
+    private val jdbcTemplate: JdbcTemplate,
+    private val tradeSessionEntityRowMapper: TradeSessionEntityRowMapper
 ) : CustomizedTradeSessionRepository {
 
     override fun search(command: TradeSessionSearchCommand): List<TradeSessionEntity> {
@@ -53,15 +58,7 @@ class CustomizedTradeSessionRepositoryImpl(
         } else {
             queryBuilder.append(" LIMIT $DEFAULT_LIMIT OFFSET $DEFAULT_OFFSET")
         }
-        return jdbcTemplate.query(queryBuilder.toString(), BeanPropertyRowMapper())
-    }
-
-    companion object {
-
-        private const val DEFAULT_OFFSET = 0
-
-        private const val DEFAULT_LIMIT = 10
-
+        return jdbcTemplate.query(queryBuilder.toString(), tradeSessionEntityRowMapper)
     }
 
 }

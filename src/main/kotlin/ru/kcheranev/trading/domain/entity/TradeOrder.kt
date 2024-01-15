@@ -50,6 +50,8 @@ enum class TradeDirection {
 
 }
 
-enum class OrderSort : SortField {
+enum class TradeOrderSort : SortField {
+
     TICKER, DATE, PRICE, DIRECTION
+
 }

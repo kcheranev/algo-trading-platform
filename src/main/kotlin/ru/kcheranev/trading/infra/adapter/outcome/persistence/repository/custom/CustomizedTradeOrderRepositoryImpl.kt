@@ -1,21 +1,26 @@
 package ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom
 
-import org.springframework.jdbc.core.BeanPropertyRowMapper
 import org.springframework.jdbc.core.JdbcTemplate
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderSearchCommand
-import ru.kcheranev.trading.domain.entity.OrderSort
+import ru.kcheranev.trading.domain.entity.TradeOrderSort
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.addAndCondition
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.ComparstionCondition
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.EqualsCondition
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.rowmapper.TradeOrderEntityRowMapper
 
-class CustomizedOrderRepositoryImpl(
-    private val jdbcTemplate: JdbcTemplate
-) : CustomizedOrderRepository {
+private const val DEFAULT_OFFSET = 0
+
+private const val DEFAULT_LIMIT = 10
+
+class CustomizedTradeOrderRepositoryImpl(
+    private val jdbcTemplate: JdbcTemplate,
+    private val tradeOrderEntityRowMapper: TradeOrderEntityRowMapper
+) : CustomizedTradeOrderRepository {
 
     override fun search(command: TradeOrderSearchCommand): List<TradeOrderEntity> {
         val queryBuilder = StringBuilder()
-        queryBuilder.append("SELECT * FROM order")
+        queryBuilder.append("SELECT * FROM trade_order")
         val conditionsBuilder = StringBuilder()
         if (command.id != null) {
             conditionsBuilder.addAndCondition(EqualsCondition("id", command.id.value))
@@ -47,10 +52,10 @@ class CustomizedOrderRepositoryImpl(
         if (command.sort != null) {
             val sortField =
                 when (command.sort.field) {
-                    OrderSort.TICKER -> "ticker"
-                    OrderSort.DATE -> "date"
-                    OrderSort.PRICE -> "price"
-                    OrderSort.DIRECTION -> "direction"
+                    TradeOrderSort.TICKER -> "ticker"
+                    TradeOrderSort.DATE -> "date"
+                    TradeOrderSort.PRICE -> "price"
+                    TradeOrderSort.DIRECTION -> "direction"
                 }
             queryBuilder.append(" ORDER BY $sortField ${command.sort.order}")
         }
@@ -59,15 +64,7 @@ class CustomizedOrderRepositoryImpl(
         } else {
             queryBuilder.append(" LIMIT $DEFAULT_LIMIT OFFSET $DEFAULT_OFFSET")
         }
-        return jdbcTemplate.query(queryBuilder.toString(), BeanPropertyRowMapper())
-    }
-
-    companion object {
-
-        private const val DEFAULT_OFFSET = 0
-
-        private const val DEFAULT_LIMIT = 10
-
+        return jdbcTemplate.query(queryBuilder.toString(), tradeOrderEntityRowMapper)
     }
 
 }

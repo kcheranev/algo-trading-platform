@@ -6,7 +6,11 @@ import ru.kcheranev.trading.domain.entity.StrategyConfigurationSort
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.addAndCondition
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.EqualsCondition
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.rowmapper.StrategyConfigurationEntityRowMapper
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.rowmapper.StrategyConfigurationEntityRowMapper
+
+private const val DEFAULT_OFFSET = 0
+
+private const val DEFAULT_LIMIT = 10
 
 class CustomizedStrategyConfigurationRepositoryImpl(
     private val jdbcTemplate: JdbcTemplate,
@@ -43,14 +47,6 @@ class CustomizedStrategyConfigurationRepositoryImpl(
             queryBuilder.append(" LIMIT $DEFAULT_LIMIT OFFSET $DEFAULT_OFFSET")
         }
         return jdbcTemplate.query(queryBuilder.toString(), strategyConfigurationEntityRowMapper)
-    }
-
-    companion object {
-
-        private const val DEFAULT_OFFSET = 0
-
-        private const val DEFAULT_LIMIT = 10
-
     }
 
 }

@@ -96,6 +96,23 @@ class SearchStrategyConfigurationIntegrationTest(
         strategyConfigurationsResult[0].type shouldBe StrategyType.MOVING_MOMENTUM.name
     }
 
+    "should search strategy configurations" {
+        //when
+        val response = testRestTemplate.postForEntity(
+            "/strategy-configurations/search",
+            StrategyConfigurationSearchRequest(),
+            StrategyConfigurationSearchResponse::class.java
+        )
+
+        //then
+        response.statusCode shouldBe HttpStatus.OK
+        withClue("Body should be present") {
+            response.body shouldNotBe null
+        }
+        val strategyConfigurationsResult = response.body!!.strategyConfigurations
+        strategyConfigurationsResult.size shouldBe 5
+    }
+
     "should search strategy configuration by candleInterval" {
         //given
         val request =
@@ -126,7 +143,7 @@ class SearchStrategyConfigurationIntegrationTest(
         //given
         val request =
             StrategyConfigurationSearchRequest(
-                page = Page(1, 1),
+                page = Page(2, 1),
                 sort = Sort(StrategyConfigurationSort.TYPE, SortDirection.DESC)
             )
 
@@ -143,8 +160,9 @@ class SearchStrategyConfigurationIntegrationTest(
             response.body shouldNotBe null
         }
         val strategyConfigurationsResult = response.body!!.strategyConfigurations
-        strategyConfigurationsResult.size shouldBe 1
+        strategyConfigurationsResult.size shouldBe 2
         strategyConfigurationsResult[0].type shouldBe "TEST_3"
+        strategyConfigurationsResult[1].type shouldBe "TEST_2"
     }
 
     "should return empty result when there are no strategy configurations found" {

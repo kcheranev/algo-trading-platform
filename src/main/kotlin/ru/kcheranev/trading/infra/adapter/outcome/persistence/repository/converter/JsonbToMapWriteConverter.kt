@@ -1,4 +1,4 @@
-package ru.kcheranev.trading.infra.adapter.outcome.persistence.converter
+package ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.converter
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.postgresql.util.PGobject

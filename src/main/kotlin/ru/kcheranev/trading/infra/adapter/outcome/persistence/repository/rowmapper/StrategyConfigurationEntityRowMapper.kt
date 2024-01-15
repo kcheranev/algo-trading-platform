@@ -1,11 +1,11 @@
-package ru.kcheranev.trading.infra.adapter.outcome.persistence.rowmapper
+package ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.rowmapper
 
 import org.postgresql.util.PGobject
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Component
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.converter.MapToJsonbReadConverter
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.converter.MapToJsonbReadConverter
 import java.sql.ResultSet
 
 @Component

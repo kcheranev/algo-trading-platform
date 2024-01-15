@@ -3,7 +3,14 @@ package ru.kcheranev.trading.core.port.income.search
 import ru.kcheranev.trading.core.port.common.model.ComparedField
 import ru.kcheranev.trading.core.port.common.model.Page
 import ru.kcheranev.trading.core.port.common.model.Sort
-import ru.kcheranev.trading.domain.entity.*
+import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
+import ru.kcheranev.trading.domain.entity.StrategyConfigurationSort
+import ru.kcheranev.trading.domain.entity.TradeDirection
+import ru.kcheranev.trading.domain.entity.TradeOrderId
+import ru.kcheranev.trading.domain.entity.TradeOrderSort
+import ru.kcheranev.trading.domain.entity.TradeSessionId
+import ru.kcheranev.trading.domain.entity.TradeSessionSort
+import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -39,5 +46,5 @@ data class TradeOrderSearchCommand(
     val direction: TradeDirection?,
     val tradeSessionId: TradeSessionId?,
     val page: Page?,
-    val sort: Sort<OrderSort>?
+    val sort: Sort<TradeOrderSort>?
 ) : SearchIncomeCommand()
