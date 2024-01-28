@@ -7,7 +7,6 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
-import org.springframework.jdbc.core.JdbcTemplate
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.StrategyType
@@ -28,11 +27,11 @@ class SearchTradeSessionIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
     private val tradeSessionRepository: TradeSessionRepository,
-    private val jdbcTemplate: JdbcTemplate,
+    private val cleanDatabaseExtension: CleanDatabaseExtension,
     private val tradeStrategyCache: TradeStrategyCache
 ) : StringSpec({
 
-    extension(CleanDatabaseExtension(jdbcTemplate))
+    extension(cleanDatabaseExtension)
 
     beforeEach {
         val strategyConfiguration =

@@ -30,7 +30,7 @@ data class GetHistoricCandlesCommand(
     val instrument: Instrument,
     val candleInterval: CandleInterval,
     val from: LocalDateTime,
-    val to: LocalDateTime = LocalDateTime.now()
+    val to: LocalDateTime
 ) : BrokerOutcomeCommand()
 
 data class GetLastHistoricCandlesCommand(

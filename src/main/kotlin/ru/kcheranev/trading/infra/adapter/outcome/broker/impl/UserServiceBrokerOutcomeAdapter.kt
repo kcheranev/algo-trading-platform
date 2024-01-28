@@ -12,8 +12,7 @@ class UserServiceBrokerOutcomeAdapter(brokerApi: BrokerApi, brokerProperties: Br
     private val userService = brokerApi.userService
 
     fun getTradingAccountId(): String {
-        return userService.accounts
-            .get()
+        return userService.accountsSync
             .first { it.name == tradingAccountName }
             .id
     }

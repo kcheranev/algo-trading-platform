@@ -12,4 +12,5 @@ application:
     placeOrderRetryCount: 3
   infra.broker:
     token: ${TOKEN}
+    appName: ${spring.application.name}
     tradingAccountName: account-name

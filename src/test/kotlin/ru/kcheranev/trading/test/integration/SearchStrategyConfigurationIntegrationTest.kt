@@ -6,7 +6,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
-import org.springframework.jdbc.core.JdbcTemplate
 import ru.kcheranev.trading.core.port.common.model.Page
 import ru.kcheranev.trading.core.port.common.model.Sort
 import ru.kcheranev.trading.core.port.common.model.SortDirection
@@ -25,10 +24,10 @@ import ru.kcheranev.trading.test.extension.CleanDatabaseExtension
 class SearchStrategyConfigurationIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
-    private val jdbcTemplate: JdbcTemplate
+    private val cleanDatabaseExtension: CleanDatabaseExtension
 ) : StringSpec({
 
-    extension(CleanDatabaseExtension(jdbcTemplate))
+    extension(cleanDatabaseExtension)
 
     beforeEach {
         val strategyConfigurations =

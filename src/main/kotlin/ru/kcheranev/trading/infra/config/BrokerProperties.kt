@@ -6,5 +6,6 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding
 @ConfigurationProperties("application.infra.broker")
 class BrokerProperties @ConstructorBinding constructor(
     val token: String,
+    val appName: String,
     val tradingAccountName: String
 )

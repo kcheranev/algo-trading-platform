@@ -7,8 +7,7 @@ import org.springframework.context.annotation.Configuration
 class BrokerConfig {
 
     @Bean(destroyMethod = "destroy")
-    fun brokerApi(brokerProperties: BrokerProperties): BrokerApi {
-        return BrokerApi(brokerProperties.token)
-    }
+    fun brokerApi(brokerProperties: BrokerProperties) =
+        BrokerApi.init(brokerProperties.token, brokerProperties.appName)
 
 }

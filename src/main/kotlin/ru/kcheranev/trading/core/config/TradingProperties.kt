@@ -1,4 +1,4 @@
-package ru.kcheranev.trading.config
+package ru.kcheranev.trading.core.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.bind.ConstructorBinding

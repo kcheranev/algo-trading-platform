@@ -1,6 +1,7 @@
 package ru.kcheranev.trading.domain.entity
 
 import org.springframework.data.domain.AbstractAggregateRoot
+import ru.kcheranev.trading.common.DateSupplier
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -23,13 +24,14 @@ data class TradeOrder(
             lotsQuantity: Int,
             price: BigDecimal,
             direction: TradeDirection,
-            tradeSessionId: TradeSessionId
+            tradeSessionId: TradeSessionId,
+            dateSupplier: DateSupplier
         ): TradeOrder =
             TradeOrder(
                 id = null,
                 ticker = ticker,
                 instrumentId = instrumentId,
-                date = LocalDateTime.now(),
+                date = dateSupplier.currentDate(),
                 lotsQuantity = lotsQuantity,
                 price = price,
                 direction = direction,

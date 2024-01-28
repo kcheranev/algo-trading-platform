@@ -1,0 +1,72 @@
+{
+  "candles": [
+    {
+      "open": {
+        "units": "1"
+      },
+      "high": {
+        "units": "2"
+      },
+      "low": {
+        "units": "1"
+      },
+      "close": {
+        "units": "2"
+      },
+      "volume": "10",
+      "time": "2024-01-29T16:00:35Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "2"
+      },
+      "high": {
+        "units": "3"
+      },
+      "low": {
+        "units": "2"
+      },
+      "close": {
+        "units": "3"
+      },
+      "volume": "11",
+      "time": "2024-01-29T16:01:35Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "3"
+      },
+      "high": {
+        "units": "4"
+      },
+      "low": {
+        "units": "3"
+      },
+      "close": {
+        "units": "4"
+      },
+      "volume": "12",
+      "time": "2024-01-29T16:02:35Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "4"
+      },
+      "high": {
+        "units": "5"
+      },
+      "low": {
+        "units": "4"
+      },
+      "close": {
+        "units": "5"
+      },
+      "volume": "13",
+      "time": "2024-01-29T16:03:35Z",
+      "isComplete": true
+    }
+  ]
+}

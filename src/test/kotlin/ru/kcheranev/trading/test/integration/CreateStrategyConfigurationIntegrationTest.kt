@@ -5,7 +5,6 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
-import org.springframework.jdbc.core.JdbcTemplate
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.StrategyType
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.CreateStrategyConfigurationRequest
@@ -17,10 +16,10 @@ import ru.kcheranev.trading.test.extension.CleanDatabaseExtension
 class CreateStrategyConfigurationIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
-    private val jdbcTemplate: JdbcTemplate
+    private val cleanDatabaseExtension: CleanDatabaseExtension
 ) : StringSpec({
 
-    extension(CleanDatabaseExtension(jdbcTemplate))
+    extension(cleanDatabaseExtension)
 
     "should create strategy configuration" {
         //given

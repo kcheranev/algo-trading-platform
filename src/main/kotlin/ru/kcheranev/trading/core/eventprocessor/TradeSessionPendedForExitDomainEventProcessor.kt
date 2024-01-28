@@ -21,7 +21,7 @@ class TradeSessionPendedForExitDomainEventProcessor(
     fun processTradeSessionPendedForExitDomainEvent(event: TradeSessionPendedForExitDomainEvent) {
         log.info("Trading session ${event.tradeSessionId} ${event.instrument.ticker} ${event.candleInterval} is ready for exit")
         val postOrderResponse =
-            orderServiceBrokerPort.postBestPriceSellOrderSync(
+            orderServiceBrokerPort.postBestPriceSellOrder(
                 PostBestPriceSellOrderCommand(event.instrument, event.lotsQuantity)
             )
         exitTradeSessionUseCase.exitTradeSession(

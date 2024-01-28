@@ -1,8 +1,8 @@
 package ru.kcheranev.trading.core.eventprocessor
 
 import org.slf4j.LoggerFactory
+import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
-import org.springframework.transaction.event.TransactionalEventListener
 import ru.kcheranev.trading.core.port.outcome.broker.MarketDataStreamSubscriptionBrokerPort
 import ru.kcheranev.trading.core.port.outcome.broker.SubscribeCandlesOrderCommand
 import ru.kcheranev.trading.domain.TradeSessionCreatedDomainEvent
@@ -14,7 +14,7 @@ class TradeSessionCreatedDomainEventProcessor(
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @TransactionalEventListener
+    @EventListener
     fun processTradeSessionCreatedDomainEvent(event: TradeSessionCreatedDomainEvent) {
         log.info("Subscribe to the market data stream ${event.instrument.ticker} ${event.candleInterval}")
         marketDataStreamSubscriptionBrokerPort.subscribeCandles(

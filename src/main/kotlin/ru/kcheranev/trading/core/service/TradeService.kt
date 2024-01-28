@@ -1,16 +1,39 @@
 package ru.kcheranev.trading.core.service
 
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import ru.kcheranev.trading.core.port.income.trading.*
+import ru.kcheranev.trading.common.DateSupplier
+import ru.kcheranev.trading.core.port.income.trading.CreateStrategyConfigurationCommand
+import ru.kcheranev.trading.core.port.income.trading.CreateStrategyConfigurationUseCase
+import ru.kcheranev.trading.core.port.income.trading.EnterTradeSessionCommand
+import ru.kcheranev.trading.core.port.income.trading.EnterTradeSessionUseCase
+import ru.kcheranev.trading.core.port.income.trading.ExitTradeSessionCommand
+import ru.kcheranev.trading.core.port.income.trading.ExitTradeSessionUseCase
+import ru.kcheranev.trading.core.port.income.trading.ProcessIncomeCandleCommand
+import ru.kcheranev.trading.core.port.income.trading.ReceiveCandleUseCase
+import ru.kcheranev.trading.core.port.income.trading.StartTradeSessionCommand
+import ru.kcheranev.trading.core.port.income.trading.StartTradeSessionUseCase
+import ru.kcheranev.trading.core.port.income.trading.StopTradeSessionCommand
+import ru.kcheranev.trading.core.port.income.trading.StopTradeSessionUseCase
 import ru.kcheranev.trading.core.port.outcome.broker.GetLastHistoricCandlesCommand
 import ru.kcheranev.trading.core.port.outcome.broker.HistoricCandleBrokerPort
-import ru.kcheranev.trading.core.port.outcome.persistence.*
+import ru.kcheranev.trading.core.port.outcome.persistence.GetReadyToOrderTradeSessionsCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.GetStrategyConfigurationCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.GetTradeSessionCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.SaveOrderCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.SaveStrategyConfigurationCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.SaveTradeSessionCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationPersistencePort
+import ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderPersistencePort
+import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionPersistencePort
 import ru.kcheranev.trading.core.strategy.StrategyFactoryProvider
+import ru.kcheranev.trading.domain.TradeSessionCreatedDomainEvent
 import ru.kcheranev.trading.domain.entity.StrategyConfiguration
 import ru.kcheranev.trading.domain.entity.TradeDirection
 import ru.kcheranev.trading.domain.entity.TradeOrder
 import ru.kcheranev.trading.domain.entity.TradeSession
+import ru.kcheranev.trading.domain.model.Instrument
 
 @Service
 class TradeService(
@@ -18,7 +41,9 @@ class TradeService(
     private val tradeSessionPersistencePort: TradeSessionPersistencePort,
     private val tradeOrderPersistencePort: TradeOrderPersistencePort,
     private val historicCandleBrokerPort: HistoricCandleBrokerPort,
-    private val strategyFactoryProvider: StrategyFactoryProvider
+    private val eventPublisher: ApplicationEventPublisher,
+    private val strategyFactoryProvider: StrategyFactoryProvider,
+    private val dateSupplier: DateSupplier
 ) : CreateStrategyConfigurationUseCase,
     StartTradeSessionUseCase,
     ReceiveCandleUseCase,
@@ -40,7 +65,6 @@ class TradeService(
 
     @Transactional
     override fun startTradeSession(command: StartTradeSessionCommand) {
-        val ticker = command.instrument.ticker
         val strategyConfiguration =
             strategyConfigurationPersistencePort.get(
                 GetStrategyConfigurationCommand(command.strategyConfigurationId)
@@ -54,15 +78,25 @@ class TradeService(
                     strategyConfiguration.initCandleAmount
                 )
             )
-        val tradeSession = TradeSession.start(
-            strategyConfiguration = strategyConfiguration,
-            ticker = ticker,
-            instrumentId = command.instrument.id,
-            lotsQuantity = command.lotsQuantity,
-            candles = candles,
-            strategyFactory = strategyFactory
-        )
+        val tradeSession =
+            TradeSession.start(
+                strategyConfiguration = strategyConfiguration,
+                ticker = command.instrument.ticker,
+                instrumentId = command.instrument.id,
+                lotsQuantity = command.lotsQuantity,
+                candles = candles,
+                strategyFactory = strategyFactory,
+                dateSupplier = dateSupplier
+            )
         tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
+        with(tradeSession) {
+            eventPublisher.publishEvent(
+                TradeSessionCreatedDomainEvent(
+                    Instrument(instrumentId, ticker),
+                    candleInterval
+                )
+            )
+        }
     }
 
     @Transactional
@@ -97,7 +131,8 @@ class TradeService(
                     lotsQuantity = lotsQuantity,
                     price = command.totalPrice,
                     direction = TradeDirection.BUY,
-                    tradeSessionId = id!!
+                    tradeSessionId = id!!,
+                    dateSupplier = dateSupplier
                 )
             }
         tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
@@ -116,7 +151,8 @@ class TradeService(
                     lotsQuantity = lotsQuantity,
                     price = command.totalPrice,
                     direction = TradeDirection.SELL,
-                    tradeSessionId = id!!
+                    tradeSessionId = id!!,
+                    dateSupplier = dateSupplier
                 )
             }
         tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))

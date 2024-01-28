@@ -9,7 +9,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
-import org.springframework.jdbc.core.JdbcTemplate
 import ru.kcheranev.trading.core.port.common.model.ComparedField
 import ru.kcheranev.trading.core.port.common.model.Comparsion
 import ru.kcheranev.trading.core.port.common.model.Page
@@ -40,10 +39,10 @@ class SearchTradeOrderIntegrationTest(
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
     private val tradeSessionRepository: TradeSessionRepository,
     private val tradeOrderRepository: TradeOrderRepository,
-    private val jdbcTemplate: JdbcTemplate
+    private val cleanDatabaseExtension: CleanDatabaseExtension
 ) : StringSpec({
 
-    extension(CleanDatabaseExtension(jdbcTemplate))
+    extension(cleanDatabaseExtension)
 
     beforeEach {
         val strategyConfiguration =

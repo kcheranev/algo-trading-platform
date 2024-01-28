@@ -4,8 +4,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.domain.AbstractAggregateRoot
 import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseBarSeriesBuilder
+import ru.kcheranev.trading.common.DateSupplier
 import ru.kcheranev.trading.core.strategy.StrategyFactory
-import ru.kcheranev.trading.domain.TradeSessionCreatedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionEnteredDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionExitedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionNotExistsException
@@ -111,27 +111,26 @@ data class TradeSession(
             instrumentId: String,
             lotsQuantity: Int,
             candles: List<Candle>,
-            strategyFactory: StrategyFactory
+            strategyFactory: StrategyFactory,
+            dateSupplier: DateSupplier
         ): TradeSession {
             val candleInterval = strategyConfiguration.candleInterval
             val series: BarSeries = BaseBarSeriesBuilder()
                 .withName("Trade session: ticker=$ticker, candleInterval=$candleInterval")
                 .build()
             candles.forEach { series.addBar(domainModelMapper.map(it)) }
-            val tradeSession = TradeSession(
+            return TradeSession(
                 id = null,
                 ticker = ticker,
                 instrumentId = instrumentId,
                 status = WAITING,
-                startDate = LocalDateTime.now(),
+                startDate = dateSupplier.currentDate(),
                 candleInterval = candleInterval,
                 lotsQuantity = lotsQuantity,
                 lastEventDate = candles.last().endTime,
                 strategy = strategyFactory.initStrategy(strategyConfiguration.params, series),
                 strategyConfigurationId = strategyConfiguration.id!!
             )
-            tradeSession.registerEvent(TradeSessionCreatedDomainEvent(Instrument(instrumentId, ticker), candleInterval))
-            return tradeSession
         }
 
     }

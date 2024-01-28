@@ -11,8 +11,7 @@ import ru.kcheranev.trading.infra.config.BrokerApi
 import ru.tinkoff.piapi.contract.v1.OrderDirection
 import ru.tinkoff.piapi.contract.v1.OrderType
 import ru.tinkoff.piapi.contract.v1.Quotation
-import java.util.*
-import java.util.concurrent.CompletableFuture
+import java.util.UUID
 
 @Component
 class OrderServiceBrokerOutcomeAdapter(
@@ -26,9 +25,9 @@ class OrderServiceBrokerOutcomeAdapter(
 
     override fun postBestPriceBuyOrder(
         command: PostBestPriceBuyOrderCommand
-    ): CompletableFuture<PostOrderResponse> {
+    ): PostOrderResponse {
         log.info("Post buy best price order for the ${command.instrument.ticker}")
-        return orderService.postOrder(
+        return orderService.postOrderSync(
             command.instrument.id,
             command.quantity.toLong(),
             Quotation.getDefaultInstance(),
@@ -36,14 +35,14 @@ class OrderServiceBrokerOutcomeAdapter(
             userServiceBrokerOutcomeAdapter.getTradingAccountId(),
             OrderType.ORDER_TYPE_BESTPRICE,
             UUID.randomUUID().toString()
-        ).thenApply { brokerOutcomeAdapterMapper.map(it) }
+        ).let { brokerOutcomeAdapterMapper.map(it) }
     }
 
     override fun postBestPriceSellOrder(
         command: PostBestPriceSellOrderCommand
-    ): CompletableFuture<PostOrderResponse> {
+    ): PostOrderResponse {
         log.info("Post sell best price order for the ${command.instrument.ticker}")
-        return orderService.postOrder(
+        return orderService.postOrderSync(
             command.instrument.id,
             command.quantity.toLong(),
             Quotation.getDefaultInstance(),
@@ -51,7 +50,7 @@ class OrderServiceBrokerOutcomeAdapter(
             userServiceBrokerOutcomeAdapter.getTradingAccountId(),
             OrderType.ORDER_TYPE_BESTPRICE,
             UUID.randomUUID().toString()
-        ).thenApply { brokerOutcomeAdapterMapper.map(it) }
+        ).let { brokerOutcomeAdapterMapper.map(it) }
     }
 
 }
