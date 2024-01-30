@@ -1,5 +1,6 @@
 package ru.kcheranev.trading.infra.adapter.outcome.persistence.impl
 
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation.MANDATORY
 import org.springframework.transaction.annotation.Transactional
@@ -17,15 +18,19 @@ import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeSe
 @Component
 class TradeSessionPersistenceOutcomeAdapter(
     private val tradeSessionRepository: TradeSessionRepository,
-    private val tradeStrategyCache: TradeStrategyCache
+    private val tradeStrategyCache: TradeStrategyCache,
+    private val eventPublisher: ApplicationEventPublisher
 ) : TradeSessionPersistencePort {
 
     @Transactional(propagation = MANDATORY)
     override fun save(command: SaveTradeSessionCommand): TradeSessionId {
+        val tradeSession = command.tradeSession
         val savedTradeSessionEntity =
-            tradeSessionRepository.save(persistenceOutcomeAdapterMapper.map(command.tradeSession))
+            tradeSessionRepository.save(persistenceOutcomeAdapterMapper.map(tradeSession))
+        tradeSession.events.forEach { eventPublisher.publishEvent(it) }
+        tradeSession.clearEvents()
         val tradeSessionId = savedTradeSessionEntity.id!!
-        tradeStrategyCache.put(tradeSessionId, command.tradeSession.strategy)
+        tradeStrategyCache.put(tradeSessionId, tradeSession.strategy)
         return TradeSessionId(tradeSessionId)
     }
 

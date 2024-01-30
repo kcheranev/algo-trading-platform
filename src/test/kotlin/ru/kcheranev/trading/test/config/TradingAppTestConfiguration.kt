@@ -11,7 +11,7 @@ import org.wiremock.grpc.GrpcExtensionFactory
 import ru.kcheranev.trading.common.DateSupplier
 import ru.kcheranev.trading.infra.config.BrokerApi
 import ru.kcheranev.trading.infra.config.BrokerProperties
-import ru.kcheranev.trading.test.strategy.DummyTestStrategy
+import ru.kcheranev.trading.test.strategy.DummyTestStrategyFactory
 import java.time.LocalDateTime
 
 @TestConfiguration
@@ -28,7 +28,7 @@ class TradingAppTestConfiguration {
         )
 
     @Bean
-    fun dummyTestStrategy() = DummyTestStrategy()
+    fun dummyTestStrategy() = DummyTestStrategyFactory()
 
     @Bean
     fun grpcWireMockServer() =

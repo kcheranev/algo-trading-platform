@@ -1,6 +1,5 @@
 package ru.kcheranev.trading.domain.entity
 
-import org.springframework.data.domain.AbstractAggregateRoot
 import ru.kcheranev.trading.common.DateSupplier
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -14,7 +13,7 @@ data class TradeOrder(
     val price: BigDecimal,
     val direction: TradeDirection,
     val tradeSessionId: TradeSessionId
-) : AbstractAggregateRoot<TradeOrder>() {
+) : AbstractAggregateRoot() {
 
     companion object {
 

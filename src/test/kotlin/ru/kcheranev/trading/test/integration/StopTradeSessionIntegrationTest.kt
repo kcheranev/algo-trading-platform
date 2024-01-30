@@ -7,6 +7,8 @@ import io.kotest.extensions.wiremock.WireMockListener
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
@@ -21,7 +23,7 @@ import ru.kcheranev.trading.test.extension.CleanDatabaseExtension
 import ru.kcheranev.trading.test.stub.grpc.MarketDataBrokerGrpcStub
 
 @IntegrationTest
-class StartTradeSessionIntegrationTest(
+class StopTradeSessionIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
     private val tradeSessionRepository: TradeSessionRepository,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
@@ -30,7 +32,7 @@ class StartTradeSessionIntegrationTest(
     private val grpcWireMockServer: WireMockServer
 ) : StringSpec({
 
-    val testName = "start-trade-session"
+    val testName = "stop-trade-session"
 
     val marketDataBrokerGrpcStub by lazy { MarketDataBrokerGrpcStub(testName, grpcWireMockServer) }
 
@@ -38,7 +40,7 @@ class StartTradeSessionIntegrationTest(
 
     extension(cleanDatabaseExtension)
 
-    "should start trade session" {
+    "should stop trade session" {
         //given
         val strategyConfiguration =
             strategyConfigurationRepository.save(
@@ -51,9 +53,7 @@ class StartTradeSessionIntegrationTest(
                 )
             )
         marketDataBrokerGrpcStub.stubForGetCandles("get-candles.json")
-
-        //when
-        val response = testRestTemplate.postForEntity(
+        testRestTemplate.postForEntity(
             "/trade-sessions",
             StartTradeSessionRequest(
                 strategyConfiguration.id!!,
@@ -62,26 +62,35 @@ class StartTradeSessionIntegrationTest(
             ),
             Unit::class.java
         )
+        val tradeSessionId = tradeSessionRepository.findAll().first().id
+
+        //when
+        val response = testRestTemplate.exchange(
+            "/trade-sessions/$tradeSessionId/stop",
+            HttpMethod.POST,
+            HttpEntity.EMPTY,
+            Unit::class.java
+        )
 
         //then
         response.statusCode shouldBe HttpStatus.OK
 
-        marketDataBrokerGrpcStub.verifyForGetCandles("get-candles.json")
         marketDataBrokerGrpcStub.verifyForMarketDataStream("market-data-stream-subscribe.json")
+        marketDataBrokerGrpcStub.verifyForMarketDataStream("market-data-stream-unsubscribe.json")
 
         val tradeSessionList = tradeSessionRepository.findAll().toList()
         tradeSessionList.size shouldBe 1
-        val tradeSession = tradeSessionList[0]
-        tradeSession.ticker shouldBe "SBER"
-        tradeSession.instrumentId shouldBe "e6123145-9665-43e0-8413-cd61b8aa9b1"
-        tradeSession.status shouldBe TradeSessionStatus.WAITING
+        val stopperTradeSession = tradeSessionList[0]
+        stopperTradeSession.ticker shouldBe "SBER"
+        stopperTradeSession.instrumentId shouldBe "e6123145-9665-43e0-8413-cd61b8aa9b1"
+        stopperTradeSession.status shouldBe TradeSessionStatus.STOPPED
         withClue("start date should be present") {
-            tradeSession.startDate shouldNotBe null
+            stopperTradeSession.startDate shouldNotBe null
         }
-        tradeSession.candleInterval shouldBe CandleInterval.ONE_MIN
-        tradeSession.lotsQuantity shouldBe 4
+        stopperTradeSession.candleInterval shouldBe CandleInterval.ONE_MIN
+        stopperTradeSession.lotsQuantity shouldBe 4
         withClue("last event date should not be null") {
-            tradeSession.lastEventDate shouldNotBe null
+            stopperTradeSession.lastEventDate shouldNotBe null
         }
     }
 

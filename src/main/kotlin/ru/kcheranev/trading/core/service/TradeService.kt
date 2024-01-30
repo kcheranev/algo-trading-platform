@@ -1,6 +1,5 @@
 package ru.kcheranev.trading.core.service
 
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.kcheranev.trading.common.DateSupplier
@@ -28,12 +27,10 @@ import ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationP
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderPersistencePort
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionPersistencePort
 import ru.kcheranev.trading.core.strategy.StrategyFactoryProvider
-import ru.kcheranev.trading.domain.TradeSessionCreatedDomainEvent
 import ru.kcheranev.trading.domain.entity.StrategyConfiguration
 import ru.kcheranev.trading.domain.entity.TradeDirection
 import ru.kcheranev.trading.domain.entity.TradeOrder
 import ru.kcheranev.trading.domain.entity.TradeSession
-import ru.kcheranev.trading.domain.model.Instrument
 
 @Service
 class TradeService(
@@ -41,7 +38,6 @@ class TradeService(
     private val tradeSessionPersistencePort: TradeSessionPersistencePort,
     private val tradeOrderPersistencePort: TradeOrderPersistencePort,
     private val historicCandleBrokerPort: HistoricCandleBrokerPort,
-    private val eventPublisher: ApplicationEventPublisher,
     private val strategyFactoryProvider: StrategyFactoryProvider,
     private val dateSupplier: DateSupplier
 ) : CreateStrategyConfigurationUseCase,
@@ -89,14 +85,6 @@ class TradeService(
                 dateSupplier = dateSupplier
             )
         tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
-        with(tradeSession) {
-            eventPublisher.publishEvent(
-                TradeSessionCreatedDomainEvent(
-                    Instrument(instrumentId, ticker),
-                    candleInterval
-                )
-            )
-        }
     }
 
     @Transactional

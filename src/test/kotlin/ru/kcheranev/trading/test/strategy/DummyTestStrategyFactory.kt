@@ -9,7 +9,7 @@ import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.TradeStrategy
 import java.math.BigDecimal
 
-class DummyTestStrategy : StrategyFactory {
+class DummyTestStrategyFactory : StrategyFactory {
 
     override fun initStrategy(
         params: StrategyParameters,

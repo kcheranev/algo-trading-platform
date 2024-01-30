@@ -67,7 +67,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
             candleSubscriptions.compute(candlesStreamId) { _, value -> if (value == 1) null else value?.minus(1) }
         }
 
-    private fun checkCandlesSubscriptionExists(ticker: String, candleInterval: CandleInterval): Boolean =
+    private fun checkCandlesSubscriptionExists(ticker: String, candleInterval: CandleInterval) =
         candleSubscriptions.filter {
             it.key == CANDLES_STREAM_ID_FORMAT.format(ticker, candleInterval)
         }.isNotEmpty()
