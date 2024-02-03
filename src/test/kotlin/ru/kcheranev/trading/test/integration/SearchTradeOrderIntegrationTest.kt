@@ -1,6 +1,7 @@
 package ru.kcheranev.trading.test.integration
 
 import io.kotest.assertions.withClue
+import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.bigdecimal.shouldBeGreaterThan
 import io.kotest.matchers.date.shouldNotBeBefore
@@ -29,7 +30,6 @@ import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.Strateg
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeOrderRepository
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeSessionRepository
 import ru.kcheranev.trading.test.IntegrationTest
-import ru.kcheranev.trading.test.extension.CleanDatabaseExtension
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -39,10 +39,10 @@ class SearchTradeOrderIntegrationTest(
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
     private val tradeSessionRepository: TradeSessionRepository,
     private val tradeOrderRepository: TradeOrderRepository,
-    private val cleanDatabaseExtension: CleanDatabaseExtension
+    private val integrationTestExtensions: List<Extension>
 ) : StringSpec({
 
-    extension(cleanDatabaseExtension)
+    extensions(integrationTestExtensions)
 
     beforeEach {
         val strategyConfiguration =

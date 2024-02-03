@@ -31,13 +31,17 @@ class TradingAppTestConfiguration {
     fun dummyTestStrategy() = DummyTestStrategyFactory()
 
     @Bean
-    fun grpcWireMockServer() =
-        WireMockServer(
-            WireMockConfiguration.wireMockConfig()
-                .port(grpcWireMockServerPort)
-                .withRootDirectory("src/test/resources/wiremock")
-                .extensions(GrpcExtensionFactory())
-        )
+    fun grpcWireMockServer(): WireMockServer {
+        val wireMockServer =
+            WireMockServer(
+                WireMockConfiguration.wireMockConfig()
+                    .port(grpcWireMockServerPort)
+                    .withRootDirectory("src/test/resources/wiremock")
+                    .extensions(GrpcExtensionFactory())
+            )
+        wireMockServer.start()
+        return wireMockServer
+    }
 
     @Bean
     fun dateSupplier() = spyk(

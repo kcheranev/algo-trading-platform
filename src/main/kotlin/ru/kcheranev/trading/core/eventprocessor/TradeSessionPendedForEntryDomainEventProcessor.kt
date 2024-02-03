@@ -19,7 +19,10 @@ class TradeSessionPendedForEntryDomainEventProcessor(
 
     @TransactionalEventListener
     fun processTradeSessionPendedForEntryDomainEvent(event: TradeSessionPendedForEntryDomainEvent) {
-        log.info("Trading session ${event.tradeSessionId} ${event.instrument.ticker} ${event.candleInterval} is ready for entry")
+        log.info(
+            "Trading session tradeSessionId=${event.tradeSessionId}, ticker= ${event.instrument.ticker}, " +
+                    "candleInterval=${event.candleInterval} is ready for entry"
+        )
         val postOrderResponse =
             orderServiceBrokerPort.postBestPriceBuyOrder(
                 PostBestPriceBuyOrderCommand(event.instrument, event.lotsQuantity)

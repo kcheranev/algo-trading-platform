@@ -1,6 +1,9 @@
 package ru.kcheranev.trading.test.stub
 
+import org.awaitility.Awaitility.await
+import org.awaitility.core.ThrowingRunnable
 import ru.kcheranev.trading.test.util.TestUtils.readResourceAsString
+import java.util.concurrent.TimeUnit
 
 abstract class AbstractGrpcStub(
     private val testName: String
@@ -11,5 +14,9 @@ abstract class AbstractGrpcStub(
 
     protected fun grpcResponse(fileName: String) =
         readResourceAsString("integration/$testName/grpc/response/$fileName")
+
+    protected fun awaitedVerify(assertion: ThrowingRunnable) {
+        await().atMost(1, TimeUnit.SECONDS).untilAsserted(assertion)
+    }
 
 }

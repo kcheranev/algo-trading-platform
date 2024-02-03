@@ -1,5 +1,6 @@
 package ru.kcheranev.trading.test.integration
 
+import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -10,16 +11,15 @@ import ru.kcheranev.trading.domain.model.StrategyType
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.CreateStrategyConfigurationRequest
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
 import ru.kcheranev.trading.test.IntegrationTest
-import ru.kcheranev.trading.test.extension.CleanDatabaseExtension
 
 @IntegrationTest
 class CreateStrategyConfigurationIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
-    private val cleanDatabaseExtension: CleanDatabaseExtension
+    private val integrationTestExtensions: List<Extension>
 ) : StringSpec({
 
-    extension(cleanDatabaseExtension)
+    extensions(integrationTestExtensions)
 
     "should create strategy configuration" {
         //given

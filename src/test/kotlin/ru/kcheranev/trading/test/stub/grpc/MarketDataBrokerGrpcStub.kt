@@ -42,8 +42,10 @@ class MarketDataBrokerGrpcStub(
     }
 
     fun verifyForMarketDataStream(fineName: String) {
-        marketDataStreamService.verify("MarketDataStream")
-            .withRequestMessage(equalToJson(grpcRequest(fineName)))
+        awaitedVerify {
+            marketDataStreamService.verify("MarketDataStream")
+                .withRequestMessage(equalToJson(grpcRequest(fineName)))
+        }
     }
 
 }

@@ -2,8 +2,8 @@ package ru.kcheranev.trading.test.integration
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import io.kotest.assertions.withClue
+import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.extensions.wiremock.WireMockListener
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -17,7 +17,6 @@ import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeSessionRepository
 import ru.kcheranev.trading.test.IntegrationTest
-import ru.kcheranev.trading.test.extension.CleanDatabaseExtension
 import ru.kcheranev.trading.test.stub.grpc.MarketDataBrokerGrpcStub
 
 @IntegrationTest
@@ -25,18 +24,15 @@ class StartTradeSessionIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
     private val tradeSessionRepository: TradeSessionRepository,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
-    private val cleanDatabaseExtension: CleanDatabaseExtension,
-    private val grpcWireMockListener: WireMockListener,
-    private val grpcWireMockServer: WireMockServer
+    private val grpcWireMockServer: WireMockServer,
+    private val integrationTestExtensions: List<Extension>
 ) : StringSpec({
+
+    extensions(integrationTestExtensions)
 
     val testName = "start-trade-session"
 
     val marketDataBrokerGrpcStub by lazy { MarketDataBrokerGrpcStub(testName, grpcWireMockServer) }
-
-    listener(grpcWireMockListener)
-
-    extension(cleanDatabaseExtension)
 
     "should start trade session" {
         //given

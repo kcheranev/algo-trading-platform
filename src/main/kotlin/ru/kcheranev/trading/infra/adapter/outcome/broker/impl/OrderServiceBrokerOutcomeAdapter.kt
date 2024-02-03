@@ -26,7 +26,7 @@ class OrderServiceBrokerOutcomeAdapter(
     override fun postBestPriceBuyOrder(
         command: PostBestPriceBuyOrderCommand
     ): PostOrderResponse {
-        log.info("Post buy best price order for the ${command.instrument.ticker}")
+        log.info("Post buy best price order for the trade session ticker=${command.instrument.ticker}")
         return orderService.postOrderSync(
             command.instrument.id,
             command.quantity.toLong(),
@@ -41,7 +41,7 @@ class OrderServiceBrokerOutcomeAdapter(
     override fun postBestPriceSellOrder(
         command: PostBestPriceSellOrderCommand
     ): PostOrderResponse {
-        log.info("Post sell best price order for the ${command.instrument.ticker}")
+        log.info("Post sell best price order for the trade session ticker=${command.instrument.ticker}")
         return orderService.postOrderSync(
             command.instrument.id,
             command.quantity.toLong(),

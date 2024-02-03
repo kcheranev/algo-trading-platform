@@ -6,7 +6,6 @@ import ru.kcheranev.trading.core.port.income.trading.ReceiveCandleUseCase
 import ru.kcheranev.trading.core.port.outcome.broker.MarketDataStreamSubscriptionBrokerPort
 import ru.kcheranev.trading.core.port.outcome.broker.SubscribeCandlesOrderCommand
 import ru.kcheranev.trading.core.port.outcome.broker.UnsubscribeCandlesOrderCommand
-import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.infra.adapter.income.broker.impl.CandleSubscriptionBrokerIncomeAdapter
 import ru.kcheranev.trading.infra.adapter.outcome.broker.brokerOutcomeAdapterMapper
 import ru.kcheranev.trading.infra.config.BrokerApi
@@ -18,14 +17,13 @@ private const val CANDLES_STREAM_ID_FORMAT = "candles_%s_%s"
 @Component
 class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
     brokerApi: BrokerApi,
-    private val receiveCandleUseCase: ReceiveCandleUseCase
+    private val receiveCandleUseCase: ReceiveCandleUseCase,
+    private val candleSubscriptionCounter: CandleSubscriptionCounter
 ) : MarketDataStreamSubscriptionBrokerPort {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
     private val marketDataStreamService = brokerApi.marketDataStreamService
-
-    private val candleSubscriptions = mutableMapOf<String, Int>()
 
     private val lock = ReentrantLock()
 
@@ -33,11 +31,11 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
         lock.withLock {
             val ticker = command.instrument.ticker
             val candleInterval = command.candleInterval
-            if (checkCandlesSubscriptionExists(ticker, candleInterval)) {
+            val candlesStreamId = CANDLES_STREAM_ID_FORMAT.format(ticker, candleInterval)
+            if (candleSubscriptionCounter.checkSubscriptionExists(candlesStreamId)) {
                 return
             }
-            log.info("Activate subscription for the $ticker $candleInterval")
-            val candlesStreamId = CANDLES_STREAM_ID_FORMAT.format(ticker, candleInterval)
+            log.info("Activate subscription for the trade session ticker=$ticker, candleInterval=$candleInterval")
             marketDataStreamService.newStream(
                 candlesStreamId,
                 CandleSubscriptionBrokerIncomeAdapter(receiveCandleUseCase)
@@ -46,7 +44,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
                     listOf(command.instrument.id),
                     brokerOutcomeAdapterMapper.mapToSubscriptionInterval(candleInterval)
                 )
-            candleSubscriptions.merge(candlesStreamId, 1) { oldValue, value -> oldValue + value }
+            candleSubscriptionCounter.addCandleSubscription(candlesStreamId)
         }
 
 
@@ -54,22 +52,17 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
         lock.withLock {
             val ticker = command.instrument.ticker
             val candleInterval = command.candleInterval
-            if (!checkCandlesSubscriptionExists(ticker, candleInterval)) {
+            val candlesStreamId = CANDLES_STREAM_ID_FORMAT.format(ticker, candleInterval)
+            if (!candleSubscriptionCounter.checkSubscriptionExists(candlesStreamId)) {
                 return
             }
-            log.info("Deactivate subscription for the $ticker $candleInterval")
-            val candlesStreamId = CANDLES_STREAM_ID_FORMAT.format(ticker, candleInterval)
+            log.info("Deactivate subscription for the trade session ticker=$ticker, candleInterval=$candleInterval")
             marketDataStreamService.getStreamById(candlesStreamId)
                 .unsubscribeCandles(
                     listOf(command.instrument.id),
                     brokerOutcomeAdapterMapper.mapToSubscriptionInterval(candleInterval)
                 )
-            candleSubscriptions.compute(candlesStreamId) { _, value -> if (value == 1) null else value?.minus(1) }
+            candleSubscriptionCounter.removeCandleSubscription(candlesStreamId)
         }
-
-    private fun checkCandlesSubscriptionExists(ticker: String, candleInterval: CandleInterval) =
-        candleSubscriptions.filter {
-            it.key == CANDLES_STREAM_ID_FORMAT.format(ticker, candleInterval)
-        }.isNotEmpty()
 
 }

@@ -1,6 +1,7 @@
 package ru.kcheranev.trading.test.integration
 
 import io.kotest.assertions.withClue
+import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -19,7 +20,6 @@ import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeSessionRepository
 import ru.kcheranev.trading.test.IntegrationTest
-import ru.kcheranev.trading.test.extension.CleanDatabaseExtension
 import java.time.LocalDateTime
 
 @IntegrationTest
@@ -27,11 +27,11 @@ class SearchTradeSessionIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
     private val tradeSessionRepository: TradeSessionRepository,
-    private val cleanDatabaseExtension: CleanDatabaseExtension,
-    private val tradeStrategyCache: TradeStrategyCache
+    private val tradeStrategyCache: TradeStrategyCache,
+    private val integrationTestExtensions: List<Extension>
 ) : StringSpec({
 
-    extension(cleanDatabaseExtension)
+    extensions(integrationTestExtensions)
 
     beforeEach {
         val strategyConfiguration =
