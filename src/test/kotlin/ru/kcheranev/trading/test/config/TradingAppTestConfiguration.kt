@@ -6,7 +6,6 @@ import io.grpc.ManagedChannelBuilder
 import io.mockk.spyk
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import org.springframework.test.util.TestSocketUtils
 import org.wiremock.grpc.GrpcExtensionFactory
 import ru.kcheranev.trading.common.DateSupplier
 import ru.kcheranev.trading.infra.config.BrokerApi
@@ -17,12 +16,10 @@ import java.time.LocalDateTime
 @TestConfiguration
 class TradingAppTestConfiguration {
 
-    private val grpcWireMockServerPort = TestSocketUtils.findAvailableTcpPort()
-
     @Bean(destroyMethod = "destroy")
-    fun brokerApi(brokerProperties: BrokerProperties) =
+    fun brokerApi(brokerProperties: BrokerProperties, wireMockServer: WireMockServer) =
         BrokerApi.init(
-            ManagedChannelBuilder.forAddress("localhost", grpcWireMockServerPort)
+            ManagedChannelBuilder.forAddress("localhost", wireMockServer.port())
                 .usePlaintext()
                 .build()
         )
@@ -35,7 +32,7 @@ class TradingAppTestConfiguration {
         val wireMockServer =
             WireMockServer(
                 WireMockConfiguration.wireMockConfig()
-                    .port(grpcWireMockServerPort)
+                    .dynamicPort()
                     .withRootDirectory("src/test/resources/wiremock")
                     .extensions(GrpcExtensionFactory())
             )
