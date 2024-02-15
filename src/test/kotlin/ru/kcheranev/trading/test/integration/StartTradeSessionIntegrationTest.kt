@@ -12,6 +12,7 @@ import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.StartTradeSessionRequest
+import ru.kcheranev.trading.infra.adapter.income.web.model.response.StartTradeSessionResponse
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
@@ -25,10 +26,10 @@ class StartTradeSessionIntegrationTest(
     private val tradeSessionRepository: TradeSessionRepository,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
     private val grpcWireMockServer: WireMockServer,
-    private val integrationTestExtensions: List<Extension>
+    private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
 
-    extensions(integrationTestExtensions)
+    extensions(resetTestContextExtensions)
 
     val testName = "start-trade-session"
 
@@ -56,11 +57,14 @@ class StartTradeSessionIntegrationTest(
                 4,
                 Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
             ),
-            Unit::class.java
+            StartTradeSessionResponse::class.java
         )
 
         //then
         response.statusCode shouldBe HttpStatus.OK
+        withClue("trade session id should be present") {
+            response.body?.tradeSessionId shouldNotBe null
+        }
 
         marketDataBrokerGrpcStub.verifyForGetCandles("get-candles.json")
         marketDataBrokerGrpcStub.verifyForMarketDataStream("market-data-stream-subscribe.json")

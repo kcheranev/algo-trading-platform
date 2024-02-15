@@ -16,7 +16,8 @@ class TradeOrderEntityRowMapper : RowMapper<TradeOrderEntity> {
             instrumentId = rs.getString("instrument_id"),
             date = rs.getTimestamp("date").toLocalDateTime(),
             lotsQuantity = rs.getInt("lots_quantity"),
-            price = rs.getBigDecimal("price"),
+            totalPrice = rs.getBigDecimal("total_price"),
+            executedCommission = rs.getBigDecimal("executed_commission"),
             direction = TradeDirection.valueOf(rs.getString("direction")),
             tradeSessionId = rs.getLong("trade_session_id")
         )

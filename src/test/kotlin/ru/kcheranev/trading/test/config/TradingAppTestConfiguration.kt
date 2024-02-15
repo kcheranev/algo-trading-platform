@@ -8,9 +8,12 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.wiremock.grpc.GrpcExtensionFactory
 import ru.kcheranev.trading.common.DateSupplier
+import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionCounter
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeStrategyCache
 import ru.kcheranev.trading.infra.config.BrokerApi
 import ru.kcheranev.trading.infra.config.BrokerProperties
 import ru.kcheranev.trading.test.strategy.DummyTestStrategyFactory
+import ru.kcheranev.trading.test.util.TradeSessionContextInitializer
 import java.time.LocalDateTime
 
 @TestConfiguration
@@ -25,7 +28,7 @@ class TradingAppTestConfiguration {
         )
 
     @Bean
-    fun dummyTestStrategy() = DummyTestStrategyFactory()
+    fun dummyTestStrategyFactory() = DummyTestStrategyFactory()
 
     @Bean
     fun grpcWireMockServer(): WireMockServer {
@@ -46,5 +49,13 @@ class TradingAppTestConfiguration {
             override fun currentDate() = LocalDateTime.parse("2024-01-30T10:15:30")
         }
     )
+
+    @Bean
+    fun tradeSessionContextInitializer(
+        tradeStrategyCache: TradeStrategyCache,
+        candleSubscriptionCounter: CandleSubscriptionCounter,
+        brokerApi: BrokerApi
+    ) =
+        TradeSessionContextInitializer(tradeStrategyCache, candleSubscriptionCounter, brokerApi)
 
 }

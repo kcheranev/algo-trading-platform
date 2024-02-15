@@ -12,6 +12,7 @@ import ru.kcheranev.trading.core.port.income.trading.StopTradeSessionUseCase
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.StartTradeSessionRequest
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.TradeSessionSearchRequest
+import ru.kcheranev.trading.infra.adapter.income.web.model.response.StartTradeSessionResponse
 import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeSessionSearchResponse
 import ru.kcheranev.trading.infra.adapter.income.web.webIncomeAdapterMapper
 
@@ -25,7 +26,9 @@ class TradeSessionController(
 
     @PostMapping
     fun start(@RequestBody request: StartTradeSessionRequest) =
-        startTradeSessionUseCase.startTradeSession(webIncomeAdapterMapper.map(request))
+        StartTradeSessionResponse(
+            startTradeSessionUseCase.startTradeSession(webIncomeAdapterMapper.map(request)).value
+        )
 
     @PostMapping("{id}/stop")
     fun stop(@PathVariable id: Long) =

@@ -34,9 +34,3 @@ data class StrategyConfiguration(
 data class StrategyConfigurationId(
     val value: Long
 )
-
-enum class StrategyConfigurationSort : SortField {
-
-    TYPE, CANDLE_INTERVAL
-
-}

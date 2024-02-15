@@ -8,9 +8,9 @@ import io.kotest.matchers.shouldNotBe
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.core.port.common.model.Page
-import ru.kcheranev.trading.core.port.common.model.Sort
-import ru.kcheranev.trading.core.port.common.model.SortDirection
-import ru.kcheranev.trading.domain.entity.StrategyConfigurationSort
+import ru.kcheranev.trading.core.port.common.model.sort.Sort
+import ru.kcheranev.trading.core.port.common.model.sort.SortDirection
+import ru.kcheranev.trading.core.port.common.model.sort.StrategyConfigurationSort
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.StrategyType
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.StrategyConfigurationSearchRequest
@@ -24,10 +24,10 @@ import ru.kcheranev.trading.test.IntegrationTest
 class SearchStrategyConfigurationIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
-    private val integrationTestExtensions: List<Extension>
+    private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
 
-    extensions(integrationTestExtensions)
+    extensions(resetTestContextExtensions)
 
     beforeEach {
         val strategyConfigurations =

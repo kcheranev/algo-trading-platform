@@ -31,6 +31,7 @@ import ru.kcheranev.trading.domain.entity.StrategyConfiguration
 import ru.kcheranev.trading.domain.entity.TradeDirection
 import ru.kcheranev.trading.domain.entity.TradeOrder
 import ru.kcheranev.trading.domain.entity.TradeSession
+import ru.kcheranev.trading.domain.entity.TradeSessionId
 
 @Service
 class TradeService(
@@ -60,7 +61,7 @@ class TradeService(
     }
 
     @Transactional
-    override fun startTradeSession(command: StartTradeSessionCommand) {
+    override fun startTradeSession(command: StartTradeSessionCommand): TradeSessionId {
         val strategyConfiguration =
             strategyConfigurationPersistencePort.get(
                 GetStrategyConfigurationCommand(command.strategyConfigurationId)
@@ -84,7 +85,7 @@ class TradeService(
                 strategyFactory = strategyFactory,
                 dateSupplier = dateSupplier
             )
-        tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
+        return tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
     }
 
     @Transactional
@@ -117,7 +118,8 @@ class TradeService(
                     ticker = ticker,
                     instrumentId = instrumentId,
                     lotsQuantity = lotsQuantity,
-                    price = command.totalPrice,
+                    totalPrice = command.totalPrice,
+                    executedCommission = command.executedCommission,
                     direction = TradeDirection.BUY,
                     tradeSessionId = id!!,
                     dateSupplier = dateSupplier
@@ -137,7 +139,8 @@ class TradeService(
                     ticker = ticker,
                     instrumentId = instrumentId,
                     lotsQuantity = lotsQuantity,
-                    price = command.totalPrice,
+                    totalPrice = command.totalPrice,
+                    executedCommission = command.executedCommission,
                     direction = TradeDirection.SELL,
                     tradeSessionId = id!!,
                     dateSupplier = dateSupplier

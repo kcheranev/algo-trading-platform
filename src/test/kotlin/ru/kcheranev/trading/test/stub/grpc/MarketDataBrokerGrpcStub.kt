@@ -36,15 +36,15 @@ class MarketDataBrokerGrpcStub(
         )
     }
 
-    fun verifyForGetCandles(fineName: String) {
+    fun verifyForGetCandles(fileName: String) {
         marketDataService.verify("GetCandles")
-            .withRequestMessage(equalToJson(grpcRequest(fineName)))
+            .withRequestMessage(equalToJson(grpcRequest(fileName)))
     }
 
-    fun verifyForMarketDataStream(fineName: String) {
+    fun verifyForMarketDataStream(fileName: String) {
         awaitedVerify {
             marketDataStreamService.verify("MarketDataStream")
-                .withRequestMessage(equalToJson(grpcRequest(fineName)))
+                .withRequestMessage(equalToJson(grpcRequest(fileName)))
         }
     }
 

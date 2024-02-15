@@ -10,10 +10,10 @@ abstract class AbstractGrpcStub(
 ) {
 
     protected fun grpcRequest(fileName: String) =
-        readResourceAsString("integration/$testName/grpc/request/$fileName")
+        readResourceAsString("stub/$testName/grpc/request/$fileName")
 
     protected fun grpcResponse(fileName: String) =
-        readResourceAsString("integration/$testName/grpc/response/$fileName")
+        readResourceAsString("stub/$testName/grpc/response/$fileName")
 
     protected fun awaitedVerify(assertion: ThrowingRunnable) {
         await().atMost(1, TimeUnit.SECONDS).untilAsserted(assertion)

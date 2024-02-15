@@ -10,7 +10,8 @@ data class TradeOrder(
     val instrumentId: String,
     val date: LocalDateTime,
     val lotsQuantity: Int,
-    val price: BigDecimal,
+    val totalPrice: BigDecimal,
+    val executedCommission: BigDecimal,
     val direction: TradeDirection,
     val tradeSessionId: TradeSessionId
 ) : AbstractAggregateRoot() {
@@ -21,7 +22,8 @@ data class TradeOrder(
             ticker: String,
             instrumentId: String,
             lotsQuantity: Int,
-            price: BigDecimal,
+            totalPrice: BigDecimal,
+            executedCommission: BigDecimal,
             direction: TradeDirection,
             tradeSessionId: TradeSessionId,
             dateSupplier: DateSupplier
@@ -32,7 +34,8 @@ data class TradeOrder(
                 instrumentId = instrumentId,
                 date = dateSupplier.currentDate(),
                 lotsQuantity = lotsQuantity,
-                price = price,
+                totalPrice = totalPrice,
+                executedCommission = executedCommission,
                 direction = direction,
                 tradeSessionId = tradeSessionId
             )
@@ -48,11 +51,5 @@ data class TradeOrderId(
 enum class TradeDirection {
 
     BUY, SELL
-
-}
-
-enum class TradeOrderSort : SortField {
-
-    TICKER, DATE, PRICE, DIRECTION
 
 }

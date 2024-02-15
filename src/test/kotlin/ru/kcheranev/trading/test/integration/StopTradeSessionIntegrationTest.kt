@@ -6,23 +6,20 @@ import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.mockk.mockk
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionCounter
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeStrategyCache
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeSessionRepository
-import ru.kcheranev.trading.infra.config.BrokerApi
 import ru.kcheranev.trading.test.IntegrationTest
 import ru.kcheranev.trading.test.stub.grpc.MarketDataBrokerGrpcStub
+import ru.kcheranev.trading.test.util.TradeSessionContextInitializer
 import java.time.LocalDateTime
 
 @IntegrationTest
@@ -31,19 +28,15 @@ class StopTradeSessionIntegrationTest(
     private val tradeSessionRepository: TradeSessionRepository,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
     private val grpcWireMockServer: WireMockServer,
-    private val tradeStrategyCache: TradeStrategyCache,
-    private val candleSubscriptionCounter: CandleSubscriptionCounter,
-    private val brokerApi: BrokerApi,
-    private val integrationTestExtensions: List<Extension>
+    private val tradeSessionContextInitializer: TradeSessionContextInitializer,
+    private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
 
-    extensions(integrationTestExtensions)
+    extensions(resetTestContextExtensions)
 
     val testName = "stop-trade-session"
 
     val marketDataBrokerGrpcStub by lazy { MarketDataBrokerGrpcStub(testName, grpcWireMockServer) }
-
-    val marketDataStreamService = brokerApi.marketDataStreamService
 
     "should stop trade session" {
         //given
@@ -70,9 +63,7 @@ class StopTradeSessionIntegrationTest(
                     strategyConfigurationId = strategyConfiguration.id!!
                 )
             )
-        tradeStrategyCache.put(tradeSession.id!!, mockk())
-        candleSubscriptionCounter.addCandleSubscription("candles_SBER_ONE_MIN")
-        marketDataStreamService.newStream("candles_SBER_ONE_MIN", {}) {}
+        tradeSessionContextInitializer.init(tradeSession.id!!, "SBER", CandleInterval.ONE_MIN)
 
         //when
         val response = testRestTemplate.exchange(

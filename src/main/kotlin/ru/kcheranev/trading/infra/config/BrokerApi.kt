@@ -3,9 +3,7 @@ package ru.kcheranev.trading.infra.config
 import io.grpc.Channel
 import ru.tinkoff.piapi.core.InvestApi
 
-class BrokerApi(
-    private val investApi: InvestApi
-) {
+class BrokerApi(private val investApi: InvestApi) {
 
     val orderService = investApi.ordersService
 

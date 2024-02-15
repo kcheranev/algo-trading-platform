@@ -2,11 +2,11 @@ package ru.kcheranev.trading.infra.adapter.income.web.model.request
 
 import ru.kcheranev.trading.core.port.common.model.ComparedField
 import ru.kcheranev.trading.core.port.common.model.Page
-import ru.kcheranev.trading.core.port.common.model.Sort
-import ru.kcheranev.trading.domain.entity.StrategyConfigurationSort
+import ru.kcheranev.trading.core.port.common.model.sort.Sort
+import ru.kcheranev.trading.core.port.common.model.sort.StrategyConfigurationSort
+import ru.kcheranev.trading.core.port.common.model.sort.TradeOrderSort
+import ru.kcheranev.trading.core.port.common.model.sort.TradeSessionSort
 import ru.kcheranev.trading.domain.entity.TradeDirection
-import ru.kcheranev.trading.domain.entity.TradeOrderSort
-import ru.kcheranev.trading.domain.entity.TradeSessionSort
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import java.math.BigDecimal
@@ -39,7 +39,7 @@ data class TradeOrderSearchRequest(
     val instrumentId: String? = null,
     val date: ComparedField<LocalDateTime>? = null,
     val lotsQuantity: ComparedField<Int>? = null,
-    val price: ComparedField<BigDecimal>? = null,
+    val totalPrice: ComparedField<BigDecimal>? = null,
     val direction: TradeDirection? = null,
     val tradeSessionId: Long? = null,
     val page: Page? = null,

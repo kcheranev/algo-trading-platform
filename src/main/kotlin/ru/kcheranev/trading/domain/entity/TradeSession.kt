@@ -163,9 +163,3 @@ enum class TradeSessionStatus(
     fun transitionAvailable(transition: TradeSessionStatus) = transition in availableTransitions.get()
 
 }
-
-enum class TradeSessionSort : SortField {
-
-    TICKER, STATUS, START_DATE, CANDLE_INTERVAL
-
-}

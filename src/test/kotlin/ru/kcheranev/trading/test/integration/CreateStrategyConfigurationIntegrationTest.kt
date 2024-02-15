@@ -16,10 +16,10 @@ import ru.kcheranev.trading.test.IntegrationTest
 class CreateStrategyConfigurationIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
-    private val integrationTestExtensions: List<Extension>
+    private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
 
-    extensions(integrationTestExtensions)
+    extensions(resetTestContextExtensions)
 
     "should create strategy configuration" {
         //given

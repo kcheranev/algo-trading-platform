@@ -13,4 +13,4 @@ application:
   infra.broker:
     token: ${TOKEN}
     appName: ${spring.application.name}
-    tradingAccountName: account-name
+    tradingAccountName: trading_account

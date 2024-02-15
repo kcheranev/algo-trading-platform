@@ -13,10 +13,10 @@ import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.core.port.common.model.ComparedField
 import ru.kcheranev.trading.core.port.common.model.Comparsion
 import ru.kcheranev.trading.core.port.common.model.Page
-import ru.kcheranev.trading.core.port.common.model.Sort
-import ru.kcheranev.trading.core.port.common.model.SortDirection
+import ru.kcheranev.trading.core.port.common.model.sort.Sort
+import ru.kcheranev.trading.core.port.common.model.sort.SortDirection
+import ru.kcheranev.trading.core.port.common.model.sort.TradeOrderSort
 import ru.kcheranev.trading.domain.entity.TradeDirection
-import ru.kcheranev.trading.domain.entity.TradeOrderSort
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.StrategyType
@@ -39,10 +39,10 @@ class SearchTradeOrderIntegrationTest(
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
     private val tradeSessionRepository: TradeSessionRepository,
     private val tradeOrderRepository: TradeOrderRepository,
-    private val integrationTestExtensions: List<Extension>
+    private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
 
-    extensions(integrationTestExtensions)
+    extensions(resetTestContextExtensions)
 
     beforeEach {
         val strategyConfiguration =
@@ -75,7 +75,8 @@ class SearchTradeOrderIntegrationTest(
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                     date = LocalDateTime.parse("2024-01-01T10:15:35"),
                     lotsQuantity = 10,
-                    price = BigDecimal(100),
+                    totalPrice = BigDecimal(100),
+                    executedCommission = BigDecimal(1),
                     direction = TradeDirection.BUY,
                     tradeSessionId = tradeSession1.id!!
                 ),
@@ -84,7 +85,8 @@ class SearchTradeOrderIntegrationTest(
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                     date = LocalDateTime.parse("2024-01-01T10:15:40"),
                     lotsQuantity = 11,
-                    price = BigDecimal(100),
+                    totalPrice = BigDecimal(100),
+                    executedCommission = BigDecimal(2),
                     direction = TradeDirection.SELL,
                     tradeSessionId = tradeSession1.id!!
                 ),
@@ -93,7 +95,8 @@ class SearchTradeOrderIntegrationTest(
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                     date = LocalDateTime.parse("2024-01-01T10:15:45"),
                     lotsQuantity = 12,
-                    price = BigDecimal(110),
+                    totalPrice = BigDecimal(110),
+                    executedCommission = BigDecimal(3),
                     direction = TradeDirection.BUY,
                     tradeSessionId = tradeSession1.id!!
                 ),
@@ -102,7 +105,8 @@ class SearchTradeOrderIntegrationTest(
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                     date = LocalDateTime.parse("2024-01-01T10:15:50"),
                     lotsQuantity = 13,
-                    price = BigDecimal(120),
+                    totalPrice = BigDecimal(120),
+                    executedCommission = BigDecimal(4),
                     direction = TradeDirection.SELL,
                     tradeSessionId = tradeSession1.id!!
                 ),
@@ -111,7 +115,8 @@ class SearchTradeOrderIntegrationTest(
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                     date = LocalDateTime.parse("2024-01-01T10:15:55"),
                     lotsQuantity = 14,
-                    price = BigDecimal(130),
+                    totalPrice = BigDecimal(130),
+                    executedCommission = BigDecimal(5),
                     direction = TradeDirection.BUY,
                     tradeSessionId = tradeSession1.id!!
                 ),
@@ -120,7 +125,8 @@ class SearchTradeOrderIntegrationTest(
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                     date = LocalDateTime.parse("2024-01-01T10:16:00"),
                     lotsQuantity = 15,
-                    price = BigDecimal(140),
+                    totalPrice = BigDecimal(140),
+                    executedCommission = BigDecimal(6),
                     direction = TradeDirection.SELL,
                     tradeSessionId = tradeSession1.id!!
                 ),
@@ -129,7 +135,8 @@ class SearchTradeOrderIntegrationTest(
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                     date = LocalDateTime.parse("2024-01-01T10:16:05"),
                     lotsQuantity = 16,
-                    price = BigDecimal(150),
+                    totalPrice = BigDecimal(150),
+                    executedCommission = BigDecimal(7),
                     direction = TradeDirection.BUY,
                     tradeSessionId = tradeSession1.id!!
                 )
@@ -156,7 +163,8 @@ class SearchTradeOrderIntegrationTest(
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b2",
                 date = LocalDateTime.parse("2024-01-01T10:15:35"),
                 lotsQuantity = 10,
-                price = BigDecimal(100),
+                totalPrice = BigDecimal(100),
+                executedCommission = BigDecimal(1),
                 direction = TradeDirection.BUY,
                 tradeSessionId = tradeSession2.id!!
             )
@@ -281,11 +289,11 @@ class SearchTradeOrderIntegrationTest(
         }
     }
 
-    "should search trade orders by price" {
+    "should search trade orders by total price" {
         //given
         val request =
             TradeOrderSearchRequest(
-                price = ComparedField(BigDecimal(120), Comparsion.GT)
+                totalPrice = ComparedField(BigDecimal(120), Comparsion.GT)
             )
         //when
         val response = testRestTemplate.postForEntity(
@@ -302,7 +310,7 @@ class SearchTradeOrderIntegrationTest(
         val tradeOrdersResult = response.body!!.tradeOrders
         tradeOrdersResult.size shouldBe 3
         tradeOrdersResult.forEach {
-            it.price shouldBeGreaterThan BigDecimal(120)
+            it.totalPrice shouldBeGreaterThan BigDecimal(120)
         }
     }
 
@@ -362,7 +370,7 @@ class SearchTradeOrderIntegrationTest(
         val request =
             TradeOrderSearchRequest(
                 page = Page(2, 1),
-                sort = Sort(TradeOrderSort.PRICE, SortDirection.DESC)
+                sort = Sort(TradeOrderSort.TOTAL_PRICE, SortDirection.DESC)
             )
         //when
         val response = testRestTemplate.postForEntity(
@@ -378,8 +386,8 @@ class SearchTradeOrderIntegrationTest(
         }
         val tradeOrdersResult = response.body!!.tradeOrders
         tradeOrdersResult.size shouldBe 2
-        tradeOrdersResult[0].price = BigDecimal(140)
-        tradeOrdersResult[1].price = BigDecimal(130)
+        tradeOrdersResult[0].totalPrice = BigDecimal(140)
+        tradeOrdersResult[1].totalPrice = BigDecimal(130)
     }
 
     "should return empty result when there are no trade orders found" {

@@ -19,8 +19,10 @@ data class TradeOrderEntity(
     val date: LocalDateTime,
     @Column("lots_quantity")
     val lotsQuantity: Int,
-    @Column("price")
-    val price: BigDecimal,
+    @Column("total_price")
+    val totalPrice: BigDecimal,
+    @Column("executed_commission")
+    val executedCommission: BigDecimal,
     @Column("direction")
     val direction: TradeDirection,
     @Column("trade_session_id")

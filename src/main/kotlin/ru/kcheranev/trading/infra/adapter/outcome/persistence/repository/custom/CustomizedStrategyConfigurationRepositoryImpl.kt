@@ -1,8 +1,8 @@
 package ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom
 
 import org.springframework.jdbc.core.JdbcTemplate
+import ru.kcheranev.trading.core.port.common.model.sort.StrategyConfigurationSort
 import ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationSearchCommand
-import ru.kcheranev.trading.domain.entity.StrategyConfigurationSort
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.addAndCondition
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.EqualsCondition

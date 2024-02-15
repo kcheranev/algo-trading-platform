@@ -6,3 +6,7 @@ spring:
 
 wiremock:
   reset-mappings-after-each-test: true
+
+application:
+  infra.broker:
+    tradingAccountName: trading_account

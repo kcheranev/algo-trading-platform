@@ -28,14 +28,15 @@ CREATE TABLE trade_session
 
 CREATE TABLE trade_order
 (
-    id               serial            NOT NULL,
-    ticker           character varying NOT NULL,
-    instrument_id    character varying NOT NULL,
-    date             timestamp without time zone NOT NULL,
-    lots_quantity    integer           NOT NULL,
-    price            numeric           NOT NULL,
-    direction        character varying NOT NULL,
-    trade_session_id bigint            NOT NULL,
+    id                  serial            NOT NULL,
+    ticker              character varying NOT NULL,
+    instrument_id       character varying NOT NULL,
+    date                timestamp without time zone NOT NULL,
+    lots_quantity       integer           NOT NULL,
+    total_price         numeric           NOT NULL,
+    executed_commission numeric           NOT NULL,
+    direction           character varying NOT NULL,
+    trade_session_id    bigint            NOT NULL,
     CONSTRAINT trade_order_pkey PRIMARY KEY (id),
     CONSTRAINT trade_session_fk FOREIGN KEY (trade_session_id)
         REFERENCES trade_session (id) MATCH SIMPLE

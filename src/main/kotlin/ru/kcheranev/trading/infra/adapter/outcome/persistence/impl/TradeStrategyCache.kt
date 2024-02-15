@@ -16,7 +16,7 @@ class TradeStrategyCache {
         tradeStrategies[key] = value
     }
 
-    fun contains(key: Long) = tradeStrategies.contains(key)
+    fun contains(key: Long) = tradeStrategies.containsKey(key)
 
     fun clear() {
         tradeStrategies.clear()

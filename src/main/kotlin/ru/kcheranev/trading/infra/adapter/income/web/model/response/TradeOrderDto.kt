@@ -10,7 +10,8 @@ data class TradeOrderDto(
     var instrumentId: String,
     var date: LocalDateTime,
     var lotsQuantity: Int,
-    var price: BigDecimal,
+    var totalPrice: BigDecimal,
+    var executedCommission: BigDecimal,
     var direction: TradeDirection,
     var tradeSessionId: Long
 )

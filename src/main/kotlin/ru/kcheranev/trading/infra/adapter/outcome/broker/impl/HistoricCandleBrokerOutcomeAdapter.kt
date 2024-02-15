@@ -18,7 +18,7 @@ class HistoricCandleBrokerOutcomeAdapter(
 
     private val marketDataService = brokerApi.marketDataService
 
-    override fun getHistoricCandles(command: GetHistoricCandlesCommand): List<Candle> =
+    override fun getHistoricCandles(command: GetHistoricCandlesCommand) =
         marketDataService.getCandlesSync(
             command.instrument.id,
             MskDateUtil.toInstant(command.from),
@@ -26,6 +26,7 @@ class HistoricCandleBrokerOutcomeAdapter(
             brokerOutcomeAdapterMapper.mapToBrokerCandleInterval(command.candleInterval)
         ).filter { it.isComplete }
             .map { brokerOutcomeAdapterMapper.map(it, command.candleInterval, command.instrument.id) }
+            .sortedBy { it.endTime }
 
     override fun getLastHistoricCandles(command: GetLastHistoricCandlesCommand): List<Candle> {
         val to = dateSupplier.currentDate()

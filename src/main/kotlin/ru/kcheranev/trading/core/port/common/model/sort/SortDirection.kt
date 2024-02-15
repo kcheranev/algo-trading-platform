@@ -1,4 +1,4 @@
-package ru.kcheranev.trading.core.port.common.model
+package ru.kcheranev.trading.core.port.common.model.sort
 
 enum class SortDirection(
     val value: String

@@ -18,7 +18,7 @@ class TradeSessionCreatedDomainEventProcessor(
     fun processTradeSessionCreatedDomainEvent(event: TradeSessionCreatedDomainEvent) {
         log.info(
             "Subscribe to the market data stream ticker=${event.instrument.ticker}, " +
-                    "candleInterval= ${event.candleInterval}"
+                    "candleInterval=${event.candleInterval}"
         )
         marketDataStreamSubscriptionBrokerPort.subscribeCandles(
             SubscribeCandlesOrderCommand(event.instrument, event.candleInterval)

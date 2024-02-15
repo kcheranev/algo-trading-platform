@@ -2,17 +2,17 @@ package ru.kcheranev.trading.core.port.outcome.persistence
 
 import ru.kcheranev.trading.core.port.common.model.ComparedField
 import ru.kcheranev.trading.core.port.common.model.Page
-import ru.kcheranev.trading.core.port.common.model.Sort
+import ru.kcheranev.trading.core.port.common.model.sort.Sort
+import ru.kcheranev.trading.core.port.common.model.sort.StrategyConfigurationSort
+import ru.kcheranev.trading.core.port.common.model.sort.TradeOrderSort
+import ru.kcheranev.trading.core.port.common.model.sort.TradeSessionSort
 import ru.kcheranev.trading.domain.entity.StrategyConfiguration
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
-import ru.kcheranev.trading.domain.entity.StrategyConfigurationSort
 import ru.kcheranev.trading.domain.entity.TradeDirection
 import ru.kcheranev.trading.domain.entity.TradeOrder
 import ru.kcheranev.trading.domain.entity.TradeOrderId
-import ru.kcheranev.trading.domain.entity.TradeOrderSort
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
-import ru.kcheranev.trading.domain.entity.TradeSessionSort
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import java.math.BigDecimal
@@ -34,7 +34,7 @@ data class TradeOrderSearchCommand(
     val instrumentId: String?,
     val date: ComparedField<LocalDateTime>?,
     val lotsQuantity: ComparedField<Int>?,
-    val price: ComparedField<BigDecimal>?,
+    val totalPrice: ComparedField<BigDecimal>?,
     val direction: TradeDirection?,
     val tradeSessionId: TradeSessionId?,
     val page: Page?,

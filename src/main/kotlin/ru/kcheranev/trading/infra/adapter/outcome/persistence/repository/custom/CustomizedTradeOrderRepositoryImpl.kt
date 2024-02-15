@@ -1,8 +1,8 @@
 package ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom
 
 import org.springframework.jdbc.core.JdbcTemplate
+import ru.kcheranev.trading.core.port.common.model.sort.TradeOrderSort
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderSearchCommand
-import ru.kcheranev.trading.domain.entity.TradeOrderSort
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.addAndCondition
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.ComparstionCondition
@@ -37,8 +37,8 @@ class CustomizedTradeOrderRepositoryImpl(
         if (command.lotsQuantity != null) {
             conditionsBuilder.addAndCondition(ComparstionCondition("lots_quantity", command.lotsQuantity))
         }
-        if (command.price != null) {
-            conditionsBuilder.addAndCondition(ComparstionCondition("price", command.price))
+        if (command.totalPrice != null) {
+            conditionsBuilder.addAndCondition(ComparstionCondition("total_price", command.totalPrice))
         }
         if (command.direction != null) {
             conditionsBuilder.addAndCondition(EqualsCondition("direction", command.direction))
@@ -54,7 +54,7 @@ class CustomizedTradeOrderRepositoryImpl(
                 when (command.sort.field) {
                     TradeOrderSort.TICKER -> "ticker"
                     TradeOrderSort.DATE -> "date"
-                    TradeOrderSort.PRICE -> "price"
+                    TradeOrderSort.TOTAL_PRICE -> "total_price"
                     TradeOrderSort.DIRECTION -> "direction"
                 }
             queryBuilder.append(" ORDER BY $sortField ${command.sort.order}")

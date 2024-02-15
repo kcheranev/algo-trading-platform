@@ -28,10 +28,10 @@ class SearchTradeSessionIntegrationTest(
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
     private val tradeSessionRepository: TradeSessionRepository,
     private val tradeStrategyCache: TradeStrategyCache,
-    private val integrationTestExtensions: List<Extension>
+    private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
 
-    extensions(integrationTestExtensions)
+    extensions(resetTestContextExtensions)
 
     beforeEach {
         val strategyConfiguration =
