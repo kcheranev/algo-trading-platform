@@ -46,7 +46,6 @@ dependencies {
     testImplementation("org.wiremock:wiremock:3.3.1")
     testImplementation("org.wiremock:wiremock-grpc-extension:0.4.0")
     testImplementation("org.testcontainers:postgresql:1.19.3")
-    testImplementation("org.awaitility:awaitility-kotlin")
 }
 
 tasks.withType<KotlinCompile> {
