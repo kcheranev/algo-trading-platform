@@ -8,15 +8,13 @@ import ru.kcheranev.trading.core.port.outcome.broker.GetLastHistoricCandlesComma
 import ru.kcheranev.trading.core.port.outcome.broker.HistoricCandleBrokerPort
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.infra.adapter.outcome.broker.brokerOutcomeAdapterMapper
-import ru.kcheranev.trading.infra.config.BrokerApi
+import ru.tinkoff.piapi.core.MarketDataService
 
 @Component
 class HistoricCandleBrokerOutcomeAdapter(
-    brokerApi: BrokerApi,
-    val dateSupplier: DateSupplier
+    private val marketDataService: MarketDataService,
+    private val dateSupplier: DateSupplier
 ) : HistoricCandleBrokerPort {
-
-    private val marketDataService = brokerApi.marketDataService
 
     override fun getHistoricCandles(command: GetHistoricCandlesCommand) =
         marketDataService.getCandlesSync(

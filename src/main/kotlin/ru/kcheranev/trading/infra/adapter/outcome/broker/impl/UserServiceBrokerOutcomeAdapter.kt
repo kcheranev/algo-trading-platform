@@ -1,18 +1,19 @@
 package ru.kcheranev.trading.infra.adapter.outcome.broker.impl
 
 import org.springframework.stereotype.Component
-import ru.kcheranev.trading.infra.config.BrokerApi
 import ru.kcheranev.trading.infra.config.BrokerProperties
+import ru.tinkoff.piapi.core.UsersService
 
 @Component
-class UserServiceBrokerOutcomeAdapter(brokerApi: BrokerApi, brokerProperties: BrokerProperties) {
+class UserServiceBrokerOutcomeAdapter(
+    private val usersService: UsersService,
+    brokerProperties: BrokerProperties
+) {
 
     private val tradingAccountName = brokerProperties.tradingAccountName
 
-    private val userService = brokerApi.userService
-
     fun getTradingAccountId(): String =
-        userService.accountsSync
+        usersService.accountsSync
             .first { it.name == tradingAccountName }
             .id
 

@@ -6,12 +6,12 @@ import org.springframework.context.annotation.Bean
 import org.springframework.jdbc.core.JdbcTemplate
 import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionCounter
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeStrategyCache
-import ru.kcheranev.trading.infra.config.BrokerApi
 import ru.kcheranev.trading.test.extension.CleanDatabaseExtension
 import ru.kcheranev.trading.test.extension.ClearTradeStrategyCacheExtension
 import ru.kcheranev.trading.test.extension.ResetCandleSubscriptionCounterExtension
 import ru.kcheranev.trading.test.extension.ResetMarketDataStreamExtension
 import ru.kcheranev.trading.test.extension.ResetWireMockExtension
+import ru.tinkoff.piapi.core.stream.MarketDataStreamService
 
 @TestConfiguration
 class ExtensionTestConfiguration {
@@ -31,7 +31,8 @@ class ExtensionTestConfiguration {
     fun resetWireMockExtension(grpcWireMockServer: WireMockServer) = ResetWireMockExtension(grpcWireMockServer)
 
     @Bean
-    fun resetMarketDataStreamExtension(brokerApi: BrokerApi) = ResetMarketDataStreamExtension(brokerApi)
+    fun resetMarketDataStreamExtension(marketDataStreamService: MarketDataStreamService) =
+        ResetMarketDataStreamExtension(marketDataStreamService)
 
     @Bean
     fun resetTestContextExtensions(

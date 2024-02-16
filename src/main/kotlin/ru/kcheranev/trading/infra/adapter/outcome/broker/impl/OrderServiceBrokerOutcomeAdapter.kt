@@ -7,7 +7,7 @@ import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceBuyOrderComman
 import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceSellOrderCommand
 import ru.kcheranev.trading.core.port.outcome.broker.model.PostOrderResponse
 import ru.kcheranev.trading.infra.adapter.outcome.broker.brokerOutcomeAdapterMapper
-import ru.kcheranev.trading.infra.config.BrokerApi
+import ru.kcheranev.trading.infra.adapter.outcome.broker.delegate.LoggingOrdersServiceDelegate
 import ru.tinkoff.piapi.contract.v1.OrderDirection
 import ru.tinkoff.piapi.contract.v1.OrderType
 import ru.tinkoff.piapi.contract.v1.Quotation
@@ -15,19 +15,17 @@ import java.util.UUID
 
 @Component
 class OrderServiceBrokerOutcomeAdapter(
-    brokerApi: BrokerApi,
+    private val loggingOrdersServiceDelegate: LoggingOrdersServiceDelegate,
     private val userServiceBrokerOutcomeAdapter: UserServiceBrokerOutcomeAdapter,
 ) : OrderServiceBrokerPort {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    private val orderService = brokerApi.orderService
-
     override fun postBestPriceBuyOrder(
         command: PostBestPriceBuyOrderCommand
     ): PostOrderResponse {
         log.info("Post buy best price order for the trade session ticker=${command.instrument.ticker}")
-        return orderService.postOrderSync(
+        return loggingOrdersServiceDelegate.postOrderSync(
             command.instrument.id,
             command.quantity.toLong(),
             Quotation.getDefaultInstance(),
@@ -42,7 +40,7 @@ class OrderServiceBrokerOutcomeAdapter(
         command: PostBestPriceSellOrderCommand
     ): PostOrderResponse {
         log.info("Post sell best price order for the trade session ticker=${command.instrument.ticker}")
-        return orderService.postOrderSync(
+        return loggingOrdersServiceDelegate.postOrderSync(
             command.instrument.id,
             command.quantity.toLong(),
             Quotation.getDefaultInstance(),

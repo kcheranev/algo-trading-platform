@@ -5,15 +5,13 @@ import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.TradeStrategy
 import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionCounter
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeStrategyCache
-import ru.kcheranev.trading.infra.config.BrokerApi
+import ru.tinkoff.piapi.core.stream.MarketDataStreamService
 
 class TradeSessionContextInitializer(
     private val tradeStrategyCache: TradeStrategyCache,
     private val candleSubscriptionCounter: CandleSubscriptionCounter,
-    brokerApi: BrokerApi
+    private val marketDataStreamService: MarketDataStreamService
 ) {
-
-    private val marketDataStreamService = brokerApi.marketDataStreamService
 
     fun init(
         tradeSessionId: Long,

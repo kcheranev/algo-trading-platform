@@ -14,6 +14,7 @@ import ru.kcheranev.trading.infra.config.BrokerApi
 import ru.kcheranev.trading.infra.config.BrokerProperties
 import ru.kcheranev.trading.test.strategy.DummyTestStrategyFactory
 import ru.kcheranev.trading.test.util.TradeSessionContextInitializer
+import ru.tinkoff.piapi.core.stream.MarketDataStreamService
 import java.time.LocalDateTime
 
 @TestConfiguration
@@ -54,8 +55,7 @@ class TradingAppTestConfiguration {
     fun tradeSessionContextInitializer(
         tradeStrategyCache: TradeStrategyCache,
         candleSubscriptionCounter: CandleSubscriptionCounter,
-        brokerApi: BrokerApi
-    ) =
-        TradeSessionContextInitializer(tradeStrategyCache, candleSubscriptionCounter, brokerApi)
+        marketDataStreamService: MarketDataStreamService
+    ) = TradeSessionContextInitializer(tradeStrategyCache, candleSubscriptionCounter, marketDataStreamService)
 
 }

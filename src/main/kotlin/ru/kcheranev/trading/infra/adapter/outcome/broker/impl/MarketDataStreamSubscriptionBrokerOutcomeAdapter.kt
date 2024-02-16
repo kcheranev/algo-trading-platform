@@ -8,7 +8,7 @@ import ru.kcheranev.trading.core.port.outcome.broker.SubscribeCandlesOrderComman
 import ru.kcheranev.trading.core.port.outcome.broker.UnsubscribeCandlesOrderCommand
 import ru.kcheranev.trading.infra.adapter.income.broker.impl.CandleSubscriptionBrokerIncomeAdapter
 import ru.kcheranev.trading.infra.adapter.outcome.broker.brokerOutcomeAdapterMapper
-import ru.kcheranev.trading.infra.config.BrokerApi
+import ru.tinkoff.piapi.core.stream.MarketDataStreamService
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -16,14 +16,12 @@ private const val CANDLES_STREAM_ID_FORMAT = "candles_%s_%s"
 
 @Component
 class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
-    brokerApi: BrokerApi,
+    private val marketDataStreamService: MarketDataStreamService,
     private val receiveCandleUseCase: ReceiveCandleUseCase,
     private val candleSubscriptionCounter: CandleSubscriptionCounter
 ) : MarketDataStreamSubscriptionBrokerPort {
 
     private val log = LoggerFactory.getLogger(javaClass)
-
-    private val marketDataStreamService = brokerApi.marketDataStreamService
 
     private val lock = ReentrantLock()
 
