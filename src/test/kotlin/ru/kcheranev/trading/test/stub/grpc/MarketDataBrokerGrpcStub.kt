@@ -1,6 +1,5 @@
 package ru.kcheranev.trading.test.stub.grpc
 
-import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import io.kotest.assertions.nondeterministic.eventually
@@ -8,14 +7,12 @@ import org.wiremock.grpc.dsl.WireMockGrpc.json
 import org.wiremock.grpc.dsl.WireMockGrpc.method
 import org.wiremock.grpc.dsl.WireMockGrpcService
 import ru.kcheranev.trading.test.stub.AbstractGrpcStub
+import ru.kcheranev.trading.test.stub.WireMockServers.grpcWireMockServer
 import ru.tinkoff.piapi.contract.v1.MarketDataServiceGrpc
 import ru.tinkoff.piapi.contract.v1.MarketDataStreamServiceGrpc
 import kotlin.time.Duration.Companion.seconds
 
-class MarketDataBrokerGrpcStub(
-    testName: String,
-    grpcWireMockServer: WireMockServer
-) : AbstractGrpcStub(testName) {
+class MarketDataBrokerGrpcStub(testName: String) : AbstractGrpcStub(testName) {
 
     private val marketDataService =
         WireMockGrpcService(

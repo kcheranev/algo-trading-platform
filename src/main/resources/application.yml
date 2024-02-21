@@ -10,7 +10,12 @@ application:
   trading:
     maxCandleDelay: 3
     placeOrderRetryCount: 3
-  infra.broker:
-    token: ${TOKEN}
-    appName: ${spring.application.name}
-    tradingAccountName: trading_account
+  infra:
+    broker:
+      token: ${BROKER_TOKEN}
+      appName: ${spring.application.name}
+      tradingAccountName: trading_account
+    notification.telegram:
+      token: ${TELEGRAM_TOKEN}
+      chatId: ${TELEGRAM_CHAT_ID}
+      apiUrl: https://api.telegram.org/bot${application.infra.notification.telegram.token}

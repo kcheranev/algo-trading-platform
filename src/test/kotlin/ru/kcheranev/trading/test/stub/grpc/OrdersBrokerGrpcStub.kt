@@ -1,6 +1,5 @@
 package ru.kcheranev.trading.test.stub.grpc
 
-import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath
@@ -15,14 +14,12 @@ import org.wiremock.grpc.dsl.WireMockGrpc
 import org.wiremock.grpc.dsl.WireMockGrpc.json
 import org.wiremock.grpc.dsl.WireMockGrpcService
 import ru.kcheranev.trading.test.stub.AbstractGrpcStub
+import ru.kcheranev.trading.test.stub.WireMockServers.grpcWireMockServer
 import ru.tinkoff.piapi.contract.v1.OrderDirection
 import ru.tinkoff.piapi.contract.v1.OrdersServiceGrpc
 
 
-class OrdersBrokerGrpcStub(
-    testName: String,
-    private val grpcWireMockServer: WireMockServer
-) : AbstractGrpcStub(testName) {
+class OrdersBrokerGrpcStub(testName: String) : AbstractGrpcStub(testName) {
 
     private val ordersService =
         WireMockGrpcService(

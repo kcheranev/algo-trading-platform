@@ -4,13 +4,16 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.*
 import org.springframework.test.context.ActiveProfiles
 import ru.kcheranev.trading.test.config.ExtensionTestConfiguration
-import ru.kcheranev.trading.test.config.TradingAppTestConfiguration
+import ru.kcheranev.trading.test.config.TradingApplicationTestConfiguration
 
 @Target(AnnotationTarget.CLASS)
 
 @SpringBootTest(
     webEnvironment = RANDOM_PORT,
-    classes = [TradingAppTestConfiguration::class, ExtensionTestConfiguration::class]
+    classes = [
+        TradingApplicationTestConfiguration::class,
+        ExtensionTestConfiguration::class
+    ]
 )
 @ActiveProfiles("test")
 annotation class IntegrationTest()

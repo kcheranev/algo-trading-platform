@@ -1,6 +1,5 @@
 package ru.kcheranev.trading.test.e2e
 
-import com.github.tomakehurst.wiremock.WireMockServer
 import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
@@ -25,6 +24,7 @@ import ru.kcheranev.trading.test.IntegrationTest
 import ru.kcheranev.trading.test.stub.grpc.MarketDataBrokerGrpcStub
 import ru.kcheranev.trading.test.stub.grpc.OrdersBrokerGrpcStub
 import ru.kcheranev.trading.test.stub.grpc.UsersBrokerGrpcStub
+import ru.kcheranev.trading.test.stub.http.TelegramNotificationHttpStub
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -35,7 +35,7 @@ class TradeProcessLongE2eTest(
     private val tradeSessionRepository: TradeSessionRepository,
     private val tradeOrderRepository: TradeOrderRepository,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
-    private val grpcWireMockServer: WireMockServer,
+    private val telegramNotificationHttpStub: TelegramNotificationHttpStub,
     private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
 
@@ -43,11 +43,11 @@ class TradeProcessLongE2eTest(
 
     val testName = "trade-process-long-e2e"
 
-    val marketDataBrokerGrpcStub by lazy { MarketDataBrokerGrpcStub(testName, grpcWireMockServer) }
+    val marketDataBrokerGrpcStub = MarketDataBrokerGrpcStub(testName)
 
-    val usersBrokerGrpcStub by lazy { UsersBrokerGrpcStub(testName, grpcWireMockServer) }
+    val usersBrokerGrpcStub = UsersBrokerGrpcStub(testName)
 
-    val ordersBrokerGrpcStub by lazy { OrdersBrokerGrpcStub(testName, grpcWireMockServer) }
+    val ordersBrokerGrpcStub = OrdersBrokerGrpcStub(testName)
 
     "should execute long trade process" {
         //create strategy configuration
@@ -79,6 +79,7 @@ class TradeProcessLongE2eTest(
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
         ordersBrokerGrpcStub.stubForPostBuyOrder("post-buy-order.json")
         ordersBrokerGrpcStub.stubForPostSellOrder("post-sell-order.json")
+        telegramNotificationHttpStub.stubForSendNotification()
 
         tradeService.processIncomeCandle(
             ProcessIncomeCandleCommand(

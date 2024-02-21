@@ -1,6 +1,5 @@
 package ru.kcheranev.trading.test.integration
 
-import com.github.tomakehurst.wiremock.WireMockServer
 import io.kotest.assertions.withClue
 import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.StringSpec
@@ -27,7 +26,6 @@ class StopTradeSessionIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
     private val tradeSessionRepository: TradeSessionRepository,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
-    private val grpcWireMockServer: WireMockServer,
     private val tradeSessionContextInitializer: TradeSessionContextInitializer,
     private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
@@ -36,7 +34,7 @@ class StopTradeSessionIntegrationTest(
 
     val testName = "stop-trade-session"
 
-    val marketDataBrokerGrpcStub by lazy { MarketDataBrokerGrpcStub(testName, grpcWireMockServer) }
+    val marketDataBrokerGrpcStub = MarketDataBrokerGrpcStub(testName)
 
     "should stop trade session" {
         //given

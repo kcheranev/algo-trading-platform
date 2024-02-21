@@ -8,5 +8,9 @@ wiremock:
   reset-mappings-after-each-test: true
 
 application:
-  infra.broker:
-    tradingAccountName: trading_account
+  infra:
+    broker:
+      tradingAccountName: trading-account
+    notification.telegram:
+      token: telegram-token
+      chatId: telegram-chat-id

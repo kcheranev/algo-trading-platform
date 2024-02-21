@@ -1,4 +1,4 @@
-package ru.kcheranev.trading.infra.adapter.outcome.broker.delegate
+package ru.kcheranev.trading.infra.adapter.outcome.broker.logging
 
 import org.slf4j.LoggerFactory
 import ru.tinkoff.piapi.contract.v1.OrderDirection

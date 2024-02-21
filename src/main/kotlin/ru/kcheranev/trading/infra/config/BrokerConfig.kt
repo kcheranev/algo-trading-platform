@@ -2,7 +2,8 @@ package ru.kcheranev.trading.infra.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import ru.kcheranev.trading.infra.adapter.outcome.broker.delegate.LoggingOrdersServiceDelegate
+import ru.kcheranev.trading.infra.adapter.outcome.broker.logging.LoggingOrdersServiceDelegate
+import ru.kcheranev.trading.infra.config.properties.BrokerProperties
 import ru.tinkoff.piapi.core.OrdersService
 
 @Configuration

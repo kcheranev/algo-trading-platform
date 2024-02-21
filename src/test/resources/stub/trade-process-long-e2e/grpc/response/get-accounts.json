@@ -3,7 +3,7 @@
     {
       "id": "123",
       "type": "ACCOUNT_TYPE_TINKOFF",
-      "name": "trading_account",
+      "name": "trading-account",
       "status": "ACCOUNT_STATUS_OPEN",
       "opened_date": "2023-01-30T07:12:00Z",
       "access_level": "ACCOUNT_ACCESS_LEVEL_FULL_ACCESS"

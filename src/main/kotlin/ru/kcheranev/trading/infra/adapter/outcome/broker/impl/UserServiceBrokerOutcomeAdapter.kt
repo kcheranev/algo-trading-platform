@@ -1,7 +1,7 @@
 package ru.kcheranev.trading.infra.adapter.outcome.broker.impl
 
 import org.springframework.stereotype.Component
-import ru.kcheranev.trading.infra.config.BrokerProperties
+import ru.kcheranev.trading.infra.config.properties.BrokerProperties
 import ru.tinkoff.piapi.core.UsersService
 
 @Component
