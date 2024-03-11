@@ -64,7 +64,6 @@ class SearchTradeOrderIntegrationTest(
                     startDate = LocalDateTime.parse("2024-01-01T10:15:30"),
                     candleInterval = CandleInterval.ONE_MIN,
                     lotsQuantity = 10,
-                    lastEventDate = LocalDateTime.parse("2024-01-01T10:16:10"),
                     strategyConfigurationId = strategyConfiguration.id!!
                 )
             )
@@ -152,7 +151,6 @@ class SearchTradeOrderIntegrationTest(
                     startDate = LocalDateTime.parse("2024-01-01T10:15:30"),
                     candleInterval = CandleInterval.ONE_MIN,
                     lotsQuantity = 10,
-                    lastEventDate = LocalDateTime.parse("2024-01-01T10:16:10"),
                     strategyConfigurationId = strategyConfiguration.id!!
                 )
             )

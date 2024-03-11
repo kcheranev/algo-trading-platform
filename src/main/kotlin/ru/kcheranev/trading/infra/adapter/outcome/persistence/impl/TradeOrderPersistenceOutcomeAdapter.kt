@@ -9,7 +9,7 @@ import ru.kcheranev.trading.core.port.outcome.persistence.SaveOrderCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderPersistencePort
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderSearchCommand
 import ru.kcheranev.trading.domain.entity.TradeOrderId
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.TradeOrderEntityNotExistsException
+import ru.kcheranev.trading.infra.adapter.outcome.PersistenceOutcomeAdapterException
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.persistenceOutcomeAdapterMapper
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeOrderRepository
 
@@ -31,7 +31,9 @@ class TradeOrderPersistenceOutcomeAdapter(
 
     override fun get(command: GetOrderCommand) =
         tradeOrderRepository.findById(command.tradeOrderId.value)
-            .orElseThrow { TradeOrderEntityNotExistsException(command.tradeOrderId) }
+            .orElseThrow {
+                PersistenceOutcomeAdapterException("Trade order entity with id ${command.tradeOrderId.value} is not exists")
+            }
             .let { persistenceOutcomeAdapterMapper.map(it) }
 
 

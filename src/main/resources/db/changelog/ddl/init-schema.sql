@@ -17,7 +17,6 @@ CREATE TABLE trade_session
     start_date                timestamp without time zone NOT NULL,
     candle_interval           character varying NOT NULL,
     lots_quantity             integer           NOT NULL,
-    last_event_date           timestamp without time zone,
     strategy_configuration_id bigint            NOT NULL,
     CONSTRAINT trade_session_pkey PRIMARY KEY (id),
     CONSTRAINT strategy_configuration_fk FOREIGN KEY (strategy_configuration_id)

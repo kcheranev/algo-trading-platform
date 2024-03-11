@@ -19,7 +19,6 @@ class TradeSessionEntityRowMapper : RowMapper<TradeSessionEntity> {
             startDate = rs.getTimestamp("start_date").toLocalDateTime(),
             candleInterval = CandleInterval.valueOf(rs.getString("candle_interval")),
             lotsQuantity = rs.getInt("lots_quantity"),
-            lastEventDate = rs.getTimestamp("last_event_date").toLocalDateTime(),
             strategyConfigurationId = rs.getLong("strategy_configuration_id")
         )
 

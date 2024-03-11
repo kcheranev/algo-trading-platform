@@ -78,9 +78,6 @@ class StartTradeSessionIntegrationTest(
         }
         tradeSession.candleInterval shouldBe CandleInterval.ONE_MIN
         tradeSession.lotsQuantity shouldBe 4
-        withClue("last event date should not be null") {
-            tradeSession.lastEventDate shouldNotBe null
-        }
     }
 
 })

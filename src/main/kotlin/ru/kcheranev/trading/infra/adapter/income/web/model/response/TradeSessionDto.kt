@@ -12,6 +12,5 @@ data class TradeSessionDto(
     var startDate: LocalDateTime,
     var candleInterval: CandleInterval,
     var lotsQuantity: Int,
-    var lastEventDate: LocalDateTime,
     var strategyConfigurationId: Long
 )

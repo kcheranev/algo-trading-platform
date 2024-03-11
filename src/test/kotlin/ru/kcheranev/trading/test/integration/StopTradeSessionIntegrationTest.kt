@@ -57,7 +57,6 @@ class StopTradeSessionIntegrationTest(
                     startDate = LocalDateTime.parse("2024-01-01T10:15:30"),
                     candleInterval = CandleInterval.ONE_MIN,
                     lotsQuantity = 10,
-                    lastEventDate = LocalDateTime.parse("2024-01-01T10:16:10"),
                     strategyConfigurationId = strategyConfiguration.id!!
                 )
             )
@@ -87,9 +86,6 @@ class StopTradeSessionIntegrationTest(
         }
         stopperTradeSession.candleInterval shouldBe CandleInterval.ONE_MIN
         stopperTradeSession.lotsQuantity shouldBe 10
-        withClue("last event date should not be null") {
-            stopperTradeSession.lastEventDate shouldNotBe null
-        }
     }
 
 })

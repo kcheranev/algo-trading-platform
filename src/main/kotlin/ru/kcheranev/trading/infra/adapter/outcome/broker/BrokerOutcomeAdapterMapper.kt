@@ -7,6 +7,7 @@ import ru.kcheranev.trading.core.port.outcome.broker.model.PostOrderStatus
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.infra.adapter.mapper.commonBrokerMapper
+import ru.kcheranev.trading.infra.adapter.outcome.UnexpectedCandleIntervalException
 import ru.tinkoff.piapi.contract.v1.HistoricCandle
 import ru.tinkoff.piapi.contract.v1.OrderExecutionReportStatus
 import ru.tinkoff.piapi.contract.v1.SubscriptionInterval

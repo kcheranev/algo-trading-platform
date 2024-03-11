@@ -26,11 +26,10 @@ abstract class PersistenceOutcomeAdapterMapper {
     @Mapping(source = "entity.startDate", target = "startDate")
     @Mapping(source = "entity.candleInterval", target = "candleInterval")
     @Mapping(source = "entity.lotsQuantity", target = "lotsQuantity")
-    @Mapping(source = "entity.lastEventDate", target = "lastEventDate")
     @Mapping(source = "tradeStrategy", target = "strategy")
     @Mapping(source = "entity.strategyConfigurationId", target = "strategyConfigurationId")
     @Mapping(target = "events", ignore = true)
-    abstract fun map(entity: TradeSessionEntity, tradeStrategy: TradeStrategy): TradeSession
+    abstract fun map(entity: TradeSessionEntity, tradeStrategy: TradeStrategy?): TradeSession
 
     abstract fun map(source: TradeOrder): TradeOrderEntity
 

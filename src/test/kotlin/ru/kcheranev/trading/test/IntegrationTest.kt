@@ -16,4 +16,4 @@ import ru.kcheranev.trading.test.config.TradingApplicationTestConfiguration
     ]
 )
 @ActiveProfiles("test")
-annotation class IntegrationTest()
+annotation class IntegrationTest

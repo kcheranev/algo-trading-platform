@@ -11,7 +11,7 @@ import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionPersistenc
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionSearchCommand
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.TradeSessionEntityNotExistsException
+import ru.kcheranev.trading.infra.adapter.outcome.PersistenceOutcomeAdapterException
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.persistenceOutcomeAdapterMapper
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeSessionRepository
 
@@ -30,7 +30,11 @@ class TradeSessionPersistenceOutcomeAdapter(
         tradeSession.events.forEach { eventPublisher.publishEvent(it) }
         tradeSession.clearEvents()
         val tradeSessionId = savedTradeSessionEntity.id!!
-        tradeStrategyCache.put(tradeSessionId, tradeSession.strategy)
+        tradeStrategyCache.put(
+            tradeSessionId,
+            tradeSession.strategy
+                ?: throw PersistenceOutcomeAdapterException("Trade strategy is not exists, tradeSessionId=$tradeSessionId")
+        )
         return TradeSessionId(tradeSessionId)
     }
 
@@ -38,7 +42,9 @@ class TradeSessionPersistenceOutcomeAdapter(
         val tradeSessionId = command.tradeSessionId
         val tradeSessionEntity =
             tradeSessionRepository.findById(tradeSessionId.value)
-                .orElseThrow { TradeSessionEntityNotExistsException(tradeSessionId) }
+                .orElseThrow {
+                    PersistenceOutcomeAdapterException("Trade session entity with id ${tradeSessionId.value} is not exists")
+                }
         val tradeStrategy = tradeStrategyCache.get(tradeSessionId.value)
         return persistenceOutcomeAdapterMapper.map(tradeSessionEntity, tradeStrategy)
     }

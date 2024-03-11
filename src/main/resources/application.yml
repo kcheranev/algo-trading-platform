@@ -8,7 +8,9 @@ spring:
 
 application:
   trading:
-    maxCandleDelay: 3
+    candleDelaysProperties:
+      availableCount: 3
+      maxAvailableCount: 15
     placeOrderRetryCount: 3
   infra:
     broker:
