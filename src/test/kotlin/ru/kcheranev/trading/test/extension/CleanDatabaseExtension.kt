@@ -11,7 +11,6 @@ class CleanDatabaseExtension(
 
     override suspend fun afterEach(testCase: TestCase, result: TestResult) {
         jdbcTemplate.execute("DELETE FROM trade_order")
-        jdbcTemplate.execute("DELETE FROM trade_session")
         jdbcTemplate.execute("DELETE FROM strategy_configuration")
     }
 

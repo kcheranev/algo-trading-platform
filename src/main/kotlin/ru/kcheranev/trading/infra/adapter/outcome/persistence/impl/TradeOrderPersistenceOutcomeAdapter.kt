@@ -28,7 +28,6 @@ class TradeOrderPersistenceOutcomeAdapter(
         return tradeOrderId
     }
 
-
     override fun get(command: GetOrderCommand) =
         tradeOrderRepository.findById(command.tradeOrderId.value)
             .orElseThrow {

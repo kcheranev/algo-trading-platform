@@ -6,11 +6,12 @@ import org.springframework.data.relational.core.mapping.Table
 import ru.kcheranev.trading.domain.entity.TradeDirection
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import java.util.UUID
 
 @Table(name = "trade_order")
 data class TradeOrderEntity(
     @Id
-    var id: Long? = null,
+    var id: UUID? = null,
     @Column("ticker")
     val ticker: String,
     @Column("instrument_id")
@@ -25,6 +26,6 @@ data class TradeOrderEntity(
     val executedCommission: BigDecimal,
     @Column("direction")
     val direction: TradeDirection,
-    @Column("trade_session_id")
-    val tradeSessionId: Long
+    @Column("strategy_configuration_id")
+    val strategyConfigurationId: UUID
 )

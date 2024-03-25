@@ -11,22 +11,21 @@ import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import java.util.UUID
 
 sealed class SearchRequest
 
 data class TradeSessionSearchRequest(
-    val id: Long? = null,
+    val id: UUID? = null,
     val ticker: String? = null,
     val instrumentId: String? = null,
     val status: TradeSessionStatus? = null,
-    val startDate: ComparedField<LocalDateTime>? = null,
     val candleInterval: CandleInterval? = null,
-    val page: Page? = null,
     val sort: Sort<TradeSessionSort>? = null
 ) : SearchRequest()
 
 data class StrategyConfigurationSearchRequest(
-    val id: Long? = null,
+    val id: UUID? = null,
     val type: String? = null,
     val candleInterval: CandleInterval? = null,
     val page: Page? = null,
@@ -34,14 +33,14 @@ data class StrategyConfigurationSearchRequest(
 ) : SearchRequest()
 
 data class TradeOrderSearchRequest(
-    val id: Long? = null,
+    val id: UUID? = null,
     val ticker: String? = null,
     val instrumentId: String? = null,
     val date: ComparedField<LocalDateTime>? = null,
     val lotsQuantity: ComparedField<Int>? = null,
     val totalPrice: ComparedField<BigDecimal>? = null,
     val direction: TradeDirection? = null,
-    val tradeSessionId: Long? = null,
+    val strategyConfigurationId: UUID? = null,
     val page: Page? = null,
     val sort: Sort<TradeOrderSort>? = null
 ) : SearchRequest()

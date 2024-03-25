@@ -36,7 +36,7 @@ data class TradeOrderSearchCommand(
     val lotsQuantity: ComparedField<Int>?,
     val totalPrice: ComparedField<BigDecimal>?,
     val direction: TradeDirection?,
-    val tradeSessionId: TradeSessionId?,
+    val strategyConfigurationId: StrategyConfigurationId?,
     val page: Page?,
     val sort: Sort<TradeOrderSort>?
 ) : PersistenceOutcomeCommand()
@@ -59,9 +59,7 @@ data class TradeSessionSearchCommand(
     val ticker: String?,
     val instrumentId: String?,
     val status: TradeSessionStatus?,
-    val startDate: ComparedField<LocalDateTime>?,
     val candleInterval: CandleInterval?,
-    val page: Page?,
     val sort: Sort<TradeSessionSort>?
 ) : PersistenceOutcomeCommand()
 

@@ -1,19 +1,20 @@
 package ru.kcheranev.trading.infra.adapter.income.web.model.request
 
+import io.swagger.v3.oas.annotations.media.Schema
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.domain.model.Instrument
+import java.util.UUID
 
 sealed class TradingRequest
 
 data class CreateStrategyConfigurationRequest(
-    val type: String,
-    val initCandleAmount: Int,
-    val candleInterval: CandleInterval,
-    val params: Map<String, Any>
+    @Schema(description = "Type") val type: String,
+    @Schema(description = "Initial candle amount") val initCandleAmount: Int,
+    @Schema(description = "Candle interval") val candleInterval: CandleInterval,
+    @Schema(description = "Strategy parameters") val params: Map<String, Any>
 )
 
 data class StartTradeSessionRequest(
-    val strategyConfigurationId: Long,
-    val lotsQuantity: Int,
-    val instrument: Instrument
+    @Schema(description = "Strategy configuration id") val strategyConfigurationId: UUID,
+    @Schema(description = "Lots quantity") val lotsQuantity: Int,
+    @Schema(description = "Instrument") val instrument: InstrumentDto
 ) : TradingRequest()

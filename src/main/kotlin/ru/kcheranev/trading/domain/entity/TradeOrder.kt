@@ -3,6 +3,7 @@ package ru.kcheranev.trading.domain.entity
 import ru.kcheranev.trading.common.DateSupplier
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import java.util.UUID
 
 data class TradeOrder(
     val id: TradeOrderId?,
@@ -13,7 +14,7 @@ data class TradeOrder(
     val totalPrice: BigDecimal,
     val executedCommission: BigDecimal,
     val direction: TradeDirection,
-    val tradeSessionId: TradeSessionId
+    val strategyConfigurationId: StrategyConfigurationId
 ) : AbstractAggregateRoot() {
 
     companion object {
@@ -25,7 +26,7 @@ data class TradeOrder(
             totalPrice: BigDecimal,
             executedCommission: BigDecimal,
             direction: TradeDirection,
-            tradeSessionId: TradeSessionId,
+            strategyConfigurationId: StrategyConfigurationId,
             dateSupplier: DateSupplier
         ): TradeOrder =
             TradeOrder(
@@ -37,7 +38,7 @@ data class TradeOrder(
                 totalPrice = totalPrice,
                 executedCommission = executedCommission,
                 direction = direction,
-                tradeSessionId = tradeSessionId
+                strategyConfigurationId = strategyConfigurationId
             )
 
     }
@@ -45,7 +46,7 @@ data class TradeOrder(
 }
 
 data class TradeOrderId(
-    val value: Long
+    val value: UUID
 )
 
 enum class TradeDirection {

@@ -17,18 +17,14 @@ import ru.kcheranev.trading.core.port.common.model.sort.Sort
 import ru.kcheranev.trading.core.port.common.model.sort.SortDirection
 import ru.kcheranev.trading.core.port.common.model.sort.TradeOrderSort
 import ru.kcheranev.trading.domain.entity.TradeDirection
-import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.domain.model.StrategyType
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.TradeOrderSearchRequest
 import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeOrderSearchResponse
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeOrderRepository
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeSessionRepository
 import ru.kcheranev.trading.test.IntegrationTest
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -37,7 +33,6 @@ import java.time.LocalDateTime
 class SearchTradeOrderIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
-    private val tradeSessionRepository: TradeSessionRepository,
     private val tradeOrderRepository: TradeOrderRepository,
     private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
@@ -45,26 +40,14 @@ class SearchTradeOrderIntegrationTest(
     extensions(resetTestContextExtensions)
 
     beforeEach {
-        val strategyConfiguration =
+        val strategyConfiguration1 =
             strategyConfigurationRepository.save(
                 StrategyConfigurationEntity(
                     null,
-                    StrategyType.MOVING_MOMENTUM.name,
+                    "STRATEGY_TYPE_1",
                     10,
                     CandleInterval.ONE_MIN,
                     MapWrapper(mapOf("param1" to "value1"))
-                )
-            )
-        val tradeSession1 =
-            tradeSessionRepository.save(
-                TradeSessionEntity(
-                    ticker = "SBER",
-                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
-                    status = TradeSessionStatus.WAITING,
-                    startDate = LocalDateTime.parse("2024-01-01T10:15:30"),
-                    candleInterval = CandleInterval.ONE_MIN,
-                    lotsQuantity = 10,
-                    strategyConfigurationId = strategyConfiguration.id!!
                 )
             )
         val tradeOrders =
@@ -77,7 +60,7 @@ class SearchTradeOrderIntegrationTest(
                     totalPrice = BigDecimal(100),
                     executedCommission = BigDecimal(1),
                     direction = TradeDirection.BUY,
-                    tradeSessionId = tradeSession1.id!!
+                    strategyConfigurationId = strategyConfiguration1.id!!
                 ),
                 TradeOrderEntity(
                     ticker = "SBER",
@@ -87,7 +70,7 @@ class SearchTradeOrderIntegrationTest(
                     totalPrice = BigDecimal(100),
                     executedCommission = BigDecimal(2),
                     direction = TradeDirection.SELL,
-                    tradeSessionId = tradeSession1.id!!
+                    strategyConfigurationId = strategyConfiguration1.id!!
                 ),
                 TradeOrderEntity(
                     ticker = "SBER",
@@ -97,7 +80,7 @@ class SearchTradeOrderIntegrationTest(
                     totalPrice = BigDecimal(110),
                     executedCommission = BigDecimal(3),
                     direction = TradeDirection.BUY,
-                    tradeSessionId = tradeSession1.id!!
+                    strategyConfigurationId = strategyConfiguration1.id!!
                 ),
                 TradeOrderEntity(
                     ticker = "SBER",
@@ -107,7 +90,7 @@ class SearchTradeOrderIntegrationTest(
                     totalPrice = BigDecimal(120),
                     executedCommission = BigDecimal(4),
                     direction = TradeDirection.SELL,
-                    tradeSessionId = tradeSession1.id!!
+                    strategyConfigurationId = strategyConfiguration1.id!!
                 ),
                 TradeOrderEntity(
                     ticker = "SBER",
@@ -117,7 +100,7 @@ class SearchTradeOrderIntegrationTest(
                     totalPrice = BigDecimal(130),
                     executedCommission = BigDecimal(5),
                     direction = TradeDirection.BUY,
-                    tradeSessionId = tradeSession1.id!!
+                    strategyConfigurationId = strategyConfiguration1.id!!
                 ),
                 TradeOrderEntity(
                     ticker = "SBER",
@@ -127,7 +110,7 @@ class SearchTradeOrderIntegrationTest(
                     totalPrice = BigDecimal(140),
                     executedCommission = BigDecimal(6),
                     direction = TradeDirection.SELL,
-                    tradeSessionId = tradeSession1.id!!
+                    strategyConfigurationId = strategyConfiguration1.id!!
                 ),
                 TradeOrderEntity(
                     ticker = "SBER",
@@ -137,24 +120,21 @@ class SearchTradeOrderIntegrationTest(
                     totalPrice = BigDecimal(150),
                     executedCommission = BigDecimal(7),
                     direction = TradeDirection.BUY,
-                    tradeSessionId = tradeSession1.id!!
+                    strategyConfigurationId = strategyConfiguration1.id!!
                 )
             )
         tradeOrderRepository.saveAll(tradeOrders)
 
-        val tradeSession2 =
-            tradeSessionRepository.save(
-                TradeSessionEntity(
-                    ticker = "MOEX",
-                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b2",
-                    status = TradeSessionStatus.WAITING,
-                    startDate = LocalDateTime.parse("2024-01-01T10:15:30"),
-                    candleInterval = CandleInterval.ONE_MIN,
-                    lotsQuantity = 10,
-                    strategyConfigurationId = strategyConfiguration.id!!
+        val strategyConfiguration2 =
+            strategyConfigurationRepository.save(
+                StrategyConfigurationEntity(
+                    null,
+                    "STRATEGY_TYPE_2",
+                    20,
+                    CandleInterval.FIVE_MIN,
+                    MapWrapper(mapOf("param2" to "value2"))
                 )
             )
-        tradeSessionRepository.save(tradeSession2)
         tradeOrderRepository.save(
             TradeOrderEntity(
                 ticker = "MOEX",
@@ -164,7 +144,7 @@ class SearchTradeOrderIntegrationTest(
                 totalPrice = BigDecimal(100),
                 executedCommission = BigDecimal(1),
                 direction = TradeDirection.BUY,
-                tradeSessionId = tradeSession2.id!!
+                strategyConfigurationId = strategyConfiguration2.id!!
             )
         )
     }
@@ -337,13 +317,15 @@ class SearchTradeOrderIntegrationTest(
         }
     }
 
-    "should search trade orders by tradeSessionId" {
+    "should search trade orders by strategyConfigurationId" {
         //given
-        val tradeSessionId = tradeSessionRepository.findAll().first { it.ticker == "MOEX" }.id
+        val strategyConfigurationId =
+            strategyConfigurationRepository.findAll().first { it.type == "STRATEGY_TYPE_2" }.id
         val request =
             TradeOrderSearchRequest(
-                tradeSessionId = tradeSessionId
+                strategyConfigurationId = strategyConfigurationId
             )
+
         //when
         val response = testRestTemplate.postForEntity(
             "/trade-orders/search",
@@ -359,7 +341,7 @@ class SearchTradeOrderIntegrationTest(
         val tradeOrdersResult = response.body!!.tradeOrders
         tradeOrdersResult.size shouldBe 1
         tradeOrdersResult.forEach {
-            it.tradeSessionId shouldBe tradeSessionId
+            it.strategyConfigurationId shouldBe strategyConfigurationId
         }
     }
 

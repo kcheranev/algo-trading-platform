@@ -9,20 +9,20 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.domain.model.Instrument
+import ru.kcheranev.trading.infra.adapter.income.web.model.request.InstrumentDto
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.StartTradeSessionRequest
 import ru.kcheranev.trading.infra.adapter.income.web.model.response.StartTradeSessionResponse
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeSessionCache
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeSessionRepository
 import ru.kcheranev.trading.test.IntegrationTest
 import ru.kcheranev.trading.test.stub.grpc.MarketDataBrokerGrpcStub
 
 @IntegrationTest
 class StartTradeSessionIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
-    private val tradeSessionRepository: TradeSessionRepository,
+    private val tradeSessionCache: TradeSessionCache,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
     private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
@@ -53,7 +53,7 @@ class StartTradeSessionIntegrationTest(
             StartTradeSessionRequest(
                 strategyConfiguration.id!!,
                 4,
-                Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
+                InstrumentDto("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
             ),
             StartTradeSessionResponse::class.java
         )
@@ -67,7 +67,7 @@ class StartTradeSessionIntegrationTest(
         marketDataBrokerGrpcStub.verifyForGetCandles("get-candles.json")
         marketDataBrokerGrpcStub.verifyForMarketDataStream("market-data-stream-subscribe.json")
 
-        val tradeSessionList = tradeSessionRepository.findAll().toList()
+        val tradeSessionList = tradeSessionCache.findAll()
         tradeSessionList.size shouldBe 1
         val tradeSession = tradeSessionList[0]
         tradeSession.ticker shouldBe "SBER"

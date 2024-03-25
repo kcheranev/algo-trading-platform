@@ -4,9 +4,9 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.jdbc.core.JdbcTemplate
 import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionCounter
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeStrategyCache
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeSessionCache
 import ru.kcheranev.trading.test.extension.CleanDatabaseExtension
-import ru.kcheranev.trading.test.extension.ClearTradeStrategyCacheExtension
+import ru.kcheranev.trading.test.extension.ClearTradeSessionCacheExtension
 import ru.kcheranev.trading.test.extension.ResetCandleSubscriptionCounterExtension
 import ru.kcheranev.trading.test.extension.ResetMarketDataStreamExtension
 import ru.kcheranev.trading.test.extension.ResetWireMockExtension
@@ -19,8 +19,8 @@ class ExtensionTestConfiguration {
     fun cleanDatabaseExtension(jdbcTemplate: JdbcTemplate) = CleanDatabaseExtension(jdbcTemplate)
 
     @Bean
-    fun clearTradeStrategyCacheExtension(tradeStrategyCache: TradeStrategyCache) =
-        ClearTradeStrategyCacheExtension(tradeStrategyCache)
+    fun clearTradeSessionacheExtension(tradeSessionCache: TradeSessionCache) =
+        ClearTradeSessionCacheExtension(tradeSessionCache)
 
     @Bean
     fun resetCandleSubscriptionCounterExtension(candleSubscriptionCounter: CandleSubscriptionCounter) =
@@ -36,13 +36,13 @@ class ExtensionTestConfiguration {
     @Bean
     fun resetTestContextExtensions(
         cleanDatabaseExtension: CleanDatabaseExtension,
-        clearTradeStrategyCacheExtension: ClearTradeStrategyCacheExtension,
+        clearTradeSessionCacheExtension: ClearTradeSessionCacheExtension,
         resetCandleSubscriptionCounterExtension: ResetCandleSubscriptionCounterExtension,
         resetWireMockExtension: ResetWireMockExtension,
         resetMarketDataStreamExtension: ResetMarketDataStreamExtension
     ) = listOf(
         cleanDatabaseExtension,
-        clearTradeStrategyCacheExtension,
+        clearTradeSessionCacheExtension,
         resetCandleSubscriptionCounterExtension,
         resetWireMockExtension,
         resetMarketDataStreamExtension

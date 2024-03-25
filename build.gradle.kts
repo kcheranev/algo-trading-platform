@@ -33,6 +33,7 @@ dependencies {
     implementation("org.ta4j:ta4j-core:0.15")
     implementation("org.mapstruct:mapstruct:1.5.5.Final")
     implementation("org.postgresql:postgresql")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     kapt("org.mapstruct:mapstruct-processor:1.5.5.Final")

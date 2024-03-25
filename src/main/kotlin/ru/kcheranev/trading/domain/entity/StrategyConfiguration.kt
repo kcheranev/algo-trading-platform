@@ -2,6 +2,7 @@ package ru.kcheranev.trading.domain.entity
 
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.StrategyParameters
+import java.util.UUID
 
 data class StrategyConfiguration(
     val id: StrategyConfigurationId?,
@@ -32,5 +33,5 @@ data class StrategyConfiguration(
 }
 
 data class StrategyConfigurationId(
-    val value: Long
+    val value: UUID
 )

@@ -1,5 +1,8 @@
 package ru.kcheranev.trading.infra.adapter.income.web.impl
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -15,7 +18,9 @@ import ru.kcheranev.trading.infra.adapter.income.web.model.request.TradeSessionS
 import ru.kcheranev.trading.infra.adapter.income.web.model.response.StartTradeSessionResponse
 import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeSessionSearchResponse
 import ru.kcheranev.trading.infra.adapter.income.web.webIncomeAdapterMapper
+import java.util.UUID
 
+@Tag(name = "Trade session", description = "Trade session operations")
 @RestController
 @RequestMapping("trade-sessions")
 class TradeSessionController(
@@ -24,17 +29,19 @@ class TradeSessionController(
     private val tradeSessionSearchUseCase: TradeSessionSearchUseCase
 ) {
 
+    @Operation(summary = "Start trade session")
     @PostMapping
     fun start(@RequestBody request: StartTradeSessionRequest) =
         StartTradeSessionResponse(
             startTradeSessionUseCase.startTradeSession(webIncomeAdapterMapper.map(request)).value
         )
 
+    @Operation(summary = "Stop trade session")
     @PostMapping("{id}/stop")
-    fun stop(@PathVariable id: Long) =
+    fun stop(@Parameter(description = "Trade session id") @PathVariable id: UUID) =
         stopTradeSessionUseCase.stopTradeSession(StopTradeSessionCommand(TradeSessionId(id)))
 
-
+    @Operation(summary = "Search trade sessions")
     @PostMapping("search")
     fun search(@RequestBody request: TradeSessionSearchRequest): TradeSessionSearchResponse =
         TradeSessionSearchResponse(

@@ -2,11 +2,18 @@ package ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom
 
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.UUID
 
 abstract class Condition {
 
     private val needWrapQuotesClasses =
-        listOf(String::class, LocalDate::class, LocalDateTime::class, Enum::class)
+        listOf(
+            String::class,
+            LocalDate::class,
+            LocalDateTime::class,
+            Enum::class,
+            UUID::class
+        )
 
     abstract fun evaluate(): String
 

@@ -50,12 +50,6 @@ data class TradeSessionExpiredDomainEvent(
     val candleInterval: CandleInterval
 ) : DomainEvent()
 
-data class TradeSessionStrategySeriesRefreshedDomainEvent(
-    val tradeSessionId: TradeSessionId,
-    val instrument: Instrument,
-    val candleInterval: CandleInterval
-) : DomainEvent()
-
 data class TradeStrategySeriesCandleAddedDomainEvent(
     val tradeSessionId: TradeSessionId,
     val candle: Candle,

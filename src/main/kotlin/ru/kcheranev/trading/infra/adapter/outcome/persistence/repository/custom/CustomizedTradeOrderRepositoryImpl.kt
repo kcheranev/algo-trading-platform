@@ -43,8 +43,13 @@ class CustomizedTradeOrderRepositoryImpl(
         if (command.direction != null) {
             conditionsBuilder.addAndCondition(EqualsCondition("direction", command.direction))
         }
-        if (command.tradeSessionId != null) {
-            conditionsBuilder.addAndCondition(EqualsCondition("trade_session_id", command.tradeSessionId.value))
+        if (command.strategyConfigurationId != null) {
+            conditionsBuilder.addAndCondition(
+                EqualsCondition(
+                    "strategy_configuration_id",
+                    command.strategyConfigurationId.value
+                )
+            )
         }
         if (conditionsBuilder.isNotEmpty()) {
             queryBuilder.append(" WHERE $conditionsBuilder")

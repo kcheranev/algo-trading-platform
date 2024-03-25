@@ -9,58 +9,47 @@ import ru.kcheranev.trading.core.port.outcome.persistence.GetTradeSessionCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.SaveTradeSessionCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionPersistencePort
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionSearchCommand
-import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.infra.adapter.outcome.PersistenceOutcomeAdapterException
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.persistenceOutcomeAdapterMapper
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeSessionRepository
+import java.util.UUID
 
 @Component
 class TradeSessionPersistenceOutcomeAdapter(
-    private val tradeSessionRepository: TradeSessionRepository,
-    private val tradeStrategyCache: TradeStrategyCache,
+    private val tradeSessionCache: TradeSessionCache,
     private val eventPublisher: ApplicationEventPublisher
 ) : TradeSessionPersistencePort {
 
     @Transactional(propagation = MANDATORY)
     override fun save(command: SaveTradeSessionCommand): TradeSessionId {
-        val tradeSession = command.tradeSession
-        val savedTradeSessionEntity =
-            tradeSessionRepository.save(persistenceOutcomeAdapterMapper.map(tradeSession))
+        val tradeSession =
+            if (command.tradeSession.id != null) {
+                command.tradeSession
+            } else {
+                command.tradeSession
+                    .let {
+                        persistenceOutcomeAdapterMapper.map(it, it.id?.value ?: UUID.randomUUID())
+                    }
+            }
+        val tradeSessionId = tradeSession.id!!.value
+        if (tradeSession.status.terminal) {
+            tradeSessionCache.remove(tradeSessionId)
+        } else {
+            tradeSessionCache.put(tradeSessionId, tradeSession)
+        }
         tradeSession.events.forEach { eventPublisher.publishEvent(it) }
         tradeSession.clearEvents()
-        val tradeSessionId = savedTradeSessionEntity.id!!
-        tradeStrategyCache.put(
-            tradeSessionId,
-            tradeSession.strategy
-                ?: throw PersistenceOutcomeAdapterException("Trade strategy is not exists, tradeSessionId=$tradeSessionId")
-        )
         return TradeSessionId(tradeSessionId)
     }
 
-    override fun get(command: GetTradeSessionCommand): TradeSession {
-        val tradeSessionId = command.tradeSessionId
-        val tradeSessionEntity =
-            tradeSessionRepository.findById(tradeSessionId.value)
-                .orElseThrow {
-                    PersistenceOutcomeAdapterException("Trade session entity with id ${tradeSessionId.value} is not exists")
-                }
-        val tradeStrategy = tradeStrategyCache.get(tradeSessionId.value)
-        return persistenceOutcomeAdapterMapper.map(tradeSessionEntity, tradeStrategy)
-    }
+    override fun get(command: GetTradeSessionCommand) =
+        tradeSessionCache.get(command.tradeSessionId.value)
+            ?: throw PersistenceOutcomeAdapterException("Trade session entity with id ${command.tradeSessionId.value} is not exists")
 
-    override fun search(command: TradeSessionSearchCommand): List<TradeSession> =
-        tradeSessionRepository.search(command)
-            .map { persistenceOutcomeAdapterMapper.map(it, tradeStrategyCache.get(it.id!!)) }
+    override fun search(command: TradeSessionSearchCommand) =
+        tradeSessionCache.search(command)
 
-    override fun getReadyToOrderTradeSessions(command: GetReadyToOrderTradeSessionsCommand): List<TradeSession> =
-        tradeSessionRepository.getReadyToOrderTradeSessions(command.instrumentId, command.candleInterval)
-            .filter { tradeStrategyCache.contains(it.id!!) }
-            .map {
-                persistenceOutcomeAdapterMapper.map(
-                    it,
-                    tradeStrategyCache.get(it.id!!)
-                )
-            }
+    override fun getReadyToOrderTradeSessions(command: GetReadyToOrderTradeSessionsCommand) =
+        tradeSessionCache.findAll().filter { tradeSession -> tradeSession.readyForOrder() }
 
 }

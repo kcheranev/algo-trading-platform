@@ -4,20 +4,21 @@ import org.mapstruct.Mapper
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.domain.entity.TradeOrderId
 import ru.kcheranev.trading.domain.entity.TradeSessionId
+import java.util.UUID
 
 @Mapper
 abstract class EntityIdMapper {
 
-    fun mapLongToTradeSessionId(source: Long): TradeSessionId = TradeSessionId(source)
+    fun mapUuidToTradeSessionId(source: UUID?) = source?.let { TradeSessionId(it) }
 
-    fun mapTradeSessionIdToLong(source: TradeSessionId?): Long? = source?.value
+    fun mapTradeSessionIdToUuid(source: TradeSessionId?) = source?.value
 
-    fun mapLongToStrategyConfigurationId(source: Long): StrategyConfigurationId = StrategyConfigurationId(source)
+    fun mapUuidToStrategyConfigurationId(source: UUID?) = source?.let { StrategyConfigurationId(it) }
 
-    fun mapStrategyConfigurationIdToLong(source: StrategyConfigurationId?): Long? = source?.value
+    fun mapStrategyConfigurationIdToUuid(source: StrategyConfigurationId?) = source?.value
 
-    fun mapLongToTradeOrderId(source: Long): TradeOrderId = TradeOrderId(source)
+    fun mapUuidToTradeOrderId(source: UUID?) = source?.let { TradeOrderId(it) }
 
-    fun mapTradeOrderIdToLong(source: TradeOrderId?): Long? = source?.value
+    fun mapTradeOrderIdToUuid(source: TradeOrderId?) = source?.value
 
 }

@@ -3,6 +3,7 @@ package ru.kcheranev.trading.test.e2e
 import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
@@ -12,14 +13,14 @@ import ru.kcheranev.trading.domain.entity.TradeDirection
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.domain.model.Instrument
+import ru.kcheranev.trading.infra.adapter.income.web.model.request.InstrumentDto
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.StartTradeSessionRequest
 import ru.kcheranev.trading.infra.adapter.income.web.model.response.StartTradeSessionResponse
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeSessionCache
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeOrderRepository
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeSessionRepository
 import ru.kcheranev.trading.test.IntegrationTest
 import ru.kcheranev.trading.test.stub.grpc.MarketDataBrokerGrpcStub
 import ru.kcheranev.trading.test.stub.grpc.OrdersBrokerGrpcStub
@@ -32,7 +33,7 @@ import java.time.LocalDateTime
 class TradeProcessLongE2eTest(
     private val tradeService: TradeService,
     private val testRestTemplate: TestRestTemplate,
-    private val tradeSessionRepository: TradeSessionRepository,
+    private val tradeSessionCache: TradeSessionCache,
     private val tradeOrderRepository: TradeOrderRepository,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
     private val telegramNotificationHttpStub: TelegramNotificationHttpStub,
@@ -69,7 +70,7 @@ class TradeProcessLongE2eTest(
             StartTradeSessionRequest(
                 strategyConfiguration.id!!,
                 4,
-                Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
+                InstrumentDto("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
             ),
             StartTradeSessionResponse::class.java
         )
@@ -171,6 +172,7 @@ class TradeProcessLongE2eTest(
             totalPrice shouldBe BigDecimal("85.000000000")
             executedCommission shouldBe BigDecimal("1.000000000")
             direction shouldBe TradeDirection.BUY
+            strategyConfigurationId.shouldNotBeNull()
         }
         val sellOrder = orders[1]
         with(sellOrder) {
@@ -181,10 +183,11 @@ class TradeProcessLongE2eTest(
             totalPrice shouldBe BigDecimal("89.000000000")
             executedCommission shouldBe BigDecimal("1.000000000")
             direction shouldBe TradeDirection.SELL
+            strategyConfigurationId.shouldNotBeNull()
         }
 
         //check trade session
-        val tradeSessions = tradeSessionRepository.findAll().toList()
+        val tradeSessions = tradeSessionCache.findAll()
         tradeSessions shouldHaveSize 1
         tradeSessions[0].status shouldBe TradeSessionStatus.WAITING
     }

@@ -7,6 +7,7 @@ import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.converter.MapToJsonbReadConverter
 import java.sql.ResultSet
+import java.util.UUID
 
 @Component
 class StrategyConfigurationEntityRowMapper(
@@ -15,7 +16,7 @@ class StrategyConfigurationEntityRowMapper(
 
     override fun mapRow(rs: ResultSet, rowNum: Int) =
         StrategyConfigurationEntity(
-            id = rs.getLong("id"),
+            id = UUID.fromString(rs.getString("id")),
             type = rs.getString("type"),
             initCandleAmount = rs.getInt("init_candle_amount"),
             candleInterval = CandleInterval.valueOf(rs.getString("candle_interval")),

@@ -5,13 +5,14 @@ import org.springframework.stereotype.Component
 import ru.kcheranev.trading.domain.entity.TradeDirection
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
 import java.sql.ResultSet
+import java.util.UUID
 
 @Component
 class TradeOrderEntityRowMapper : RowMapper<TradeOrderEntity> {
 
     override fun mapRow(rs: ResultSet, rowNum: Int) =
         TradeOrderEntity(
-            id = rs.getLong("id"),
+            id = UUID.fromString(rs.getString("id")),
             ticker = rs.getString("ticker"),
             instrumentId = rs.getString("instrument_id"),
             date = rs.getTimestamp("date").toLocalDateTime(),
@@ -19,7 +20,7 @@ class TradeOrderEntityRowMapper : RowMapper<TradeOrderEntity> {
             totalPrice = rs.getBigDecimal("total_price"),
             executedCommission = rs.getBigDecimal("executed_commission"),
             direction = TradeDirection.valueOf(rs.getString("direction")),
-            tradeSessionId = rs.getLong("trade_session_id")
+            strategyConfigurationId = UUID.fromString(rs.getString("strategy_configuration_id"))
         )
 
 }
