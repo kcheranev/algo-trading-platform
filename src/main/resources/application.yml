@@ -8,7 +8,7 @@ spring:
 
 application:
   trading:
-    availableDelayedCandleCount: 15
+    availableDelayedCandleCount: 5
     placeOrderRetryCount: 3
   infra:
     broker:

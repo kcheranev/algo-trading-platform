@@ -10,6 +10,7 @@ import ru.kcheranev.trading.domain.TradeSessionDomainException
 import ru.kcheranev.trading.domain.TradeSessionEnteredDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionExitedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionExpiredDomainEvent
+import ru.kcheranev.trading.domain.TradeSessionMovedToWaitingForEntryDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionPendedForEntryDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionPendedForExitDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionStoppedDomainEvent
@@ -33,17 +34,16 @@ data class TradeSession(
     val id: TradeSessionId?,
     val ticker: String,
     val instrumentId: String,
-    var status: TradeSessionStatus,
-    val startDate: LocalDateTime,
+    var status: TradeSessionStatus = WAITING,
+    val startDate: LocalDateTime = LocalDateTime.now(),
     val candleInterval: CandleInterval,
     val lotsQuantity: Int,
+    var lotsQuantityInPosition: Int = 0,
     val strategy: TradeStrategy,
     val strategyConfigurationId: StrategyConfigurationId
 ) : AbstractAggregateRoot() {
 
     private val log = LoggerFactory.getLogger(javaClass)
-
-    private val candleIntervalDuration = candleInterval.duration
 
     val instrument = Instrument(instrumentId, ticker)
 
@@ -52,21 +52,21 @@ data class TradeSession(
     fun processIncomeCandle(candle: Candle, availableCandleDelay: Long) {
         if (!readyForOrder()) {
             throw TradeSessionDomainException(
-                "Unable to process income candle, current trade session ${id!!.value} status is $status"
+                "Unable to process income candle for the trade session $this"
             )
         }
         val lastCandleDate = lastCandleDate()
         if (lastCandleDate >= candle.endTime) {
             throw TradeSessionDomainException(
-                "Unable to process income candle: new candle date intersects trade session ${id!!.value} series dates"
+                "Unable to process income candle: new candle date intersects trade session $this series dates"
             )
         }
-        if (lastCandleDate.plus(candleIntervalDuration.multipliedBy(availableCandleDelay)) < candle.endTime) {
+        if (lastCandleDate.plus(candleInterval.duration.multipliedBy(availableCandleDelay)) < candle.endTime) {
             expire()
             return
         }
         strategy.addBar(domainModelMapper.map(candle))
-        registerEvent(TradeStrategySeriesCandleAddedDomainEvent(id!!, candle, instrument))
+        registerEvent(TradeStrategySeriesCandleAddedDomainEvent(id!!))
         executeStrategy()
     }
 
@@ -80,7 +80,7 @@ data class TradeSession(
         checkTransition(EXPIRED)
         status = EXPIRED
         registerEvent(TradeSessionExpiredDomainEvent(id!!, instrument, candleInterval))
-        log.info("Trade session ${id.value} has been expired")
+        log.info("Trade session $this has been expired")
     }
 
     private fun executeStrategy() {
@@ -103,7 +103,7 @@ data class TradeSession(
         registerEvent(
             TradeSessionPendedForEntryDomainEvent(id!!, instrument, candleInterval, lotsQuantity)
         )
-        log.info("Trade session ${id.value} is pended for entry")
+        log.info("Trade session $this is pended for entry")
     }
 
     private fun pendingExit() {
@@ -114,39 +114,66 @@ data class TradeSession(
                 id!!,
                 instrument,
                 candleInterval,
-                lotsQuantity
+                lotsQuantityInPosition
             )
         )
-        log.info("Trade session ${id.value} is pended for exit")
+        log.info("Trade session $this is pended for exit")
     }
 
-    fun enter() {
+    fun enter(lotsExecuted: Int) {
         checkTransition(IN_POSITION)
         status = IN_POSITION
+        if (lotsQuantity != lotsExecuted) {
+            log.warn("$lotsExecuted executed lots while entering trade session $this is not equal to expected $lotsQuantity")
+        }
+        lotsQuantityInPosition = lotsExecuted
         registerEvent(TradeSessionEnteredDomainEvent(id!!, instrument, candleInterval))
-        log.info("Trade session ${id.value} has been entered")
+        log.info("Trade session $this has been entered")
     }
 
-    fun exit() {
+    fun exit(lotsExecuted: Int) {
         checkTransition(WAITING)
         status = WAITING
+        if (lotsQuantityInPosition != lotsExecuted) {
+            log.warn("$lotsExecuted executed lots while exiting trade session $this is not equal to expected $lotsQuantityInPosition")
+        }
+        lotsQuantityInPosition = 0
         registerEvent(TradeSessionExitedDomainEvent(id!!, instrument, candleInterval))
-        log.info("Trade session ${id.value} has been exited")
+        log.info("Trade session $this has been exited")
     }
 
+    fun waitForEntry() {
+        if (status == PENDING_ENTER) {
+            checkTransition(WAITING)
+            status = WAITING
+            registerEvent(TradeSessionMovedToWaitingForEntryDomainEvent(id!!))
+            log.info("Trade session $this has been moved back from $PENDING_ENTER")
+            return
+        } else if (status == PENDING_EXIT) {
+            checkTransition(IN_POSITION)
+            status = IN_POSITION
+            registerEvent(TradeSessionMovedToWaitingForEntryDomainEvent(id!!))
+            log.info("Trade session $this has been moved back from $PENDING_EXIT")
+            return
+        }
+        throw TradeSessionDomainException("Trade session $this unable to move to waiting for entry status")
+    }
 
     fun stop() {
         checkTransition(STOPPED)
         status = STOPPED
         registerEvent(TradeSessionStoppedDomainEvent(id!!, instrument, candleInterval))
-        log.info("Trade session ${id.value} has been stopped")
+        log.info("Trade session $this has been stopped")
     }
 
     private fun checkTransition(toStatus: TradeSessionStatus) {
         if (!status.transitionAvailable(toStatus)) {
-            throw TradeSessionDomainException("Unexpected trade session ${id?.value} status transition from $status to $toStatus")
+            throw TradeSessionDomainException("Unexpected trade session $this status transition from $status to $toStatus")
         }
     }
+
+    override fun toString() =
+        "[id=${id?.value}, ticker=$ticker, instrumentId=$instrumentId, status=$status, candleInterval=$candleInterval]"
 
     companion object {
 
@@ -173,6 +200,7 @@ data class TradeSession(
                     startDate = dateSupplier.currentDate(),
                     candleInterval = candleInterval,
                     lotsQuantity = lotsQuantity,
+                    lotsQuantityInPosition = 0,
                     strategy = strategyFactory.initStrategy(strategyConfiguration.params, series),
                     strategyConfigurationId = strategyConfiguration.id!!
                 )
@@ -199,9 +227,9 @@ enum class TradeSessionStatus(
 ) {
 
     WAITING({ setOf(PENDING_ENTER, STOPPED, EXPIRED) }, false),
-    PENDING_ENTER({ setOf(IN_POSITION, STOPPED) }, false),
+    PENDING_ENTER({ setOf(IN_POSITION, STOPPED, WAITING) }, false),
     IN_POSITION({ setOf(PENDING_EXIT, STOPPED, EXPIRED) }, false),
-    PENDING_EXIT({ setOf(WAITING, STOPPED) }, false),
+    PENDING_EXIT({ setOf(WAITING, STOPPED, IN_POSITION) }, false),
     STOPPED({ emptySet() }, true),
     EXPIRED({ emptySet() }, true);
 

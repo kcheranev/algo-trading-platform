@@ -1,7 +1,6 @@
 package ru.kcheranev.trading.domain
 
 import ru.kcheranev.trading.domain.entity.TradeSessionId
-import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
 
@@ -23,7 +22,7 @@ data class TradeSessionPendedForExitDomainEvent(
     val tradeSessionId: TradeSessionId,
     val instrument: Instrument,
     val candleInterval: CandleInterval,
-    val lotsQuantity: Int
+    val lotsQuantityInPosition: Int
 ) : DomainEvent()
 
 data class TradeSessionEnteredDomainEvent(
@@ -51,7 +50,9 @@ data class TradeSessionExpiredDomainEvent(
 ) : DomainEvent()
 
 data class TradeStrategySeriesCandleAddedDomainEvent(
-    val tradeSessionId: TradeSessionId,
-    val candle: Candle,
-    val instrument: Instrument
+    val tradeSessionId: TradeSessionId
+) : DomainEvent()
+
+data class TradeSessionMovedToWaitingForEntryDomainEvent(
+    val tradeSessionId: TradeSessionId
 ) : DomainEvent()

@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
 import ru.kcheranev.trading.common.DateSupplier
 import ru.kcheranev.trading.core.config.TradingProperties
+import ru.kcheranev.trading.core.model.order.PostOrderResultAccumulator
 import ru.kcheranev.trading.core.port.income.trading.CreateStrategyConfigurationCommand
 import ru.kcheranev.trading.core.port.income.trading.CreateStrategyConfigurationUseCase
 import ru.kcheranev.trading.core.port.income.trading.EnterTradeSessionCommand
@@ -20,6 +21,10 @@ import ru.kcheranev.trading.core.port.income.trading.StopTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.trading.StopTradeSessionUseCase
 import ru.kcheranev.trading.core.port.outcome.broker.GetLastHistoricCandlesCommand
 import ru.kcheranev.trading.core.port.outcome.broker.HistoricCandleBrokerPort
+import ru.kcheranev.trading.core.port.outcome.broker.OrderServiceBrokerPort
+import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceBuyOrderCommand
+import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceSellOrderCommand
+import ru.kcheranev.trading.core.port.outcome.broker.model.PostOrderResponse
 import ru.kcheranev.trading.core.port.outcome.persistence.GetReadyToOrderTradeSessionsCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.GetStrategyConfigurationCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.GetTradeSessionCommand
@@ -42,6 +47,7 @@ class TradeService(
     private val transactionalTemplate: TransactionTemplate,
     private val strategyConfigurationPersistencePort: StrategyConfigurationPersistencePort,
     private val tradeSessionPersistencePort: TradeSessionPersistencePort,
+    private val orderServiceBrokerPort: OrderServiceBrokerPort,
     private val tradeOrderPersistencePort: TradeOrderPersistencePort,
     private val historicCandleBrokerPort: HistoricCandleBrokerPort,
     private val strategyFactoryProvider: StrategyFactoryProvider,
@@ -56,6 +62,8 @@ class TradeService(
     private val log = LoggerFactory.getLogger(javaClass)
 
     private val availableDelayedCandleCount = tradingProperties.availableDelayedCandleCount
+
+    private val placeOrderRetryCount = tradingProperties.placeOrderRetryCount
 
     @Transactional
     override fun createStrategyConfiguration(command: CreateStrategyConfigurationCommand) {
@@ -116,43 +124,82 @@ class TradeService(
     @Transactional
     override fun enterTradeSession(command: EnterTradeSessionCommand) {
         val tradeSession = tradeSessionPersistencePort.get(GetTradeSessionCommand(command.tradeSessionId))
-        tradeSession.enter()
-        val tradeOrder =
-            with(tradeSession) {
-                TradeOrder.create(
-                    ticker = ticker,
-                    instrumentId = instrumentId,
-                    lotsQuantity = lotsQuantity,
-                    totalPrice = command.totalPrice,
-                    executedCommission = command.executedCommission,
-                    direction = TradeDirection.BUY,
-                    strategyConfigurationId = tradeSession.strategyConfigurationId,
-                    dateSupplier = dateSupplier
-                )
+        val postOrderResultAccumulator =
+            postOrderWithRetry(tradeSession.lotsQuantity) { remainLotsQuantity ->
+                val postOrderResponse =
+                    orderServiceBrokerPort.postBestPriceBuyOrder(
+                        PostBestPriceBuyOrderCommand(tradeSession.instrument, remainLotsQuantity)
+                    )
+                if (postOrderResponse.executed()) {
+                    val tradeOrder =
+                        TradeOrder.create(
+                            ticker = tradeSession.ticker,
+                            instrumentId = tradeSession.instrumentId,
+                            lotsQuantity = postOrderResponse.lotsExecuted,
+                            totalPrice = postOrderResponse.totalPrice,
+                            executedCommission = postOrderResponse.executedCommission,
+                            direction = TradeDirection.BUY,
+                            strategyConfigurationId = tradeSession.strategyConfigurationId,
+                            dateSupplier = dateSupplier
+                        )
+                    tradeOrderPersistencePort.save(SaveOrderCommand(tradeOrder))
+                }
+                return@postOrderWithRetry postOrderResponse
             }
+        if (postOrderResultAccumulator.haveOrders()) {
+            tradeSession.enter(postOrderResultAccumulator.lotsExecuted)
+        } else {
+            tradeSession.waitForEntry()
+        }
         tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
-        tradeOrderPersistencePort.save(SaveOrderCommand(tradeOrder))
     }
 
     @Transactional
     override fun exitTradeSession(command: ExitTradeSessionCommand) {
         val tradeSession = tradeSessionPersistencePort.get(GetTradeSessionCommand(command.tradeSessionId))
-        tradeSession.exit()
-        val tradeOrder =
-            with(tradeSession) {
-                TradeOrder.create(
-                    ticker = ticker,
-                    instrumentId = instrumentId,
-                    lotsQuantity = lotsQuantity,
-                    totalPrice = command.totalPrice,
-                    executedCommission = command.executedCommission,
-                    direction = TradeDirection.SELL,
-                    strategyConfigurationId = tradeSession.strategyConfigurationId,
-                    dateSupplier = dateSupplier
-                )
+        val postOrderResultAccumulator =
+            postOrderWithRetry(tradeSession.lotsQuantityInPosition) { remainLotsQuantity ->
+                val postOrderResponse =
+                    orderServiceBrokerPort.postBestPriceSellOrder(
+                        PostBestPriceSellOrderCommand(tradeSession.instrument, remainLotsQuantity)
+                    )
+                if (postOrderResponse.executed()) {
+                    val tradeOrder =
+                        TradeOrder.create(
+                            ticker = tradeSession.ticker,
+                            instrumentId = tradeSession.instrumentId,
+                            lotsQuantity = postOrderResponse.lotsExecuted,
+                            totalPrice = postOrderResponse.totalPrice,
+                            executedCommission = postOrderResponse.executedCommission,
+                            direction = TradeDirection.SELL,
+                            strategyConfigurationId = tradeSession.strategyConfigurationId,
+                            dateSupplier = dateSupplier
+                        )
+                    tradeOrderPersistencePort.save(SaveOrderCommand(tradeOrder))
+                }
+                return@postOrderWithRetry postOrderResponse
             }
+        if (postOrderResultAccumulator.haveOrders()) {
+            tradeSession.exit(postOrderResultAccumulator.lotsExecuted)
+        } else {
+            tradeSession.waitForEntry()
+        }
         tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
-        tradeOrderPersistencePort.save(SaveOrderCommand(tradeOrder))
+    }
+
+    private fun postOrderWithRetry(
+        lotsQuantity: Int,
+        postOrder: (requestedLotsQuantity: Int) -> PostOrderResponse
+    ): PostOrderResultAccumulator {
+        val postOrderResultAccumulator = PostOrderResultAccumulator(lotsQuantity)
+        for (placeOrderTry in 1..placeOrderRetryCount) {
+            val postOrderResponse = postOrder.invoke(postOrderResultAccumulator.remainLotsQuantity())
+            postOrderResultAccumulator.accumulate(postOrderResponse)
+            if (postOrderResultAccumulator.completed()) {
+                break
+            }
+        }
+        return postOrderResultAccumulator
     }
 
     @Transactional

@@ -20,7 +20,7 @@ class TradeOrderController(
 
     @Operation(summary = "Search trade orders")
     @PostMapping("search")
-    fun search(@RequestBody request: TradeOrderSearchRequest): TradeOrderSearchResponse =
+    fun search(@RequestBody request: TradeOrderSearchRequest) =
         TradeOrderSearchResponse(
             tradeOrderSearchUseCase.search(webIncomeAdapterMapper.map(request))
                 .map { webIncomeAdapterMapper.map(it) }

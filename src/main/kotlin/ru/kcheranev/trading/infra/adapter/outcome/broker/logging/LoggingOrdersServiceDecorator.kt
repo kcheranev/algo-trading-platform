@@ -8,7 +8,7 @@ import ru.tinkoff.piapi.contract.v1.Quotation
 import ru.tinkoff.piapi.core.OrdersService
 import ru.tinkoff.piapi.core.utils.MapperUtils.moneyValueToBigDecimal
 
-class LoggingOrdersServiceDelegate(private val ordersService: OrdersService) {
+class LoggingOrdersServiceDecorator(private val ordersService: OrdersService) {
 
     private val log = LoggerFactory.getLogger(javaClass)
 

@@ -1,0 +1,9 @@
+{
+  "quantity": "10",
+  "price": {},
+  "direction": "ORDER_DIRECTION_BUY",
+  "accountId": "123",
+  "orderType": "ORDER_TYPE_BESTPRICE",
+  "orderId": "any-value",
+  "instrumentId": "e6123145-9665-43e0-8413-cd61b8aa9b1"
+}

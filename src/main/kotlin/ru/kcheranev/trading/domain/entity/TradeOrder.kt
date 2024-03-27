@@ -28,18 +28,17 @@ data class TradeOrder(
             direction: TradeDirection,
             strategyConfigurationId: StrategyConfigurationId,
             dateSupplier: DateSupplier
-        ): TradeOrder =
-            TradeOrder(
-                id = null,
-                ticker = ticker,
-                instrumentId = instrumentId,
-                date = dateSupplier.currentDate(),
-                lotsQuantity = lotsQuantity,
-                totalPrice = totalPrice,
-                executedCommission = executedCommission,
-                direction = direction,
-                strategyConfigurationId = strategyConfigurationId
-            )
+        ) = TradeOrder(
+            id = null,
+            ticker = ticker,
+            instrumentId = instrumentId,
+            date = dateSupplier.currentDate(),
+            lotsQuantity = lotsQuantity,
+            totalPrice = totalPrice,
+            executedCommission = executedCommission,
+            direction = direction,
+            strategyConfigurationId = strategyConfigurationId
+        )
 
     }
 

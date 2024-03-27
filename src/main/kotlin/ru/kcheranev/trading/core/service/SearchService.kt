@@ -11,9 +11,6 @@ import ru.kcheranev.trading.core.port.income.search.TradeSessionSearchUseCase
 import ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationPersistencePort
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderPersistencePort
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionPersistencePort
-import ru.kcheranev.trading.domain.entity.StrategyConfiguration
-import ru.kcheranev.trading.domain.entity.TradeOrder
-import ru.kcheranev.trading.domain.entity.TradeSession
 
 @Service
 class SearchService(
@@ -24,13 +21,13 @@ class SearchService(
     StrategyConfigurationSearchUseCase,
     TradeOrderSearchUseCase {
 
-    override fun search(command: TradeOrderSearchCommand): List<TradeOrder> =
+    override fun search(command: TradeOrderSearchCommand) =
         tradeOrderPersistencePort.search(commandMapper.map(command))
 
-    override fun search(command: StrategyConfigurationSearchCommand): List<StrategyConfiguration> =
+    override fun search(command: StrategyConfigurationSearchCommand) =
         strategyConfigurationPersistencePort.search(commandMapper.map(command))
 
-    override fun search(command: TradeSessionSearchCommand): List<TradeSession> =
+    override fun search(command: TradeSessionSearchCommand) =
         tradeSessionPersistencePort.search(commandMapper.map(command))
 
 }

@@ -2,7 +2,7 @@ package ru.kcheranev.trading.infra.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import ru.kcheranev.trading.infra.adapter.outcome.broker.logging.LoggingOrdersServiceDelegate
+import ru.kcheranev.trading.infra.adapter.outcome.broker.logging.LoggingOrdersServiceDecorator
 import ru.kcheranev.trading.infra.config.properties.BrokerProperties
 import ru.tinkoff.piapi.core.OrdersService
 
@@ -17,7 +17,7 @@ class BrokerConfig {
     fun ordersService(brokerApi: BrokerApi) = brokerApi.investApi.ordersService
 
     @Bean
-    fun loggingOrderServiceDelegate(ordersService: OrdersService) = LoggingOrdersServiceDelegate(ordersService)
+    fun loggingOrderServiceDecorator(ordersService: OrdersService) = LoggingOrdersServiceDecorator(ordersService)
 
     @Bean
     fun usersService(brokerApi: BrokerApi) = brokerApi.investApi.userService

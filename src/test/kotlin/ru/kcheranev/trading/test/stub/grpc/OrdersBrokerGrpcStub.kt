@@ -18,7 +18,6 @@ import ru.kcheranev.trading.test.stub.WireMockServers.grpcWireMockServer
 import ru.tinkoff.piapi.contract.v1.OrderDirection
 import ru.tinkoff.piapi.contract.v1.OrdersServiceGrpc
 
-
 class OrdersBrokerGrpcStub(testName: String) : AbstractGrpcStub(testName) {
 
     private val ordersService =
@@ -27,37 +26,65 @@ class OrdersBrokerGrpcStub(testName: String) : AbstractGrpcStub(testName) {
             OrdersServiceGrpc.SERVICE_NAME
         )
 
-    fun stubForPostBuyOrder(fileName: String) {
-        stubForPostOrder(fileName, OrderDirection.ORDER_DIRECTION_BUY.name)
+    fun stubForPostBuyOrder(fileName: String, matchConditions: Map<String, String> = emptyMap()) {
+        val newMatchConditions = matchConditions.toMutableMap()
+        newMatchConditions["$.direction"] = OrderDirection.ORDER_DIRECTION_BUY.name
+        stubForPostOrder(fileName, newMatchConditions)
     }
 
-    fun stubForPostSellOrder(fileName: String) {
-        stubForPostOrder(fileName, OrderDirection.ORDER_DIRECTION_SELL.name)
+    fun stubForPostSellOrder(fileName: String, matchConditions: Map<String, String> = emptyMap()) {
+        val newMatchConditions = matchConditions.toMutableMap()
+        newMatchConditions["$.direction"] = OrderDirection.ORDER_DIRECTION_SELL.name
+        stubForPostOrder(fileName, newMatchConditions)
     }
 
-    private fun stubForPostOrder(responseFileName: String, orderDirection: String) {
+    private fun stubForPostOrder(responseFileName: String, matchConditions: Map<String, String> = emptyMap()) {
         ordersService.stubFor(
             WireMockGrpc.method("PostOrder")
-                .withRequestMessage(matchingJsonPath("$.direction", equalTo(orderDirection)))
+                .also {
+                    matchConditions.forEach { (jsonPath, expectedValue) ->
+                        it.withRequestMessage(matchingJsonPath(jsonPath, equalTo(expectedValue)))
+                    }
+                }
                 .willReturn(json(grpcResponse(responseFileName)))
         )
     }
 
-    fun verifyForPostBuyOrder(fileName: String) {
-        verifyForPostOrder(fileName, OrderDirection.ORDER_DIRECTION_BUY.name)
+    fun verifyForPostBuyOrder(
+        fileName: String,
+        matchConditions: Map<String, String> = emptyMap(),
+        queryCount: Int = 1
+    ) {
+        val newMatchConditions = matchConditions.toMutableMap()
+        newMatchConditions["$.direction"] = OrderDirection.ORDER_DIRECTION_BUY.name
+        verifyForPostOrder(fileName, newMatchConditions, queryCount)
     }
 
-    fun verifyForPostSellOrder(fileName: String) {
-        verifyForPostOrder(fileName, OrderDirection.ORDER_DIRECTION_SELL.name)
+    fun verifyForPostSellOrder(
+        fileName: String,
+        matchConditions: Map<String, String> = emptyMap(),
+        queryCount: Int = 1
+    ) {
+        val newMatchConditions = matchConditions.toMutableMap()
+        newMatchConditions["$.direction"] = OrderDirection.ORDER_DIRECTION_SELL.name
+        verifyForPostOrder(fileName, newMatchConditions, queryCount)
     }
 
-    private fun verifyForPostOrder(fileName: String, orderDirection: String) {
+    private fun verifyForPostOrder(
+        fileName: String,
+        matchConditions: Map<String, String> = emptyMap(),
+        queryCount: Int = 1
+    ) {
         val requests =
             grpcWireMockServer.findAll(
                 postRequestedFor(urlMatching("/${OrdersServiceGrpc.SERVICE_NAME}/PostOrder"))
-                    .withRequestBody(matchingJsonPath("$.direction", equalTo(orderDirection)))
+                    .also {
+                        matchConditions.forEach { (jsonPath, expectedValue) ->
+                            it.withRequestBody(matchingJsonPath(jsonPath, equalTo(expectedValue)))
+                        }
+                    }
             )
-        requests shouldHaveSize 1
+        requests shouldHaveSize queryCount
         JSONAssert.assertEquals(
             grpcRequest(fileName),
             requests[0].bodyAsString,

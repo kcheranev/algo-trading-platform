@@ -2,6 +2,8 @@ package ru.kcheranev.trading.test.unit.domain
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.data.forAll
+import io.kotest.data.row
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
@@ -21,6 +23,7 @@ import ru.kcheranev.trading.domain.TradeSessionDomainException
 import ru.kcheranev.trading.domain.TradeSessionEnteredDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionExitedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionExpiredDomainEvent
+import ru.kcheranev.trading.domain.TradeSessionMovedToWaitingForEntryDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionPendedForEntryDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionPendedForExitDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionStoppedDomainEvent
@@ -260,6 +263,7 @@ class TradeSessionTest : StringSpec({
                 startDate = LocalDateTime.now(),
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
+                lotsQuantityInPosition = 5,
                 strategy = tradeStrategy,
                 strategyConfigurationId = StrategyConfigurationId(UUID.randomUUID())
             )
@@ -287,7 +291,7 @@ class TradeSessionTest : StringSpec({
         pendingExitEvent.tradeSessionId shouldBe TradeSessionId(tradeSessionId)
         pendingExitEvent.instrument shouldBe Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
         pendingExitEvent.candleInterval shouldBe CandleInterval.ONE_MIN
-        pendingExitEvent.lotsQuantity shouldBe 10
+        pendingExitEvent.lotsQuantityInPosition shouldBe 5
     }
 
     "should enter trade session" {
@@ -308,10 +312,11 @@ class TradeSessionTest : StringSpec({
             )
 
         //when
-        tradeSession.enter()
+        tradeSession.enter(5)
 
         //then
         tradeSession.status shouldBe TradeSessionStatus.IN_POSITION
+        tradeSession.lotsQuantityInPosition shouldBe 5
         val domainEvents = tradeSession.events
         domainEvents shouldHaveSize 1
         val enteredEvent = domainEvents.first()
@@ -339,10 +344,11 @@ class TradeSessionTest : StringSpec({
             )
 
         //when
-        tradeSession.exit()
+        tradeSession.exit(5)
 
         //then
         tradeSession.status shouldBe TradeSessionStatus.WAITING
+        tradeSession.lotsQuantityInPosition shouldBe 0
         val domainEvents = tradeSession.events
         domainEvents shouldHaveSize 1
         val exitedEvent = domainEvents.first()
@@ -486,7 +492,43 @@ class TradeSessionTest : StringSpec({
         val ex = shouldThrow<TradeSessionDomainException> { tradeSession.processIncomeCandle(candle, 5) }
 
         //then
-        ex shouldHaveMessage "Unable to process income candle: new candle date intersects trade session $tradeSessionId series dates"
+        ex shouldHaveMessage "Unable to process income candle: new candle date intersects trade session " +
+                "[id=$tradeSessionId, ticker=SBER, instrumentId=e6123145-9665-43e0-8413-cd61b8aa9b1, " +
+                "status=WAITING, candleInterval=ONE_MIN] series dates"
+    }
+
+    "should waiting for entry" {
+        forAll(
+            row(TradeSessionStatus.PENDING_ENTER, TradeSessionStatus.WAITING),
+            row(TradeSessionStatus.PENDING_EXIT, TradeSessionStatus.IN_POSITION),
+        ) { currentStatus, targetStatus ->
+            //given
+            val tradeStrategy = mockk<TradeStrategy>()
+            val tradeSessionId = UUID.randomUUID()
+            val tradeSession =
+                TradeSession(
+                    id = TradeSessionId(tradeSessionId),
+                    ticker = "SBER",
+                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                    status = currentStatus,
+                    startDate = LocalDateTime.now(),
+                    candleInterval = CandleInterval.ONE_MIN,
+                    lotsQuantity = 10,
+                    strategy = tradeStrategy,
+                    strategyConfigurationId = StrategyConfigurationId(UUID.randomUUID())
+                )
+
+            //when
+            tradeSession.waitForEntry()
+
+            //then
+            tradeSession.status shouldBe targetStatus
+            val domainEvents = tradeSession.events
+            domainEvents shouldHaveSize 1
+            val stoppedEvent = domainEvents.first()
+            stoppedEvent.shouldBeTypeOf<TradeSessionMovedToWaitingForEntryDomainEvent>()
+            stoppedEvent.tradeSessionId shouldBe TradeSessionId(tradeSessionId)
+        }
     }
 
 })

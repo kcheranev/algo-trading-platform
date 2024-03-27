@@ -29,11 +29,9 @@ abstract class PersistenceOutcomeAdapterMapper {
     @Mapping(target = "events", ignore = true)
     abstract fun map(source: StrategyConfigurationEntity): StrategyConfiguration
 
-    fun map(source: StrategyParameters): MapWrapper<String, Any> =
-        MapWrapper(source)
+    fun map(source: StrategyParameters) = MapWrapper(source)
 
-    fun map(source: MapWrapper<String, Any>): StrategyParameters =
-        StrategyParameters(source.value)
+    fun map(source: MapWrapper<String, Any>) = StrategyParameters(source.value)
 
 }
 

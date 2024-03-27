@@ -26,7 +26,7 @@ abstract class BrokerIncomeAdapterMapper {
         }
 
 
-    fun map(source: SubscriptionInterval): CandleInterval =
+    fun map(source: SubscriptionInterval) =
         when (source) {
             SubscriptionInterval.SUBSCRIPTION_INTERVAL_UNSPECIFIED -> CandleInterval.UNDEFINED
             SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE -> CandleInterval.ONE_MIN

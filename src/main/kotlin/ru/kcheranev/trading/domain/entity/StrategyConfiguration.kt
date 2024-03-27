@@ -19,14 +19,13 @@ data class StrategyConfiguration(
             initCandleAmount: Int,
             candleInterval: CandleInterval,
             params: Map<String, Any>
-        ): StrategyConfiguration =
-            StrategyConfiguration(
-                id = null,
-                type = type,
-                initCandleAmount = initCandleAmount,
-                candleInterval = candleInterval,
-                params = StrategyParameters(params)
-            )
+        ) = StrategyConfiguration(
+            id = null,
+            type = type,
+            initCandleAmount = initCandleAmount,
+            candleInterval = candleInterval,
+            params = StrategyParameters(params)
+        )
 
     }
 

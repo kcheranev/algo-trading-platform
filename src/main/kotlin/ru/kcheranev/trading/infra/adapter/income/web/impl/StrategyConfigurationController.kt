@@ -28,7 +28,7 @@ class StrategyConfigurationController(
 
     @Operation(summary = "Search strategy configurations")
     @PostMapping("search")
-    fun search(@RequestBody request: StrategyConfigurationSearchRequest): StrategyConfigurationSearchResponse =
+    fun search(@RequestBody request: StrategyConfigurationSearchRequest) =
         StrategyConfigurationSearchResponse(
             strategyConfigurationSearchUseCase.search(webIncomeAdapterMapper.map(request))
                 .map { webIncomeAdapterMapper.map(it) }

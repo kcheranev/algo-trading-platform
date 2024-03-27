@@ -13,5 +13,6 @@ data class TradeSessionDto(
     var startDate: LocalDateTime,
     var candleInterval: CandleInterval,
     var lotsQuantity: Int,
+    val lotsQuantityInPosition: Int,
     var strategyConfigurationId: UUID
 )

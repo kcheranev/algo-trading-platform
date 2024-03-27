@@ -4,14 +4,18 @@ import java.math.BigDecimal
 
 data class PostOrderResponse(
     val orderId: String,
-    val status: PostOrderStatus,
-    val lotsRequested: Long,
-    val lotsExecuted: Long,
+    val status: PostOrderResponseStatus,
+    val lotsRequested: Int,
+    val lotsExecuted: Int,
     val totalPrice: BigDecimal,
     val executedCommission: BigDecimal
-)
+) {
 
-enum class PostOrderStatus {
+    fun executed() = status == PostOrderResponseStatus.FILL || status == PostOrderResponseStatus.PARTIALLY_FILL
+
+}
+
+enum class PostOrderResponseStatus {
 
     UNSPECIFIED,
 

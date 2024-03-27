@@ -1,0 +1,29 @@
+{
+  "orderId": "f0c9fcc7-c5c3-42d6-b936-4fa513d59585",
+  "executionReportStatus": "EXECUTION_REPORT_STATUS_REJECTED",
+  "lotsRequested": "10",
+  "lotsExecuted": "0",
+  "initialOrderPrice": {
+    "units": "80"
+  },
+  "executedOrderPrice": {
+    "units": "0"
+  },
+  "totalOrderAmount": {
+    "units": "85"
+  },
+  "initialCommission": {
+    "units": "1"
+  },
+  "executedCommission": {
+    "units": "0"
+  },
+  "figi": "12345",
+  "direction": "ORDER_DIRECTION_SELL",
+  "initialSecurityPrice": {
+    "units": "20"
+  },
+  "orderType": "ORDER_TYPE_BESTPRICE",
+  "message": "message",
+  "instrumentUid": "e6123145-9665-43e0-8413-cd61b8aa9b1"
+}

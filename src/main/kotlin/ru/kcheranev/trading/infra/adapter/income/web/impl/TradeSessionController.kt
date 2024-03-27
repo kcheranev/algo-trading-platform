@@ -43,7 +43,7 @@ class TradeSessionController(
 
     @Operation(summary = "Search trade sessions")
     @PostMapping("search")
-    fun search(@RequestBody request: TradeSessionSearchRequest): TradeSessionSearchResponse =
+    fun search(@RequestBody request: TradeSessionSearchRequest) =
         TradeSessionSearchResponse(
             tradeSessionSearchUseCase.search(webIncomeAdapterMapper.map(request))
                 .map { webIncomeAdapterMapper.map(it) }

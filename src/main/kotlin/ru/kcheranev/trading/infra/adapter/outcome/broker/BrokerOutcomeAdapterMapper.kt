@@ -3,7 +3,7 @@ package ru.kcheranev.trading.infra.adapter.outcome.broker
 import org.mapstruct.Mapper
 import org.mapstruct.factory.Mappers
 import ru.kcheranev.trading.core.port.outcome.broker.model.PostOrderResponse
-import ru.kcheranev.trading.core.port.outcome.broker.model.PostOrderStatus
+import ru.kcheranev.trading.core.port.outcome.broker.model.PostOrderResponseStatus
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.infra.adapter.mapper.commonBrokerMapper
@@ -20,40 +20,40 @@ abstract class BrokerOutcomeAdapterMapper {
             PostOrderResponse(
                 orderId = orderId,
                 status = map(executionReportStatus),
-                lotsRequested = lotsRequested,
-                lotsExecuted = lotsExecuted,
+                lotsRequested = lotsRequested.toInt(),
+                lotsExecuted = lotsExecuted.toInt(),
                 totalPrice = commonBrokerMapper.map(totalOrderAmount),
                 executedCommission = commonBrokerMapper.map(executedCommission)
             )
         }
 
-    fun map(source: OrderExecutionReportStatus): PostOrderStatus =
+    fun map(source: OrderExecutionReportStatus) =
         when (source) {
-            OrderExecutionReportStatus.EXECUTION_REPORT_STATUS_UNSPECIFIED -> PostOrderStatus.UNSPECIFIED
-            OrderExecutionReportStatus.EXECUTION_REPORT_STATUS_FILL -> PostOrderStatus.FILL
-            OrderExecutionReportStatus.EXECUTION_REPORT_STATUS_REJECTED -> PostOrderStatus.REJECTED
-            OrderExecutionReportStatus.EXECUTION_REPORT_STATUS_CANCELLED -> PostOrderStatus.CANCELLED
-            OrderExecutionReportStatus.EXECUTION_REPORT_STATUS_NEW -> PostOrderStatus.NEW
-            OrderExecutionReportStatus.EXECUTION_REPORT_STATUS_PARTIALLYFILL -> PostOrderStatus.PARTIALLY_FILL
-            OrderExecutionReportStatus.UNRECOGNIZED -> PostOrderStatus.UNRECOGNIZED
+            OrderExecutionReportStatus.EXECUTION_REPORT_STATUS_UNSPECIFIED -> PostOrderResponseStatus.UNSPECIFIED
+            OrderExecutionReportStatus.EXECUTION_REPORT_STATUS_FILL -> PostOrderResponseStatus.FILL
+            OrderExecutionReportStatus.EXECUTION_REPORT_STATUS_REJECTED -> PostOrderResponseStatus.REJECTED
+            OrderExecutionReportStatus.EXECUTION_REPORT_STATUS_CANCELLED -> PostOrderResponseStatus.CANCELLED
+            OrderExecutionReportStatus.EXECUTION_REPORT_STATUS_NEW -> PostOrderResponseStatus.NEW
+            OrderExecutionReportStatus.EXECUTION_REPORT_STATUS_PARTIALLYFILL -> PostOrderResponseStatus.PARTIALLY_FILL
+            OrderExecutionReportStatus.UNRECOGNIZED -> PostOrderResponseStatus.UNRECOGNIZED
         }
 
-    fun mapToSubscriptionInterval(source: CandleInterval): SubscriptionInterval =
+    fun mapToSubscriptionInterval(source: CandleInterval) =
         when (source) {
             CandleInterval.UNDEFINED -> throw UnexpectedCandleIntervalException(source)
             CandleInterval.ONE_MIN -> SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE
             CandleInterval.FIVE_MIN -> SubscriptionInterval.SUBSCRIPTION_INTERVAL_FIVE_MINUTES
         }
 
-    fun mapToBrokerCandleInterval(source: CandleInterval): ru.tinkoff.piapi.contract.v1.CandleInterval =
+    fun mapToBrokerCandleInterval(source: CandleInterval) =
         when (source) {
             CandleInterval.UNDEFINED -> throw UnexpectedCandleIntervalException(source)
             CandleInterval.ONE_MIN -> ru.tinkoff.piapi.contract.v1.CandleInterval.CANDLE_INTERVAL_1_MIN
             CandleInterval.FIVE_MIN -> ru.tinkoff.piapi.contract.v1.CandleInterval.CANDLE_INTERVAL_5_MIN
         }
 
-    fun map(historicCandle: HistoricCandle, candleInterval: CandleInterval, instrumentId: String): Candle {
-        return Candle(
+    fun map(historicCandle: HistoricCandle, candleInterval: CandleInterval, instrumentId: String) =
+        Candle(
             interval = candleInterval,
             openPrice = commonBrokerMapper.map(historicCandle.open),
             closePrice = commonBrokerMapper.map(historicCandle.close),
@@ -63,7 +63,6 @@ abstract class BrokerOutcomeAdapterMapper {
             endTime = commonBrokerMapper.map(historicCandle.time).plus(candleInterval.duration),
             instrumentId = instrumentId
         )
-    }
 
 }
 
