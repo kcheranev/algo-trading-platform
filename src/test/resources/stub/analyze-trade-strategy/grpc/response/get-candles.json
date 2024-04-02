@@ -1,0 +1,259 @@
+{
+  "candles": [
+    {
+      "open": {
+        "units": "95"
+      },
+      "high": {
+        "units": "96"
+      },
+      "low": {
+        "units": "94"
+      },
+      "close": {
+        "units": "96"
+      },
+      "volume": "10",
+      "time": "2024-01-30T07:12:00Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "96"
+      },
+      "high": {
+        "units": "97"
+      },
+      "low": {
+        "units": "95"
+      },
+      "close": {
+        "units": "97"
+      },
+      "volume": "11",
+      "time": "2024-01-30T07:13:00Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "97"
+      },
+      "high": {
+        "units": "98"
+      },
+      "low": {
+        "units": "96"
+      },
+      "close": {
+        "units": "97"
+      },
+      "volume": "12",
+      "time": "2024-01-30T07:14:00Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "97"
+      },
+      "high": {
+        "units": "99"
+      },
+      "low": {
+        "units": "97"
+      },
+      "close": {
+        "units": "99"
+      },
+      "volume": "13",
+      "time": "2024-01-30T07:15:00Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "99"
+      },
+      "high": {
+        "units": "100"
+      },
+      "low": {
+        "units": "98"
+      },
+      "close": {
+        "units": "100"
+      },
+      "volume": "10",
+      "time": "2024-01-30T07:16:00Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "100"
+      },
+      "high": {
+        "units": "101"
+      },
+      "low": {
+        "units": "99"
+      },
+      "close": {
+        "units": "101"
+      },
+      "volume": "11",
+      "time": "2024-01-30T07:17:00Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "101"
+      },
+      "high": {
+        "units": "104"
+      },
+      "low": {
+        "units": "100"
+      },
+      "close": {
+        "units": "104"
+      },
+      "volume": "12",
+      "time": "2024-01-30T07:18:00Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "104"
+      },
+      "high": {
+        "units": "110"
+      },
+      "low": {
+        "units": "95"
+      },
+      "close": {
+        "units": "110"
+      },
+      "volume": "13",
+      "time": "2024-01-30T07:19:00Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "110"
+      },
+      "high": {
+        "units": "111"
+      },
+      "low": {
+        "units": "107"
+      },
+      "close": {
+        "units": "111"
+      },
+      "volume": "13",
+      "time": "2024-01-30T07:20:00Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "111"
+      },
+      "high": {
+        "units": "93"
+      },
+      "low": {
+        "units": "90"
+      },
+      "close": {
+        "units": "93"
+      },
+      "volume": "13",
+      "time": "2024-01-30T07:21:00Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "93"
+      },
+      "high": {
+        "units": "95"
+      },
+      "low": {
+        "units": "90"
+      },
+      "close": {
+        "units": "95"
+      },
+      "volume": "13",
+      "time": "2024-01-30T07:22:00Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "95"
+      },
+      "high": {
+        "units": "102"
+      },
+      "low": {
+        "units": "100"
+      },
+      "close": {
+        "units": "102"
+      },
+      "volume": "13",
+      "time": "2024-01-30T07:23:00Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "102"
+      },
+      "high": {
+        "units": "103"
+      },
+      "low": {
+        "units": "99"
+      },
+      "close": {
+        "units": "103"
+      },
+      "volume": "13",
+      "time": "2024-01-30T07:24:00Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "103"
+      },
+      "high": {
+        "units": "103"
+      },
+      "low": {
+        "units": "96"
+      },
+      "close": {
+        "units": "95"
+      },
+      "volume": "13",
+      "time": "2024-01-30T07:25:00Z",
+      "isComplete": true
+    },
+    {
+      "open": {
+        "units": "95"
+      },
+      "high": {
+        "units": "97"
+      },
+      "low": {
+        "units": "90"
+      },
+      "close": {
+        "units": "97"
+      },
+      "volume": "13",
+      "time": "2024-01-30T07:26:00Z",
+      "isComplete": true
+    }
+  ]
+}

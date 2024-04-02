@@ -1,0 +1,25 @@
+package ru.kcheranev.trading.infra.adapter.income.web.model.response
+
+import java.math.BigDecimal
+
+sealed class BacktestingResponse
+
+data class StrategyAnalyzeResponse(
+    val averageLoss: BigDecimal,
+    val averageProfit: BigDecimal,
+    val enterAndHoldReturn: BigDecimal,
+    val netLoss: BigDecimal,
+    val grossLoss: BigDecimal,
+    val maximumDrawdown: BigDecimal,
+    val numberOfBars: Int,
+    val numberOfConsecutiveProfitPositions: Int,
+    val numberOfConsecutiveLosingPositions: Int,
+    val numberOfLosingPositions: Int,
+    val numberOfPositions: Int,
+    val numberOfProfitPositions: Int,
+    val netProfit: BigDecimal,
+    val grossProfit: BigDecimal,
+    val profitLoss: BigDecimal,
+    val profitLossPercentage: BigDecimal,
+    val profitLossRatio: BigDecimal
+) : BacktestingResponse()
