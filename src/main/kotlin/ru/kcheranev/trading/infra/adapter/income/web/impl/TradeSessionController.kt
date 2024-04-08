@@ -13,10 +13,10 @@ import ru.kcheranev.trading.core.port.income.trading.StartTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.trading.StopTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.trading.StopTradeSessionUseCase
 import ru.kcheranev.trading.domain.entity.TradeSessionId
-import ru.kcheranev.trading.infra.adapter.income.web.model.request.StartTradeSessionRequest
-import ru.kcheranev.trading.infra.adapter.income.web.model.request.TradeSessionSearchRequest
-import ru.kcheranev.trading.infra.adapter.income.web.model.response.StartTradeSessionResponse
-import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeSessionSearchResponse
+import ru.kcheranev.trading.infra.adapter.income.web.model.request.StartTradeSessionRequestDto
+import ru.kcheranev.trading.infra.adapter.income.web.model.request.TradeSessionSearchRequestDto
+import ru.kcheranev.trading.infra.adapter.income.web.model.response.StartTradeSessionResponseDto
+import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeSessionSearchResponseDto
 import ru.kcheranev.trading.infra.adapter.income.web.webIncomeAdapterMapper
 import java.util.UUID
 
@@ -31,8 +31,8 @@ class TradeSessionController(
 
     @Operation(summary = "Start trade session")
     @PostMapping
-    fun start(@RequestBody request: StartTradeSessionRequest) =
-        StartTradeSessionResponse(
+    fun start(@RequestBody request: StartTradeSessionRequestDto) =
+        StartTradeSessionResponseDto(
             startTradeSessionUseCase.startTradeSession(webIncomeAdapterMapper.map(request)).value
         )
 
@@ -43,8 +43,8 @@ class TradeSessionController(
 
     @Operation(summary = "Search trade sessions")
     @PostMapping("search")
-    fun search(@RequestBody request: TradeSessionSearchRequest) =
-        TradeSessionSearchResponse(
+    fun search(@RequestBody request: TradeSessionSearchRequestDto) =
+        TradeSessionSearchResponseDto(
             tradeSessionSearchUseCase.search(webIncomeAdapterMapper.map(request))
                 .map { webIncomeAdapterMapper.map(it) }
         )

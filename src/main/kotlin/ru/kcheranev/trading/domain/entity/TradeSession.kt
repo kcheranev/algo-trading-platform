@@ -1,7 +1,6 @@
 package ru.kcheranev.trading.domain.entity
 
 import org.slf4j.LoggerFactory
-import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseBarSeriesBuilder
 import ru.kcheranev.trading.common.DateSupplier
 import ru.kcheranev.trading.core.strategy.StrategyFactory
@@ -29,6 +28,8 @@ import ru.kcheranev.trading.domain.model.TradeStrategy
 import java.time.LocalDateTime
 import java.util.UUID
 import java.util.function.Supplier
+
+private const val MAX_STRATEGY_BARS_COUNT = 100
 
 data class TradeSession(
     val id: TradeSessionId?,
@@ -92,10 +93,10 @@ data class TradeSession(
     }
 
     private fun shouldEnter() =
-        status.transitionAvailable(PENDING_ENTER) && strategy.shouldEnter(strategy.series.endIndex)
+        status.transitionAvailable(PENDING_ENTER) && strategy.shouldEnter()
 
     private fun shouldExit() =
-        status.transitionAvailable(PENDING_EXIT) && strategy.shouldExit(strategy.series.endIndex)
+        status.transitionAvailable(PENDING_EXIT) && strategy.shouldExit()
 
     private fun pendingEnter() {
         checkTransition(PENDING_ENTER)
@@ -187,10 +188,12 @@ data class TradeSession(
             dateSupplier: DateSupplier
         ): TradeSession {
             val candleInterval = strategyConfiguration.candleInterval
-            val series: BarSeries = BaseBarSeriesBuilder()
-                .withName("Trade session: ticker=$ticker, candleInterval=$candleInterval")
-                .build()
-            candles.forEach { series.addBar(domainModelMapper.map(it)) }
+            val series =
+                BaseBarSeriesBuilder()
+                    .withName("Trade session: ticker=$ticker, candleInterval=$candleInterval")
+                    .withMaxBarCount(MAX_STRATEGY_BARS_COUNT)
+                    .withBars(candles.map { domainModelMapper.map(it) })
+                    .build()
             val tradeSession =
                 TradeSession(
                     id = null,

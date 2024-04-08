@@ -16,10 +16,10 @@ import ru.kcheranev.trading.core.port.common.model.Page
 import ru.kcheranev.trading.core.port.common.model.sort.Sort
 import ru.kcheranev.trading.core.port.common.model.sort.SortDirection
 import ru.kcheranev.trading.core.port.common.model.sort.TradeOrderSort
-import ru.kcheranev.trading.domain.entity.TradeDirection
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.infra.adapter.income.web.model.request.TradeOrderSearchRequest
-import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeOrderSearchResponse
+import ru.kcheranev.trading.domain.model.TradeDirection
+import ru.kcheranev.trading.infra.adapter.income.web.model.request.TradeOrderSearchRequestDto
+import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeOrderSearchResponseDto
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
@@ -47,7 +47,7 @@ class SearchTradeOrderIntegrationTest(
                     "STRATEGY_TYPE_1",
                     10,
                     CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param1" to "value1"))
+                    MapWrapper(mapOf("param1" to 1))
                 )
             )
         val tradeOrders =
@@ -132,7 +132,7 @@ class SearchTradeOrderIntegrationTest(
                     "STRATEGY_TYPE_2",
                     20,
                     CandleInterval.FIVE_MIN,
-                    MapWrapper(mapOf("param2" to "value2"))
+                    MapWrapper(mapOf("param2" to 2))
                 )
             )
         tradeOrderRepository.save(
@@ -153,8 +153,8 @@ class SearchTradeOrderIntegrationTest(
         //when
         val response = testRestTemplate.postForEntity(
             "/trade-orders/search",
-            TradeOrderSearchRequest(),
-            TradeOrderSearchResponse::class.java
+            TradeOrderSearchRequestDto(),
+            TradeOrderSearchResponseDto::class.java
         )
 
         //then
@@ -169,14 +169,14 @@ class SearchTradeOrderIntegrationTest(
     "should search trade orders by ticker" {
         //given
         val request =
-            TradeOrderSearchRequest(
+            TradeOrderSearchRequestDto(
                 ticker = "MOEX"
             )
         //when
         val response = testRestTemplate.postForEntity(
             "/trade-orders/search",
             request,
-            TradeOrderSearchResponse::class.java
+            TradeOrderSearchResponseDto::class.java
         )
 
         //then
@@ -194,14 +194,14 @@ class SearchTradeOrderIntegrationTest(
     "should search trade orders by instrumentId" {
         //given
         val request =
-            TradeOrderSearchRequest(
+            TradeOrderSearchRequestDto(
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b2"
             )
         //when
         val response = testRestTemplate.postForEntity(
             "/trade-orders/search",
             request,
-            TradeOrderSearchResponse::class.java
+            TradeOrderSearchResponseDto::class.java
         )
 
         //then
@@ -220,14 +220,14 @@ class SearchTradeOrderIntegrationTest(
         //given
         val dateFilter = LocalDateTime.parse("2024-01-01T10:15:50")
         val request =
-            TradeOrderSearchRequest(
+            TradeOrderSearchRequestDto(
                 date = ComparedField(dateFilter, Comparsion.GT_EQ)
             )
         //when
         val response = testRestTemplate.postForEntity(
             "/trade-orders/search",
             request,
-            TradeOrderSearchResponse::class.java
+            TradeOrderSearchResponseDto::class.java
         )
 
         //then
@@ -245,14 +245,14 @@ class SearchTradeOrderIntegrationTest(
     "should search trade orders by lotsQuantity" {
         //given
         val request =
-            TradeOrderSearchRequest(
+            TradeOrderSearchRequestDto(
                 lotsQuantity = ComparedField(13, Comparsion.LT_EQ)
             )
         //when
         val response = testRestTemplate.postForEntity(
             "/trade-orders/search",
             request,
-            TradeOrderSearchResponse::class.java
+            TradeOrderSearchResponseDto::class.java
         )
 
         //then
@@ -270,14 +270,14 @@ class SearchTradeOrderIntegrationTest(
     "should search trade orders by total price" {
         //given
         val request =
-            TradeOrderSearchRequest(
+            TradeOrderSearchRequestDto(
                 totalPrice = ComparedField(BigDecimal(120), Comparsion.GT)
             )
         //when
         val response = testRestTemplate.postForEntity(
             "/trade-orders/search",
             request,
-            TradeOrderSearchResponse::class.java
+            TradeOrderSearchResponseDto::class.java
         )
 
         //then
@@ -295,14 +295,14 @@ class SearchTradeOrderIntegrationTest(
     "should search trade orders by direction" {
         //given
         val request =
-            TradeOrderSearchRequest(
+            TradeOrderSearchRequestDto(
                 direction = TradeDirection.BUY
             )
         //when
         val response = testRestTemplate.postForEntity(
             "/trade-orders/search",
             request,
-            TradeOrderSearchResponse::class.java
+            TradeOrderSearchResponseDto::class.java
         )
 
         //then
@@ -322,7 +322,7 @@ class SearchTradeOrderIntegrationTest(
         val strategyConfigurationId =
             strategyConfigurationRepository.findAll().first { it.type == "STRATEGY_TYPE_2" }.id
         val request =
-            TradeOrderSearchRequest(
+            TradeOrderSearchRequestDto(
                 strategyConfigurationId = strategyConfigurationId
             )
 
@@ -330,7 +330,7 @@ class SearchTradeOrderIntegrationTest(
         val response = testRestTemplate.postForEntity(
             "/trade-orders/search",
             request,
-            TradeOrderSearchResponse::class.java
+            TradeOrderSearchResponseDto::class.java
         )
 
         //then
@@ -348,7 +348,7 @@ class SearchTradeOrderIntegrationTest(
     "should search trade orders with paging and sorting" {
         //given
         val request =
-            TradeOrderSearchRequest(
+            TradeOrderSearchRequestDto(
                 page = Page(2, 1),
                 sort = Sort(TradeOrderSort.TOTAL_PRICE, SortDirection.DESC)
             )
@@ -356,7 +356,7 @@ class SearchTradeOrderIntegrationTest(
         val response = testRestTemplate.postForEntity(
             "/trade-orders/search",
             request,
-            TradeOrderSearchResponse::class.java
+            TradeOrderSearchResponseDto::class.java
         )
 
         //then
@@ -373,14 +373,14 @@ class SearchTradeOrderIntegrationTest(
     "should return empty result when there are no trade orders found" {
         //given
         val request =
-            TradeOrderSearchRequest(
+            TradeOrderSearchRequestDto(
                 ticker = "ANY_ANOTHER_TICKER"
             )
         //when
         val response = testRestTemplate.postForEntity(
             "/trade-orders/search",
             request,
-            TradeOrderSearchResponse::class.java
+            TradeOrderSearchResponseDto::class.java
         )
 
         //then

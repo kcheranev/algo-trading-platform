@@ -1,6 +1,7 @@
 package ru.kcheranev.trading.domain.entity
 
 import ru.kcheranev.trading.common.DateSupplier
+import ru.kcheranev.trading.domain.model.TradeDirection
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
@@ -47,9 +48,3 @@ data class TradeOrder(
 data class TradeOrderId(
     val value: UUID
 )
-
-enum class TradeDirection {
-
-    BUY, SELL
-
-}

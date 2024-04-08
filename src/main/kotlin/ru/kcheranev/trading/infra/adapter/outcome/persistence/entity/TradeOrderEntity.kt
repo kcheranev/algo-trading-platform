@@ -3,7 +3,7 @@ package ru.kcheranev.trading.infra.adapter.outcome.persistence.entity
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
-import ru.kcheranev.trading.domain.entity.TradeDirection
+import ru.kcheranev.trading.domain.model.TradeDirection
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID

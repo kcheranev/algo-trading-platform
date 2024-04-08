@@ -14,12 +14,12 @@ import ru.kcheranev.trading.common.MskDateUtil
 import ru.kcheranev.trading.core.port.income.trading.ProcessIncomeCandleCommand
 import ru.kcheranev.trading.core.service.TradeService
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
-import ru.kcheranev.trading.domain.entity.TradeDirection
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
+import ru.kcheranev.trading.domain.model.TradeDirection
 import ru.kcheranev.trading.domain.model.TradeStrategy
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeSessionCache
@@ -64,7 +64,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
                     "DUMMY",
                     10,
                     CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param1" to "value1"))
+                    MapWrapper(mapOf("param1" to 1))
                 )
             )
         val mockedSeries: BarSeries = BaseBarSeriesBuilder().build()
@@ -81,7 +81,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
         )
         val tradeStrategy = mockk<TradeStrategy> {
             every { series } returns mockedSeries
-            every { shouldExit(1) } returns true
+            every { shouldExit() } returns true
             every { addBar(any()) } answers { callOriginal() }
         }
         val tradeSessionId = UUID.randomUUID()
@@ -161,7 +161,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
                     "DUMMY",
                     10,
                     CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param1" to "value1"))
+                    MapWrapper(mapOf("param1" to 1))
                 )
             )
         val mockedSeries: BarSeries = BaseBarSeriesBuilder().build()
@@ -178,7 +178,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
         )
         val tradeStrategy = mockk<TradeStrategy> {
             every { series } returns mockedSeries
-            every { shouldExit(1) } returns true
+            every { shouldExit() } returns true
             every { addBar(any()) } answers { callOriginal() }
         }
         val tradeSessionId = UUID.randomUUID()
@@ -258,7 +258,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
                     "DUMMY",
                     10,
                     CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param1" to "value1"))
+                    MapWrapper(mapOf("param1" to 1))
                 )
             )
         val mockedSeries: BarSeries = BaseBarSeriesBuilder().build()
@@ -275,7 +275,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
         )
         val tradeStrategy = mockk<TradeStrategy> {
             every { series } returns mockedSeries
-            every { shouldExit(1) } returns true
+            every { shouldExit() } returns true
             every { addBar(any()) } answers { callOriginal() }
         }
         val tradeSessionId = UUID.randomUUID()

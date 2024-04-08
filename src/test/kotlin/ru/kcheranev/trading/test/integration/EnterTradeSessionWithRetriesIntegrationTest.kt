@@ -63,7 +63,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                     "DUMMY",
                     10,
                     CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param1" to "value1"))
+                    MapWrapper(mapOf("param1" to 1))
                 )
             )
         val mockedSeries: BarSeries = BaseBarSeriesBuilder().build()
@@ -80,7 +80,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
         )
         val tradeStrategy = mockk<TradeStrategy> {
             every { series } returns mockedSeries
-            every { shouldEnter(1) } returns true
+            every { shouldEnter() } returns true
             every { addBar(any()) } answers { callOriginal() }
         }
         val tradeSessionId = UUID.randomUUID()
@@ -156,7 +156,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                     "DUMMY",
                     10,
                     CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param1" to "value1"))
+                    MapWrapper(mapOf("param1" to 1))
                 )
             )
         val mockedSeries: BarSeries = BaseBarSeriesBuilder().build()
@@ -173,7 +173,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
         )
         val tradeStrategy = mockk<TradeStrategy> {
             every { series } returns mockedSeries
-            every { shouldEnter(1) } returns true
+            every { shouldEnter() } returns true
             every { addBar(any()) } answers { callOriginal() }
         }
         val tradeSessionId = UUID.randomUUID()
@@ -249,7 +249,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                     "DUMMY",
                     10,
                     CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param1" to "value1"))
+                    MapWrapper(mapOf("param1" to 1))
                 )
             )
         val mockedSeries: BarSeries = BaseBarSeriesBuilder().build()
@@ -266,7 +266,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
         )
         val tradeStrategy = mockk<TradeStrategy> {
             every { series } returns mockedSeries
-            every { shouldEnter(1) } returns true
+            every { shouldEnter() } returns true
             every { addBar(any()) } answers { callOriginal() }
         }
         val tradeSessionId = UUID.randomUUID()

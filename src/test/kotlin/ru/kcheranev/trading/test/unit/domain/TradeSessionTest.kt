@@ -53,7 +53,7 @@ class TradeSessionTest : StringSpec({
                 type = "strategy-type",
                 initCandleAmount = 10,
                 candleInterval = CandleInterval.ONE_MIN,
-                params = StrategyParameters(mapOf("key" to "value"))
+                params = StrategyParameters(mapOf("key" to 1))
             )
         val strategyFactory = mockk<StrategyFactory>()
         val strategyParamsSlot = slot<StrategyParameters>()
@@ -96,7 +96,7 @@ class TradeSessionTest : StringSpec({
         tradeSession.lotsQuantity shouldBe 10
         tradeSession.strategy shouldBe tradeStrategy
         tradeSession.strategyConfigurationId shouldBe StrategyConfigurationId(strategyConfigurationId)
-        strategyParamsSlot.captured shouldBe StrategyParameters(mapOf("key" to "value"))
+        strategyParamsSlot.captured shouldBe StrategyParameters(mapOf("key" to 1))
 
         val series = seriesSlot.captured
         series.barCount shouldBe 1
@@ -137,8 +137,8 @@ class TradeSessionTest : StringSpec({
         )
         val tradeStrategy = mockk<TradeStrategy> {
             every { series } returns mockedSeries
-            every { shouldEnter(1) } returns false
-            every { shouldExit(1) } returns false
+            every { shouldEnter() } returns false
+            every { shouldExit() } returns false
             every { addBar(any()) } answers { callOriginal() }
         }
         val candle =
@@ -190,7 +190,7 @@ class TradeSessionTest : StringSpec({
         )
         val tradeStrategy = mockk<TradeStrategy> {
             every { series } returns mockedSeries
-            every { shouldEnter(1) } returns true
+            every { shouldEnter() } returns true
             every { addBar(any()) } answers { callOriginal() }
         }
         val tradeSessionId = UUID.randomUUID()
@@ -249,8 +249,8 @@ class TradeSessionTest : StringSpec({
         )
         val tradeStrategy = mockk<TradeStrategy> {
             every { series } returns mockedSeries
-            every { shouldEnter(1) } returns false
-            every { shouldExit(1) } returns true
+            every { shouldEnter() } returns false
+            every { shouldExit() } returns true
             every { addBar(any()) } answers { callOriginal() }
         }
         val tradeSessionId = UUID.randomUUID()

@@ -36,10 +36,10 @@ import ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderPersistenceP
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionPersistencePort
 import ru.kcheranev.trading.core.strategy.StrategyFactoryProvider
 import ru.kcheranev.trading.domain.entity.StrategyConfiguration
-import ru.kcheranev.trading.domain.entity.TradeDirection
 import ru.kcheranev.trading.domain.entity.TradeOrder
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
+import ru.kcheranev.trading.domain.model.TradeDirection
 
 @Service
 class TradeService(

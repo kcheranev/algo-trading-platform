@@ -47,7 +47,7 @@ class StopTradeSessionIntegrationTest(
                     "DUMMY",
                     10,
                     CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param1" to "value1"))
+                    MapWrapper(mapOf("param1" to 1))
                 )
             )
         val tradeSessionId = UUID.randomUUID()

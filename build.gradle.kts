@@ -29,6 +29,7 @@ dependencies {
     implementation("org.liquibase:liquibase-core")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("ru.tinkoff.piapi:java-sdk-core:1.5")
     implementation("org.ta4j:ta4j-core:0.15")
     implementation("org.mapstruct:mapstruct:1.5.5.Final")

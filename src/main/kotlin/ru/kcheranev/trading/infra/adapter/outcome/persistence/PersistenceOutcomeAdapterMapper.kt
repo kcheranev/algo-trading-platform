@@ -31,7 +31,7 @@ abstract class PersistenceOutcomeAdapterMapper {
 
     fun map(source: StrategyParameters) = MapWrapper(source)
 
-    fun map(source: MapWrapper<String, Any>) = StrategyParameters(source.value)
+    fun map(source: MapWrapper<String, Int>) = StrategyParameters(source.value)
 
 }
 

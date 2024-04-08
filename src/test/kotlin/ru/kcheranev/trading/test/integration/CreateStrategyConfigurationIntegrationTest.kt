@@ -8,7 +8,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.StrategyType
-import ru.kcheranev.trading.infra.adapter.income.web.model.request.CreateStrategyConfigurationRequest
+import ru.kcheranev.trading.infra.adapter.income.web.model.request.CreateStrategyConfigurationRequestDto
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
 import ru.kcheranev.trading.test.IntegrationTest
 
@@ -24,11 +24,11 @@ class CreateStrategyConfigurationIntegrationTest(
     "should create strategy configuration" {
         //given
         val request =
-            CreateStrategyConfigurationRequest(
+            CreateStrategyConfigurationRequestDto(
                 type = StrategyType.MOVING_MOMENTUM.name,
                 initCandleAmount = 10,
                 candleInterval = CandleInterval.ONE_MIN,
-                params = mapOf("paramKey" to "paramValue")
+                params = mapOf("paramKey" to 1)
             )
 
         //when
@@ -44,7 +44,7 @@ class CreateStrategyConfigurationIntegrationTest(
         strategyConfiguration.type shouldBe StrategyType.MOVING_MOMENTUM.name
         strategyConfiguration.initCandleAmount shouldBe 10
         strategyConfiguration.candleInterval shouldBe CandleInterval.ONE_MIN
-        strategyConfiguration.params.value shouldBe mapOf("paramKey" to "paramValue")
+        strategyConfiguration.params.value shouldBe mapOf("paramKey" to 1)
     }
 
 })

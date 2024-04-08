@@ -2,8 +2,6 @@ package ru.kcheranev.trading.infra.adapter.income.web.model.response
 
 import java.util.UUID
 
-sealed class TradingResponses
-
-data class StartTradeSessionResponse(
+data class StartTradeSessionResponseDto(
     val tradeSessionId: UUID
-) : TradingResponses()
+)

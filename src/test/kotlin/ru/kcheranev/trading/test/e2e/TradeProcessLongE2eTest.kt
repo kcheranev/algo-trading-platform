@@ -9,13 +9,13 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.core.port.income.trading.ProcessIncomeCandleCommand
 import ru.kcheranev.trading.core.service.TradeService
-import ru.kcheranev.trading.domain.entity.TradeDirection
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
+import ru.kcheranev.trading.domain.model.TradeDirection
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.InstrumentDto
-import ru.kcheranev.trading.infra.adapter.income.web.model.request.StartTradeSessionRequest
-import ru.kcheranev.trading.infra.adapter.income.web.model.response.StartTradeSessionResponse
+import ru.kcheranev.trading.infra.adapter.income.web.model.request.StartTradeSessionRequestDto
+import ru.kcheranev.trading.infra.adapter.income.web.model.response.StartTradeSessionResponseDto
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeSessionCache
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
@@ -67,12 +67,12 @@ class TradeProcessLongE2eTest(
         marketDataBrokerGrpcStub.stubForGetCandles("get-candles.json")
         val startTradeSessionResponse = testRestTemplate.postForEntity(
             "/trade-sessions",
-            StartTradeSessionRequest(
+            StartTradeSessionRequestDto(
                 strategyConfiguration.id!!,
                 4,
                 InstrumentDto("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
             ),
-            StartTradeSessionResponse::class.java
+            StartTradeSessionResponseDto::class.java
         )
         startTradeSessionResponse.statusCode shouldBe HttpStatus.OK
 

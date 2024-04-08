@@ -1,6 +1,6 @@
 package ru.kcheranev.trading.infra.adapter.income.web.model.response
 
-import ru.kcheranev.trading.domain.entity.TradeDirection
+import ru.kcheranev.trading.domain.model.TradeDirection
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID

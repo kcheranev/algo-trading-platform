@@ -11,6 +11,7 @@ import org.ta4j.core.rules.CrossedDownIndicatorRule
 import org.ta4j.core.rules.CrossedUpIndicatorRule
 import org.ta4j.core.rules.OverIndicatorRule
 import org.ta4j.core.rules.UnderIndicatorRule
+import ru.kcheranev.trading.core.StrategyValidationException
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.StrategyType
 import ru.kcheranev.trading.domain.model.TradeStrategy
@@ -22,12 +23,19 @@ class MovingMomentumStrategyFactory : StrategyFactory {
         params: StrategyParameters,
         series: BarSeries
     ): TradeStrategy {
-        val shortEmaBarCount = params.getAsInt("shortEmaBarCount")
-        val longEmaBarCount = params.getAsInt("longEmaBarCount")
-        val shortMacdBarCount = params.getAsInt("shortMacdBarCount")
-        val longMacdBarCount = params.getAsInt("longMacdBarCount")
-        val emaMacdBarCount = params.getAsInt("emaMacdBarCount")
-        val stochasticOscillatorKBarCount = params.getAsInt("stochasticOscillatorKBarCount")
+        val shortEmaBarCount = params.getParam("shortEmaBarCount")
+        val longEmaBarCount = params.getParam("longEmaBarCount")
+        val shortMacdBarCount = params.getParam("shortMacdBarCount")
+        val longMacdBarCount = params.getParam("longMacdBarCount")
+        val emaMacdBarCount = params.getParam("emaMacdBarCount")
+        val stochasticOscillatorKBarCount = params.getParam("stochasticOscillatorKBarCount")
+
+        if (shortEmaBarCount >= longEmaBarCount) {
+            throw StrategyValidationException("longEmaBarCount must be greater than shortEmaBarCount")
+        }
+        if (shortMacdBarCount >= longMacdBarCount) {
+            throw StrategyValidationException("longMacdBarCount must be greater than shortMacdBarCount")
+        }
 
         val closePrice = ClosePriceIndicator(series)
         val shortEma = EMAIndicator(closePrice, shortEmaBarCount)

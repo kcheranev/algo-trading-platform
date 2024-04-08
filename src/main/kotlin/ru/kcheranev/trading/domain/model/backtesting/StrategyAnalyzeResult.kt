@@ -19,5 +19,12 @@ data class StrategyAnalyzeResult(
     val grossProfit: BigDecimal,
     val profitLoss: BigDecimal,
     val profitLossPercentage: BigDecimal,
-    val profitLossRatio: BigDecimal
-)
+    val profitLossRatio: BigDecimal,
+    val trades: List<Trade>
+) {
+
+    val totalGrossProfit = grossProfit + grossLoss
+
+    val totalNetProfit = netProfit + netLoss
+
+}

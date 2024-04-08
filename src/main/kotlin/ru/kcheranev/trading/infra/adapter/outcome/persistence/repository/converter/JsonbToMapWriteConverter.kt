@@ -11,9 +11,9 @@ import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 @WritingConverter
 class JsonbToMapWriteConverter(
     private val objectMapper: ObjectMapper
-) : Converter<MapWrapper<String, Any>, PGobject> {
+) : Converter<MapWrapper<String, Int>, PGobject> {
 
-    override fun convert(source: MapWrapper<String, Any>): PGobject {
+    override fun convert(source: MapWrapper<String, Int>): PGobject {
         val jsonObject = PGobject()
         jsonObject.type = "jsonb"
         jsonObject.value = objectMapper.writeValueAsString(source.value)

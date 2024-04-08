@@ -1,10 +1,10 @@
 package ru.kcheranev.trading.infra.adapter.income.web.model.response
 
+import ru.kcheranev.trading.domain.model.TradeDirection
 import java.math.BigDecimal
+import java.time.LocalDateTime
 
-sealed class BacktestingResponse
-
-data class StrategyAnalyzeResponse(
+data class StrategyAnalyzeDto(
     val averageLoss: BigDecimal,
     val averageProfit: BigDecimal,
     val enterAndHoldReturn: BigDecimal,
@@ -21,5 +21,29 @@ data class StrategyAnalyzeResponse(
     val grossProfit: BigDecimal,
     val profitLoss: BigDecimal,
     val profitLossPercentage: BigDecimal,
-    val profitLossRatio: BigDecimal
-) : BacktestingResponse()
+    val profitLossRatio: BigDecimal,
+    val trades: List<TradeDto>,
+    val totalGrossProfit: BigDecimal,
+    val totalNetProfit: BigDecimal
+)
+
+data class TradeDto(
+    val entry: OrderDto,
+    val exit: OrderDto,
+    val profit: BigDecimal
+)
+
+data class OrderDto(
+    val date: LocalDateTime,
+    val direction: TradeDirection,
+    val price: BigDecimal
+)
+
+data class StrategyAdjustAndAnalyzeDto(
+    val result: StrategyAnalyzeDto,
+    val params: Map<String, Int>
+)
+
+data class StrategyAdjustAndAnalyzeResponseDto(
+    val analyzeResults: List<StrategyAdjustAndAnalyzeDto>
+)

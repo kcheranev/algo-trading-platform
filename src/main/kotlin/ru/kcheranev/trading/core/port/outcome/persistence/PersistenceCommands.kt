@@ -8,25 +8,23 @@ import ru.kcheranev.trading.core.port.common.model.sort.TradeOrderSort
 import ru.kcheranev.trading.core.port.common.model.sort.TradeSessionSort
 import ru.kcheranev.trading.domain.entity.StrategyConfiguration
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
-import ru.kcheranev.trading.domain.entity.TradeDirection
 import ru.kcheranev.trading.domain.entity.TradeOrder
 import ru.kcheranev.trading.domain.entity.TradeOrderId
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
+import ru.kcheranev.trading.domain.model.TradeDirection
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
-sealed class PersistenceOutcomeCommand
-
 data class SaveOrderCommand(
     val tradeOrder: TradeOrder
-) : PersistenceOutcomeCommand()
+)
 
 data class GetOrderCommand(
     val tradeOrderId: TradeOrderId
-) : PersistenceOutcomeCommand()
+)
 
 data class TradeOrderSearchCommand(
     val id: TradeOrderId?,
@@ -39,20 +37,20 @@ data class TradeOrderSearchCommand(
     val strategyConfigurationId: StrategyConfigurationId?,
     val page: Page?,
     val sort: Sort<TradeOrderSort>?
-) : PersistenceOutcomeCommand()
+)
 
 data class SaveTradeSessionCommand(
     val tradeSession: TradeSession
-) : PersistenceOutcomeCommand()
+)
 
 data class GetTradeSessionCommand(
     val tradeSessionId: TradeSessionId
-) : PersistenceOutcomeCommand()
+)
 
 data class GetReadyToOrderTradeSessionsCommand(
     val instrumentId: String,
     val candleInterval: CandleInterval
-) : PersistenceOutcomeCommand()
+)
 
 data class TradeSessionSearchCommand(
     val id: TradeSessionId?,
@@ -61,15 +59,15 @@ data class TradeSessionSearchCommand(
     val status: TradeSessionStatus?,
     val candleInterval: CandleInterval?,
     val sort: Sort<TradeSessionSort>?
-) : PersistenceOutcomeCommand()
+)
 
 data class SaveStrategyConfigurationCommand(
     val strategyConfiguration: StrategyConfiguration
-) : PersistenceOutcomeCommand()
+)
 
 data class GetStrategyConfigurationCommand(
     val strategyConfigurationId: StrategyConfigurationId
-) : PersistenceOutcomeCommand()
+)
 
 data class StrategyConfigurationSearchCommand(
     val id: StrategyConfigurationId?,
@@ -77,4 +75,4 @@ data class StrategyConfigurationSearchCommand(
     val candleInterval: CandleInterval?,
     val page: Page?,
     val sort: Sort<StrategyConfigurationSort>?
-) : PersistenceOutcomeCommand()
+)

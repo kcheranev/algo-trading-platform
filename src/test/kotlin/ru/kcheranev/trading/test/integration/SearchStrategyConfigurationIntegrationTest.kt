@@ -13,8 +13,8 @@ import ru.kcheranev.trading.core.port.common.model.sort.SortDirection
 import ru.kcheranev.trading.core.port.common.model.sort.StrategyConfigurationSort
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.StrategyType
-import ru.kcheranev.trading.infra.adapter.income.web.model.request.StrategyConfigurationSearchRequest
-import ru.kcheranev.trading.infra.adapter.income.web.model.response.StrategyConfigurationSearchResponse
+import ru.kcheranev.trading.infra.adapter.income.web.model.request.StrategyConfigurationSearchRequestDto
+import ru.kcheranev.trading.infra.adapter.income.web.model.response.StrategyConfigurationSearchResponseDto
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
@@ -37,35 +37,35 @@ class SearchStrategyConfigurationIntegrationTest(
                     StrategyType.MOVING_MOMENTUM.name,
                     10,
                     CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param1" to "value1"))
+                    MapWrapper(mapOf("param1" to 1))
                 ),
                 StrategyConfigurationEntity(
                     null,
                     "TEST_1",
                     11,
                     CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param12" to "value2"))
+                    MapWrapper(mapOf("param2" to 2))
                 ),
                 StrategyConfigurationEntity(
                     null,
                     "TEST_2",
                     12,
                     CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param3" to "value3"))
+                    MapWrapper(mapOf("param3" to 3))
                 ),
                 StrategyConfigurationEntity(
                     null,
                     "TEST_3",
                     13,
                     CandleInterval.FIVE_MIN,
-                    MapWrapper(mapOf("param4" to "value4"))
+                    MapWrapper(mapOf("param4" to 4))
                 ),
                 StrategyConfigurationEntity(
                     null,
                     "TEST_4",
                     14,
                     CandleInterval.FIVE_MIN,
-                    MapWrapper(mapOf("param5" to "value5"))
+                    MapWrapper(mapOf("param5" to 5))
                 )
             )
         strategyConfigurationRepository.saveAll(strategyConfigurations)
@@ -74,7 +74,7 @@ class SearchStrategyConfigurationIntegrationTest(
     "should search strategy configuration by type" {
         //given
         val request =
-            StrategyConfigurationSearchRequest(
+            StrategyConfigurationSearchRequestDto(
                 type = StrategyType.MOVING_MOMENTUM.name
             )
 
@@ -82,7 +82,7 @@ class SearchStrategyConfigurationIntegrationTest(
         val response = testRestTemplate.postForEntity(
             "/strategy-configurations/search",
             request,
-            StrategyConfigurationSearchResponse::class.java
+            StrategyConfigurationSearchResponseDto::class.java
         )
 
         //then
@@ -99,8 +99,8 @@ class SearchStrategyConfigurationIntegrationTest(
         //when
         val response = testRestTemplate.postForEntity(
             "/strategy-configurations/search",
-            StrategyConfigurationSearchRequest(),
-            StrategyConfigurationSearchResponse::class.java
+            StrategyConfigurationSearchRequestDto(),
+            StrategyConfigurationSearchResponseDto::class.java
         )
 
         //then
@@ -115,7 +115,7 @@ class SearchStrategyConfigurationIntegrationTest(
     "should search strategy configuration by candleInterval" {
         //given
         val request =
-            StrategyConfigurationSearchRequest(
+            StrategyConfigurationSearchRequestDto(
                 candleInterval = CandleInterval.ONE_MIN
             )
 
@@ -123,7 +123,7 @@ class SearchStrategyConfigurationIntegrationTest(
         val response = testRestTemplate.postForEntity(
             "/strategy-configurations/search",
             request,
-            StrategyConfigurationSearchResponse::class.java
+            StrategyConfigurationSearchResponseDto::class.java
         )
 
         //then
@@ -141,7 +141,7 @@ class SearchStrategyConfigurationIntegrationTest(
     "should search strategy configuration with paging and sorting" {
         //given
         val request =
-            StrategyConfigurationSearchRequest(
+            StrategyConfigurationSearchRequestDto(
                 page = Page(2, 1),
                 sort = Sort(StrategyConfigurationSort.TYPE, SortDirection.DESC)
             )
@@ -150,7 +150,7 @@ class SearchStrategyConfigurationIntegrationTest(
         val response = testRestTemplate.postForEntity(
             "/strategy-configurations/search",
             request,
-            StrategyConfigurationSearchResponse::class.java
+            StrategyConfigurationSearchResponseDto::class.java
         )
 
         //then
@@ -167,7 +167,7 @@ class SearchStrategyConfigurationIntegrationTest(
     "should return empty result when there are no strategy configurations found" {
         //given
         val request =
-            StrategyConfigurationSearchRequest(
+            StrategyConfigurationSearchRequestDto(
                 type = "any other type"
             )
 
@@ -175,7 +175,7 @@ class SearchStrategyConfigurationIntegrationTest(
         val response = testRestTemplate.postForEntity(
             "/strategy-configurations/search",
             request,
-            StrategyConfigurationSearchResponse::class.java
+            StrategyConfigurationSearchResponseDto::class.java
         )
 
         //then

@@ -6,33 +6,31 @@ import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
 
-sealed class TradingIncomeCommand
-
 data class CreateStrategyConfigurationCommand(
     val type: String,
     val initCandleAmount: Int,
     val candleInterval: CandleInterval,
-    val params: Map<String, Any>
-) : TradingIncomeCommand()
+    val params: Map<String, Int>
+)
 
 data class StartTradeSessionCommand(
     val strategyConfigurationId: StrategyConfigurationId,
     val lotsQuantity: Int,
     val instrument: Instrument
-) : TradingIncomeCommand()
+)
 
 data class ProcessIncomeCandleCommand(
     val candle: Candle
-) : TradingIncomeCommand()
+)
 
 data class EnterTradeSessionCommand(
     val tradeSessionId: TradeSessionId
-) : TradingIncomeCommand()
+)
 
 data class ExitTradeSessionCommand(
     val tradeSessionId: TradeSessionId
-) : TradingIncomeCommand()
+)
 
 data class StopTradeSessionCommand(
     val tradeSessionId: TradeSessionId
-) : TradingIncomeCommand()
+)

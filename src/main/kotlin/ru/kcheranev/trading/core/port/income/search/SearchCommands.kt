@@ -7,15 +7,13 @@ import ru.kcheranev.trading.core.port.common.model.sort.StrategyConfigurationSor
 import ru.kcheranev.trading.core.port.common.model.sort.TradeOrderSort
 import ru.kcheranev.trading.core.port.common.model.sort.TradeSessionSort
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
-import ru.kcheranev.trading.domain.entity.TradeDirection
 import ru.kcheranev.trading.domain.entity.TradeOrderId
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
+import ru.kcheranev.trading.domain.model.TradeDirection
 import java.math.BigDecimal
 import java.time.LocalDateTime
-
-sealed class SearchIncomeCommand
 
 data class TradeSessionSearchCommand(
     val id: TradeSessionId?,
@@ -24,7 +22,7 @@ data class TradeSessionSearchCommand(
     val status: TradeSessionStatus?,
     val candleInterval: CandleInterval?,
     val sort: Sort<TradeSessionSort>?
-) : SearchIncomeCommand()
+)
 
 data class StrategyConfigurationSearchCommand(
     val id: StrategyConfigurationId?,
@@ -32,7 +30,7 @@ data class StrategyConfigurationSearchCommand(
     val candleInterval: CandleInterval?,
     val page: Page?,
     val sort: Sort<StrategyConfigurationSort>?
-) : SearchIncomeCommand()
+)
 
 data class TradeOrderSearchCommand(
     val id: TradeOrderId?,
@@ -45,4 +43,4 @@ data class TradeOrderSearchCommand(
     val strategyConfigurationId: StrategyConfigurationId?,
     val page: Page?,
     val sort: Sort<TradeOrderSort>?
-) : SearchIncomeCommand()
+)

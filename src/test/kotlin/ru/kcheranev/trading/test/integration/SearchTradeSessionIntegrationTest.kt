@@ -14,8 +14,8 @@ import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.StrategyType
-import ru.kcheranev.trading.infra.adapter.income.web.model.request.TradeSessionSearchRequest
-import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeSessionSearchResponse
+import ru.kcheranev.trading.infra.adapter.income.web.model.request.TradeSessionSearchRequestDto
+import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeSessionSearchResponseDto
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeSessionCache
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
@@ -42,7 +42,7 @@ class SearchTradeSessionIntegrationTest(
                     StrategyType.MOVING_MOMENTUM.name,
                     10,
                     CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param1" to "value1"))
+                    MapWrapper(mapOf("param1" to 1))
                 )
             )
         val tradeSession1Id = UUID.randomUUID()
@@ -81,8 +81,8 @@ class SearchTradeSessionIntegrationTest(
         //when
         val response = testRestTemplate.postForEntity(
             "/trade-sessions/search",
-            TradeSessionSearchRequest(),
-            TradeSessionSearchResponse::class.java
+            TradeSessionSearchRequestDto(),
+            TradeSessionSearchResponseDto::class.java
         )
 
         //then

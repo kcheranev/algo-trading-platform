@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.kcheranev.trading.core.port.income.search.TradeOrderSearchUseCase
-import ru.kcheranev.trading.infra.adapter.income.web.model.request.TradeOrderSearchRequest
-import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeOrderSearchResponse
+import ru.kcheranev.trading.infra.adapter.income.web.model.request.TradeOrderSearchRequestDto
+import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeOrderSearchResponseDto
 import ru.kcheranev.trading.infra.adapter.income.web.webIncomeAdapterMapper
 
 @Tag(name = "Trade order", description = "Trade order operations")
@@ -20,8 +20,8 @@ class TradeOrderController(
 
     @Operation(summary = "Search trade orders")
     @PostMapping("search")
-    fun search(@RequestBody request: TradeOrderSearchRequest) =
-        TradeOrderSearchResponse(
+    fun search(@RequestBody request: TradeOrderSearchRequestDto) =
+        TradeOrderSearchResponseDto(
             tradeOrderSearchUseCase.search(webIncomeAdapterMapper.map(request))
                 .map { webIncomeAdapterMapper.map(it) }
         )

@@ -2,7 +2,7 @@ package ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.rowmap
 
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Component
-import ru.kcheranev.trading.domain.entity.TradeDirection
+import ru.kcheranev.trading.domain.model.TradeDirection
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
 import java.sql.ResultSet
 import java.util.UUID

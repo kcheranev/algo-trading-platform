@@ -1,6 +1,6 @@
 package ru.kcheranev.trading.domain
 
-abstract class DomainException(
+open class DomainException(
     message: String
 ) : RuntimeException(message)
 

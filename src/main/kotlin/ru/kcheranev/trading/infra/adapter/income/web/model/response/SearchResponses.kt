@@ -1,15 +1,13 @@
 package ru.kcheranev.trading.infra.adapter.income.web.model.response
 
-sealed class SearchResponse
-
-data class TradeOrderSearchResponse(
+data class TradeOrderSearchResponseDto(
     var tradeOrders: List<TradeOrderDto>
-) : SearchResponse()
+)
 
-data class TradeSessionSearchResponse(
+data class TradeSessionSearchResponseDto(
     var tradeSessions: List<TradeSessionDto>
-) : SearchResponse()
+)
 
-data class StrategyConfigurationSearchResponse(
+data class StrategyConfigurationSearchResponseDto(
     var strategyConfigurations: List<StrategyConfigurationDto>
-) : SearchResponse()
+)
