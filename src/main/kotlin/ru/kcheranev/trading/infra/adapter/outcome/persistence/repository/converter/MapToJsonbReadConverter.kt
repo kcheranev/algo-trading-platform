@@ -12,9 +12,9 @@ import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 @ReadingConverter
 class MapToJsonbReadConverter(
     private val objectMapper: ObjectMapper
-) : Converter<PGobject, MapWrapper<String, Int>> {
+) : Converter<PGobject, MapWrapper<String>> {
 
-    override fun convert(pgObject: PGobject): MapWrapper<String, Int> {
+    override fun convert(pgObject: PGobject): MapWrapper<String> {
         val source = pgObject.value ?: return MapWrapper(emptyMap())
         return MapWrapper(objectMapper.readValue(source))
     }

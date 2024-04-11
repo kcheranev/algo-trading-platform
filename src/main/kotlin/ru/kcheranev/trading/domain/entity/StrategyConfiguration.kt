@@ -18,7 +18,7 @@ data class StrategyConfiguration(
             type: String,
             initCandleAmount: Int,
             candleInterval: CandleInterval,
-            params: Map<String, Int>
+            params: Map<String, Number>
         ) = StrategyConfiguration(
             id = null,
             type = type,

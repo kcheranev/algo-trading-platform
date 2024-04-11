@@ -2,9 +2,27 @@ package ru.kcheranev.trading.infra.adapter.income.web.model.response
 
 import ru.kcheranev.trading.domain.model.TradeDirection
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.LocalDateTime
 
-data class StrategyAnalyzeDto(
+data class StrategyAdjustAndAnalyzeResponseDto(
+    val adjustedAnalyzeResults: List<StrategyAdjustAndAnalyzeDto>
+)
+
+data class StrategyAdjustAndAnalyzeDto(
+    val result: PeriodStrategyAnalyzeResultDto,
+    val params: Map<String, Number>
+)
+
+data class PeriodStrategyAnalyzeResultDto(
+    val totalGrossProfit: BigDecimal,
+    val totalNetProfit: BigDecimal,
+    val results: Map<LocalDate, DailyStrategyAnalyzeResultDto>
+)
+
+data class DailyStrategyAnalyzeResultDto(
+    val totalGrossProfit: BigDecimal,
+    val totalNetProfit: BigDecimal,
     val averageLoss: BigDecimal,
     val averageProfit: BigDecimal,
     val enterAndHoldReturn: BigDecimal,
@@ -22,28 +40,19 @@ data class StrategyAnalyzeDto(
     val profitLoss: BigDecimal,
     val profitLossPercentage: BigDecimal,
     val profitLossRatio: BigDecimal,
-    val trades: List<TradeDto>,
-    val totalGrossProfit: BigDecimal,
-    val totalNetProfit: BigDecimal
+    val trades: List<TradeDto>
 )
 
 data class TradeDto(
     val entry: OrderDto,
     val exit: OrderDto,
-    val profit: BigDecimal
+    val netProfit: BigDecimal,
+    val grossProfit: BigDecimal
 )
 
 data class OrderDto(
     val date: LocalDateTime,
     val direction: TradeDirection,
-    val price: BigDecimal
-)
-
-data class StrategyAdjustAndAnalyzeDto(
-    val result: StrategyAnalyzeDto,
-    val params: Map<String, Int>
-)
-
-data class StrategyAdjustAndAnalyzeResponseDto(
-    val analyzeResults: List<StrategyAdjustAndAnalyzeDto>
+    val netPrice: BigDecimal,
+    val grossPrice: BigDecimal
 )

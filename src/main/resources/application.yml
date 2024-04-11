@@ -5,11 +5,17 @@ spring:
     url: ${DATASOURCE_URL}
     username: postgres
     password: postgres
+  jackson:
+    deserialization:
+      use-big-decimal-for-floats: true
 
 application:
   trading:
+    defaultCommission: 0.0004
     availableDelayedCandleCount: 5
     placeOrderRetryCount: 3
+    startTradingTime: "10:00:00"
+    endTradingTime: "18:00:00"
   infra:
     broker:
       token: ${BROKER_TOKEN}

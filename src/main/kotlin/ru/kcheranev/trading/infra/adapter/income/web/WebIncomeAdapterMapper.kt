@@ -12,8 +12,8 @@ import ru.kcheranev.trading.core.port.income.trading.StartTradeSessionCommand
 import ru.kcheranev.trading.domain.entity.StrategyConfiguration
 import ru.kcheranev.trading.domain.entity.TradeOrder
 import ru.kcheranev.trading.domain.entity.TradeSession
+import ru.kcheranev.trading.domain.model.backtesting.PeriodStrategyAnalyzeResult
 import ru.kcheranev.trading.domain.model.backtesting.StrategyAdjustAndAnalyzeResult
-import ru.kcheranev.trading.domain.model.backtesting.StrategyAnalyzeResult
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.CreateStrategyConfigurationRequestDto
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.StartTradeSessionRequestDto
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.StrategyAdjustAndAnalyzeRequestDto
@@ -21,8 +21,8 @@ import ru.kcheranev.trading.infra.adapter.income.web.model.request.StrategyAnaly
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.StrategyConfigurationSearchRequestDto
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.TradeOrderSearchRequestDto
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.TradeSessionSearchRequestDto
+import ru.kcheranev.trading.infra.adapter.income.web.model.response.PeriodStrategyAnalyzeResultDto
 import ru.kcheranev.trading.infra.adapter.income.web.model.response.StrategyAdjustAndAnalyzeDto
-import ru.kcheranev.trading.infra.adapter.income.web.model.response.StrategyAnalyzeDto
 import ru.kcheranev.trading.infra.adapter.income.web.model.response.StrategyConfigurationDto
 import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeOrderDto
 import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeSessionDto
@@ -51,7 +51,7 @@ interface WebIncomeAdapterMapper {
 
     fun map(source: TradeOrder): TradeOrderDto
 
-    fun map(source: StrategyAnalyzeResult): StrategyAnalyzeDto
+    fun map(source: PeriodStrategyAnalyzeResult): PeriodStrategyAnalyzeResultDto
 
     fun map(source: StrategyAdjustAndAnalyzeResult): StrategyAdjustAndAnalyzeDto
 

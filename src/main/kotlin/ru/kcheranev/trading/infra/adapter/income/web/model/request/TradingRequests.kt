@@ -8,7 +8,7 @@ data class CreateStrategyConfigurationRequestDto(
     @Schema(description = "Type") val type: String,
     @Schema(description = "Initial candle amount") val initCandleAmount: Int,
     @Schema(description = "Candle interval") val candleInterval: CandleInterval,
-    @Schema(description = "Strategy parameters") val params: Map<String, Int>
+    @Schema(description = "Strategy parameters") val params: Map<String, Number>
 )
 
 data class StartTradeSessionRequestDto(

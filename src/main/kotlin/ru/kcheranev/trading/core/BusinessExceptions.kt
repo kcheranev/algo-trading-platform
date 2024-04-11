@@ -4,4 +4,8 @@ open class BusinessException(
     message: String
 ) : RuntimeException(message)
 
-class StrategyValidationException(message: String) : BusinessException(message)
+class StrategyParamValidationException(message: String) : BusinessException(message)
+
+class IncomeCommandValidationException(message: String) : BusinessException(message)
+
+class OutcomeCommandValidationException(message: String) : BusinessException(message)

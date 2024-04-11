@@ -1,8 +1,24 @@
 package ru.kcheranev.trading.domain.model.backtesting
 
 import java.math.BigDecimal
+import java.time.LocalDate
 
-data class StrategyAnalyzeResult(
+data class StrategyAdjustAndAnalyzeResult(
+    val result: PeriodStrategyAnalyzeResult,
+    val params: Map<String, Number>
+)
+
+data class PeriodStrategyAnalyzeResult(
+    val results: Map<LocalDate, DailyStrategyAnalyzeResult>
+) {
+
+    val totalGrossProfit = results.values.sumOf { it.totalGrossProfit }
+
+    val totalNetProfit = results.values.sumOf { it.totalNetProfit }
+
+}
+
+data class DailyStrategyAnalyzeResult(
     val averageLoss: BigDecimal,
     val averageProfit: BigDecimal,
     val enterAndHoldReturn: BigDecimal,

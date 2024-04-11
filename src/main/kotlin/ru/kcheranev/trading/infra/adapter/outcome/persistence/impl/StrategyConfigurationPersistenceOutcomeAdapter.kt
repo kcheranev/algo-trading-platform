@@ -9,7 +9,7 @@ import ru.kcheranev.trading.core.port.outcome.persistence.SaveStrategyConfigurat
 import ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationPersistencePort
 import ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationSearchCommand
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
-import ru.kcheranev.trading.infra.adapter.outcome.PersistenceOutcomeAdapterException
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.PersistenceNotFoundException
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.persistenceOutcomeAdapterMapper
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
 
@@ -37,7 +37,7 @@ class StrategyConfigurationPersistenceOutcomeAdapter(
     override fun get(command: GetStrategyConfigurationCommand) =
         strategyConfigurationRepository.findById(command.strategyConfigurationId.value)
             .orElseThrow {
-                PersistenceOutcomeAdapterException("Strategy configuration entity with id ${command.strategyConfigurationId.value} is not exists")
+                PersistenceNotFoundException("Strategy configuration entity with id ${command.strategyConfigurationId.value} is not exists")
             }
             .let { persistenceOutcomeAdapterMapper.map(it) }
 

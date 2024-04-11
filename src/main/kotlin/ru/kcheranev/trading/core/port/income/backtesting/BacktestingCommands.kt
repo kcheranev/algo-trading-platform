@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 
 data class StrategyAnalyzeCommand(
     val strategyType: String,
-    val strategyParams: Map<String, Int>,
+    val strategyParams: Map<String, Number>,
     val instrument: Instrument,
     val candleInterval: CandleInterval,
     val candlesFrom: LocalDateTime,
@@ -16,8 +16,8 @@ data class StrategyAnalyzeCommand(
 
 data class StrategyAdjustAndAnalyzeCommand(
     val strategyType: String,
-    val strategyParams: Map<String, Int>,
-    val mutableStrategyParams: Map<String, Int>,
+    val strategyParams: Map<String, Number>,
+    val mutableStrategyParams: Map<String, Number>,
     val adjustFactor: BigDecimal,
     val adjustVariantCount: Int,
     val instrument: Instrument,

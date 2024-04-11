@@ -10,7 +10,7 @@ data class CreateStrategyConfigurationCommand(
     val type: String,
     val initCandleAmount: Int,
     val candleInterval: CandleInterval,
-    val params: Map<String, Int>
+    val params: Map<String, Number>
 )
 
 data class StartTradeSessionCommand(

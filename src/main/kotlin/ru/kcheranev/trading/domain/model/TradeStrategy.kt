@@ -5,6 +5,8 @@ import org.ta4j.core.Bar
 import org.ta4j.core.BarSeries
 import org.ta4j.core.BarSeriesManager
 import org.ta4j.core.Strategy
+import org.ta4j.core.analysis.cost.LinearTransactionCostModel
+import org.ta4j.core.analysis.cost.ZeroCostModel
 import org.ta4j.core.criteria.EnterAndHoldReturnCriterion
 import org.ta4j.core.criteria.MaximumDrawdownCriterion
 import org.ta4j.core.criteria.NumberOfBarsCriterion
@@ -14,6 +16,7 @@ import org.ta4j.core.criteria.NumberOfPositionsCriterion
 import org.ta4j.core.criteria.NumberOfWinningPositionsCriterion
 import org.ta4j.core.criteria.pnl.AverageLossCriterion
 import org.ta4j.core.criteria.pnl.AverageProfitCriterion
+import org.ta4j.core.criteria.pnl.GrossLossCriterion
 import org.ta4j.core.criteria.pnl.GrossProfitCriterion
 import org.ta4j.core.criteria.pnl.NetLossCriterion
 import org.ta4j.core.criteria.pnl.NetProfitCriterion
@@ -22,9 +25,10 @@ import org.ta4j.core.criteria.pnl.ProfitLossPercentageCriterion
 import org.ta4j.core.criteria.pnl.ProfitLossRatioCriterion
 import org.ta4j.core.num.DecimalNum
 import org.ta4j.core.num.Num
+import ru.kcheranev.trading.domain.model.backtesting.DailyStrategyAnalyzeResult
 import ru.kcheranev.trading.domain.model.backtesting.Order
-import ru.kcheranev.trading.domain.model.backtesting.StrategyAnalyzeResult
 import ru.kcheranev.trading.domain.model.backtesting.Trade
+import java.math.BigDecimal
 
 class TradeStrategy(
     val series: BarSeries,
@@ -39,8 +43,10 @@ class TradeStrategy(
 
     fun shouldExit() = shouldExit(series.endIndex)
 
-    fun analyze(): StrategyAnalyzeResult {
-        val tradingRecord = BarSeriesManager(series).run(this)
+    fun analyze(commission: BigDecimal): DailyStrategyAnalyzeResult {
+        val tradingRecord =
+            BarSeriesManager(series, LinearTransactionCostModel(commission.toDouble()), ZeroCostModel())
+                .run(this)
         val trades =
             tradingRecord.positions
                 .map { position ->
@@ -49,13 +55,13 @@ class TradeStrategy(
                         exit = mapPositionTrade(position.exit)
                     )
                 }
-        return StrategyAnalyzeResult(
+        return DailyStrategyAnalyzeResult(
             averageLoss = AverageLossCriterion().calculate(series, tradingRecord).toBigDecimal(),
             averageProfit = AverageProfitCriterion().calculate(series, tradingRecord).toBigDecimal(),
             enterAndHoldReturn = EnterAndHoldReturnCriterion()
                 .calculate(series, tradingRecord).toBigDecimal(),
             netLoss = NetLossCriterion().calculate(series, tradingRecord).toBigDecimal(),
-            grossLoss = NetLossCriterion().calculate(series, tradingRecord).toBigDecimal(),
+            grossLoss = GrossLossCriterion().calculate(series, tradingRecord).toBigDecimal(),
             maximumDrawdown = MaximumDrawdownCriterion().calculate(series, tradingRecord).toBigDecimal(),
             numberOfBars = NumberOfBarsCriterion().calculate(series, tradingRecord).toInt(),
             numberOfConsecutiveProfitPositions = NumberOfConsecutivePositionsCriterion(AnalysisCriterion.PositionFilter.PROFIT)
@@ -81,7 +87,8 @@ class TradeStrategy(
         Order(
             date = series.getBar(trade.index - 1).endTime.toLocalDateTime(),
             direction = TradeDirection.valueOf(trade.type.name),
-            price = trade.netPrice.toBigDecimal()
+            netPrice = trade.netPrice.toBigDecimal(),
+            grossPrice = trade.pricePerAsset.toBigDecimal()
         )
 
     private fun Num.toBigDecimal() = (this as DecimalNum).delegate

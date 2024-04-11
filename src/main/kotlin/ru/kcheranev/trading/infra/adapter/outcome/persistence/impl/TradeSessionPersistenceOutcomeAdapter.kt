@@ -10,7 +10,7 @@ import ru.kcheranev.trading.core.port.outcome.persistence.SaveTradeSessionComman
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionPersistencePort
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionSearchCommand
 import ru.kcheranev.trading.domain.entity.TradeSessionId
-import ru.kcheranev.trading.infra.adapter.outcome.PersistenceOutcomeAdapterException
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.PersistenceNotFoundException
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.persistenceOutcomeAdapterMapper
 import java.util.UUID
 
@@ -44,7 +44,7 @@ class TradeSessionPersistenceOutcomeAdapter(
 
     override fun get(command: GetTradeSessionCommand) =
         tradeSessionCache.get(command.tradeSessionId.value)
-            ?: throw PersistenceOutcomeAdapterException("Trade session entity with id ${command.tradeSessionId.value} is not exists")
+            ?: throw PersistenceNotFoundException("Trade session entity with id ${command.tradeSessionId.value} is not exists")
 
     override fun search(command: TradeSessionSearchCommand) =
         tradeSessionCache.search(command)

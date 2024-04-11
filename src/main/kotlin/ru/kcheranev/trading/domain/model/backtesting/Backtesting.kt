@@ -6,31 +6,41 @@ import kotlinx.coroutines.runBlocking
 import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseBarSeriesBuilder
 import ru.kcheranev.trading.core.strategy.StrategyFactory
+import ru.kcheranev.trading.domain.DomainException
 import ru.kcheranev.trading.domain.mapper.domainModelMapper
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.LocalDate
 
 private const val BEST_STRATEGIES_RESULT_LIMIT = 15
 
 class Backtesting(
     val ticker: String,
     val candleInterval: CandleInterval,
-    candles: List<Candle>
+    val commission: BigDecimal,
+    candlesByPeriod: Map<LocalDate, List<Candle>>
 ) {
 
-    private val series: BarSeries =
-        BaseBarSeriesBuilder()
-            .withName("Trade session: ticker=$ticker, candleInterval=$candleInterval")
-            .withBars(candles.map { domainModelMapper.map(it) })
-            .build()
+    private val series: Map<LocalDate, BarSeries> =
+        candlesByPeriod.mapValues { dayCandles ->
+            BaseBarSeriesBuilder()
+                .withName("Trade session: ticker=$ticker, candleInterval=$candleInterval")
+                .withBars(dayCandles.value.map { domainModelMapper.map(it) })
+                .build()
+        }
 
     fun analyzeStrategy(
         strategyFactory: StrategyFactory,
         params: StrategyParameters
-    ) = strategyFactory.initStrategy(params, series).analyze()
+    ) = PeriodStrategyAnalyzeResult(
+        series.mapValues {
+            strategyFactory.initStrategy(params, it.value)
+                .analyze(commission)
+        }
+    )
 
     fun adjustAndAnalyzeStrategy(
         strategyFactory: StrategyFactory,
@@ -56,21 +66,39 @@ class Backtesting(
     }
 
     private fun buildAdjustedParams(
-        paramValue: Int,
+        paramValue: Number,
         adjustFactor: BigDecimal,
         adjustVariantCount: Int
-    ): List<Int> {
-        val minParamValue = BigDecimal(paramValue).divide(adjustFactor, RoundingMode.HALF_UP).toInt()
-        val maxParamValue = BigDecimal(paramValue).multiply(adjustFactor).toInt()
-        val paramValueStep = (maxParamValue - minParamValue) / (adjustVariantCount - 1)
-        val paramVariants = mutableListOf(paramValue)
-        for (paramVariant in minParamValue..maxParamValue step paramValueStep) {
-            paramVariants.add(paramVariant)
-        }
-        return paramVariants.distinct()
-    }
+    ): List<Number> =
+        when (paramValue) {
+            is Int -> {
+                val minParamValue = BigDecimal(paramValue).divide(adjustFactor, RoundingMode.HALF_UP).toInt()
+                val maxParamValue = BigDecimal(paramValue).multiply(adjustFactor).toInt()
+                val paramValueStep = (maxParamValue - minParamValue) / (adjustVariantCount - 1)
+                val paramVariants = mutableListOf(paramValue)
+                for (paramVariant in minParamValue..maxParamValue step paramValueStep) {
+                    paramVariants.add(paramVariant)
+                }
+                paramVariants.distinct()
+            }
 
-    private fun cartesianProduct(paramVariants: Map<String, List<Int>>): List<Map<String, Int>> =
+            is BigDecimal -> {
+                val minParamValue = paramValue.divide(adjustFactor, RoundingMode.HALF_UP)
+                val maxParamValue = paramValue.multiply(adjustFactor)
+                val paramValueStep = (maxParamValue - minParamValue) / (BigDecimal(adjustVariantCount - 1))
+                val paramVariants = mutableListOf(paramValue)
+                var paramVariant = minParamValue
+                while (paramValue <= maxParamValue) {
+                    paramVariants.add(paramVariant)
+                    paramVariant += paramValueStep
+                }
+                paramVariants.distinct()
+            }
+
+            else -> throw DomainException("Unexpected parameter $paramValue value type")
+        }
+
+    private fun cartesianProduct(paramVariants: Map<String, List<Number>>): List<Map<String, Number>> =
         paramVariants.entries
             .fold(listOf(mapOf())) { accumulator, currentParams ->
                 accumulator.flatMap { map ->
@@ -81,7 +109,7 @@ class Backtesting(
 
     private fun analyzeAdjustedStrategy(
         strategyFactory: StrategyFactory,
-        params: Map<String, Int>
+        params: Map<String, Number>
     ): StrategyAdjustAndAnalyzeResult? =
         try {
             StrategyAdjustAndAnalyzeResult(analyzeStrategy(strategyFactory, StrategyParameters(params)), params)

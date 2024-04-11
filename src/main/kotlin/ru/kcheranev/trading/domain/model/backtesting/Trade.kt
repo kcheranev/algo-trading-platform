@@ -7,11 +7,18 @@ data class Trade(
     val exit: Order
 ) {
 
-    val profit =
+    val netProfit =
         if (entry.direction == TradeDirection.BUY) {
-            exit.price - entry.price
+            exit.netPrice - entry.netPrice
         } else {
-            entry.price - exit.price
+            entry.netPrice - exit.netPrice
+        }
+
+    val grossProfit =
+        if (entry.direction == TradeDirection.BUY) {
+            exit.grossPrice - entry.grossPrice
+        } else {
+            entry.grossPrice - exit.grossPrice
         }
 
 }
