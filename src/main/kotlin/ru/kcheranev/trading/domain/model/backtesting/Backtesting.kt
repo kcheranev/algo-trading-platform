@@ -61,7 +61,7 @@ class Backtesting(
                 }
             }.awaitAll()
         }.filterNotNull()
-            .sortedByDescending { it.result.totalGrossProfit }
+            .sortedByDescending { it.result.profitLossPositionsRatio }
             .take(BEST_STRATEGIES_RESULT_LIMIT)
     }
 
@@ -74,7 +74,9 @@ class Backtesting(
             is Int -> {
                 val minParamValue = BigDecimal(paramValue).divide(adjustFactor, RoundingMode.HALF_UP).toInt()
                 val maxParamValue = BigDecimal(paramValue).multiply(adjustFactor).toInt()
-                val paramValueStep = (maxParamValue - minParamValue) / (adjustVariantCount - 1)
+                val paramValueStep =
+                    ((maxParamValue - minParamValue) / (adjustVariantCount - 1))
+                        .let { if (it == 0) 1 else it }
                 val paramVariants = mutableListOf(paramValue)
                 for (paramVariant in minParamValue..maxParamValue step paramValueStep) {
                     paramVariants.add(paramVariant)
@@ -85,7 +87,7 @@ class Backtesting(
             is BigDecimal -> {
                 val minParamValue = paramValue.divide(adjustFactor, RoundingMode.HALF_UP)
                 val maxParamValue = paramValue.multiply(adjustFactor)
-                val paramValueStep = (maxParamValue - minParamValue) / (BigDecimal(adjustVariantCount - 1))
+                val paramValueStep = (maxParamValue - minParamValue).divide(BigDecimal(adjustVariantCount - 1))
                 val paramVariants = mutableListOf(paramValue)
                 var paramVariant = minParamValue
                 while (paramValue <= maxParamValue) {

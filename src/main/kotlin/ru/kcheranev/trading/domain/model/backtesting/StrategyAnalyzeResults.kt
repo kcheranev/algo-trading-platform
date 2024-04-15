@@ -1,6 +1,7 @@
 package ru.kcheranev.trading.domain.model.backtesting
 
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDate
 
 data class StrategyAdjustAndAnalyzeResult(
@@ -15,6 +16,18 @@ data class PeriodStrategyAnalyzeResult(
     val totalGrossProfit = results.values.sumOf { it.totalGrossProfit }
 
     val totalNetProfit = results.values.sumOf { it.totalNetProfit }
+
+    val totalNumberOfProfitPositions = results.values.sumOf { it.numberOfProfitPositions }
+
+    val totalNumberOfLosingPositions = results.values.sumOf { it.numberOfLosingPositions }
+
+    val profitLossPositionsRatio: BigDecimal =
+        if (totalNumberOfLosingPositions == 0) {
+            BigDecimal.ZERO
+        } else {
+            BigDecimal(totalNumberOfProfitPositions)
+                .divide(BigDecimal(totalNumberOfLosingPositions), 4, RoundingMode.HALF_UP)
+        }
 
 }
 

@@ -10,13 +10,16 @@ data class StrategyAdjustAndAnalyzeResponseDto(
 )
 
 data class StrategyAdjustAndAnalyzeDto(
-    val result: PeriodStrategyAnalyzeResultDto,
-    val params: Map<String, Number>
+    val params: Map<String, Number>,
+    val result: PeriodStrategyAnalyzeResultDto
 )
 
 data class PeriodStrategyAnalyzeResultDto(
     val totalGrossProfit: BigDecimal,
     val totalNetProfit: BigDecimal,
+    val totalNumberOfProfitPositions: BigDecimal,
+    val totalNumberOfLosingPositions: BigDecimal,
+    val profitLossPositionsRatio: BigDecimal,
     val results: Map<LocalDate, DailyStrategyAnalyzeResultDto>
 )
 
