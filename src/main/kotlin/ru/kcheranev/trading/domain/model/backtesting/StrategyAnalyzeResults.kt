@@ -33,6 +33,8 @@ data class PeriodStrategyAnalyzeResult(
         results.values
             .count { result -> result.trades.any { trade -> trade.exit == null } }
 
+    val tradesCount = profitPositionsTotalCount + losingPositionsTotalCount
+
 }
 
 data class DailyStrategyAnalyzeResult(

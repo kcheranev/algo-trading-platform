@@ -21,6 +21,7 @@ data class PeriodStrategyAnalyzeResultDto(
     val losingPositionsTotalCount: Int,
     val profitLossPositionsRatio: BigDecimal,
     val notClosedPositionsCount: Int,
+    val tradesCount: Int,
     val results: Map<LocalDate, DailyStrategyAnalyzeResultDto>
 )
 

@@ -2,6 +2,7 @@ package ru.kcheranev.trading.infra.adapter.outcome.broker.impl
 
 import org.springframework.stereotype.Component
 import ru.kcheranev.trading.common.DateSupplier
+import ru.kcheranev.trading.common.isWeekend
 import ru.kcheranev.trading.common.toMskInstant
 import ru.kcheranev.trading.core.config.TradingProperties
 import ru.kcheranev.trading.core.port.outcome.broker.GetHistoricCandlesCommand
@@ -42,6 +43,10 @@ class HistoricCandleBrokerOutcomeAdapter(
         val resultMap = mutableMapOf<LocalDate, List<Candle>>()
         var currentDay = startDay
         while (currentDay <= endDay) {
+            if (currentDay.isWeekend()) {
+                currentDay = currentDay.plusDays(1)
+                continue
+            }
             val startTime =
                 if (currentDay == startDay) {
                     command.from.toLocalTime()

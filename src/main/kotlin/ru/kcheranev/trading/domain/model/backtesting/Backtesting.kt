@@ -4,6 +4,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.ta4j.core.BaseBarSeriesBuilder
+import ru.kcheranev.trading.common.isWeekend
 import ru.kcheranev.trading.core.strategy.factory.StrategyFactory
 import ru.kcheranev.trading.domain.DomainException
 import ru.kcheranev.trading.domain.mapper.domainModelMapper
@@ -18,6 +19,8 @@ import java.time.LocalDate
 const val BACKTESTING_RESULT_SCALE = 5
 
 private const val BEST_STRATEGIES_RESULT_LIMIT = 15
+
+private val PROFIT_LOSS_POSITIONS_RATIO_LIMIT = BigDecimal(0.5)
 
 class Backtesting(
     val ticker: String,
@@ -36,6 +39,8 @@ class Backtesting(
                 candleInterval
             )
         }
+
+    private val daysCount = candlesByPeriod.keys.count { !it.isWeekend() }
 
     fun analyzeStrategy(
         strategyFactory: StrategyFactory,
@@ -65,9 +70,14 @@ class Backtesting(
                     analyzeAdjustedStrategy(strategyFactory, paramVariant + params)
                 }
             }.awaitAll()
-        }.filterNotNull()
-            .sortedByDescending { it.result.profitLossPositionsRatio }
+        }.asSequence()
+            .filterNotNull()
+            .filter { it.result.totalGrossProfit > BigDecimal.ZERO }
+            .filter { it.result.profitLossPositionsRatio > PROFIT_LOSS_POSITIONS_RATIO_LIMIT }
+            .filter { it.result.tradesCount >= daysCount }
+            .sortedByDescending { it.result.totalGrossProfit }
             .take(BEST_STRATEGIES_RESULT_LIMIT)
+            .toList()
     }
 
     private fun buildAdjustedParams(
