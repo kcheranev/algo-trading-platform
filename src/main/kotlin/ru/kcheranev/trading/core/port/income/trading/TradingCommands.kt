@@ -8,7 +8,6 @@ import ru.kcheranev.trading.domain.model.Instrument
 
 data class CreateStrategyConfigurationCommand(
     val type: String,
-    val initCandleAmount: Int,
     val candleInterval: CandleInterval,
     val params: Map<String, Number>
 )

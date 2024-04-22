@@ -10,14 +10,16 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.throwable.shouldHaveMessage
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.verify
 import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseBar
 import org.ta4j.core.BaseBarSeriesBuilder
 import ru.kcheranev.trading.common.DateSupplier
-import ru.kcheranev.trading.common.MskDateUtil
-import ru.kcheranev.trading.core.strategy.StrategyFactory
+import ru.kcheranev.trading.common.toMskZonedDateTime
+import ru.kcheranev.trading.core.strategy.factory.StrategyFactory
 import ru.kcheranev.trading.domain.TradeSessionCreatedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionDomainException
 import ru.kcheranev.trading.domain.TradeSessionEnteredDomainEvent
@@ -34,6 +36,7 @@ import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
+import ru.kcheranev.trading.domain.model.CustomizedBarSeries
 import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.TradeStrategy
@@ -44,6 +47,45 @@ import java.util.UUID
 
 class TradeSessionTest : StringSpec({
 
+    "should init strategy series" {
+        //given
+        val tradeStrategy = mockk<TradeStrategy> {
+            every { series.barCount } returns 0
+            justRun { addBar(any()) }
+        }
+        val tradeSession =
+            TradeSession(
+                id = TradeSessionId(UUID.randomUUID()),
+                ticker = "SBER",
+                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                status = TradeSessionStatus.WAITING,
+                startDate = LocalDateTime.now(),
+                candleInterval = CandleInterval.ONE_MIN,
+                lotsQuantity = 10,
+                strategy = tradeStrategy,
+                strategyConfigurationId = StrategyConfigurationId(UUID.randomUUID())
+            )
+
+        //when
+        tradeSession.initStrategySeries(
+            listOf(
+                Candle(
+                    interval = CandleInterval.ONE_MIN,
+                    openPrice = BigDecimal(102),
+                    closePrice = BigDecimal(104),
+                    highestPrice = BigDecimal(104),
+                    lowestPrice = BigDecimal(97),
+                    volume = 10,
+                    endTime = LocalDateTime.parse("2024-01-30T10:19:00"),
+                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                )
+            )
+        )
+
+        //then
+        verify(exactly = 1) { tradeStrategy.addBar(any()) }
+    }
+
     "should start trade session" {
         //given
         val strategyConfigurationId = UUID.fromString("d18bbe01-6e7a-44dd-a4cf-7fcc0c2ac874")
@@ -51,28 +93,16 @@ class TradeSessionTest : StringSpec({
             StrategyConfiguration(
                 id = StrategyConfigurationId(strategyConfigurationId),
                 type = "strategy-type",
-                initCandleAmount = 10,
                 candleInterval = CandleInterval.ONE_MIN,
                 params = StrategyParameters(mapOf("key" to 1))
             )
         val strategyFactory = mockk<StrategyFactory>()
         val strategyParamsSlot = slot<StrategyParameters>()
-        val seriesSlot = slot<BarSeries>()
+        val seriesSlot = slot<CustomizedBarSeries>()
         val tradeStrategy = mockk<TradeStrategy>()
         every { strategyFactory.initStrategy(capture(strategyParamsSlot), capture(seriesSlot)) } returns tradeStrategy
         val now = LocalDateTime.parse("2024-01-30T10:15:30")
         val dateSupplier = DateSupplier { now }
-        val candle =
-            Candle(
-                interval = CandleInterval.ONE_MIN,
-                openPrice = BigDecimal(101),
-                closePrice = BigDecimal(102),
-                highestPrice = BigDecimal(102),
-                lowestPrice = BigDecimal(100),
-                volume = 10,
-                endTime = LocalDateTime.parse("2024-01-30T10:19:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
-            )
 
         //when
         val tradeSession =
@@ -81,7 +111,6 @@ class TradeSessionTest : StringSpec({
                 ticker = "SBER",
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 lotsQuantity = 10,
-                candles = listOf(candle),
                 strategyFactory = strategyFactory,
                 dateSupplier = dateSupplier
             )
@@ -99,20 +128,7 @@ class TradeSessionTest : StringSpec({
         strategyParamsSlot.captured shouldBe StrategyParameters(mapOf("key" to 1))
 
         val series = seriesSlot.captured
-        series.barCount shouldBe 1
-        val expectedBar =
-            with(candle) {
-                BaseBar(
-                    interval.duration,
-                    MskDateUtil.toZonedDateTime(endTime),
-                    openPrice,
-                    highestPrice,
-                    lowestPrice,
-                    closePrice,
-                    BigDecimal(volume)
-                )
-            }
-        series.lastBar shouldBe expectedBar
+        series.barCount shouldBe 0
 
         tradeSession.events.size shouldBe 1
         val domainEvent = tradeSession.events.first()
@@ -127,7 +143,7 @@ class TradeSessionTest : StringSpec({
         mockedSeries.addBar(
             BaseBar(
                 Duration.ofMinutes(1),
-                MskDateUtil.toZonedDateTime(LocalDateTime.parse("2024-01-30T10:15:00")),
+                LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
                 BigDecimal(100),
                 BigDecimal(102),
                 BigDecimal(98),
@@ -171,7 +187,7 @@ class TradeSessionTest : StringSpec({
         //then
         mockedSeries.barCount shouldBe 2
         val lastBar = mockedSeries.lastBar
-        lastBar.endTime shouldBe MskDateUtil.toZonedDateTime(LocalDateTime.parse("2024-01-30T10:19:00"))
+        lastBar.endTime shouldBe LocalDateTime.parse("2024-01-30T10:19:00").toMskZonedDateTime()
     }
 
     "should pending enter trade session" {
@@ -180,7 +196,7 @@ class TradeSessionTest : StringSpec({
         mockedSeries.addBar(
             BaseBar(
                 Duration.ofMinutes(1),
-                MskDateUtil.toZonedDateTime(LocalDateTime.parse("2024-01-30T10:15:00")),
+                LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
                 BigDecimal(100),
                 BigDecimal(102),
                 BigDecimal(98),
@@ -239,7 +255,7 @@ class TradeSessionTest : StringSpec({
         mockedSeries.addBar(
             BaseBar(
                 Duration.ofMinutes(1),
-                MskDateUtil.toZonedDateTime(LocalDateTime.parse("2024-01-30T10:15:00")),
+                LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
                 BigDecimal(100),
                 BigDecimal(102),
                 BigDecimal(98),
@@ -364,7 +380,7 @@ class TradeSessionTest : StringSpec({
         mockedSeries.addBar(
             BaseBar(
                 Duration.ofMinutes(1),
-                MskDateUtil.toZonedDateTime(LocalDateTime.parse("2024-01-30T10:15:00")),
+                LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
                 BigDecimal(100),
                 BigDecimal(102),
                 BigDecimal(98),
@@ -451,7 +467,7 @@ class TradeSessionTest : StringSpec({
         mockedSeries.addBar(
             BaseBar(
                 Duration.ofMinutes(1),
-                MskDateUtil.toZonedDateTime(LocalDateTime.parse("2024-01-30T10:15:00")),
+                LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
                 BigDecimal(100),
                 BigDecimal(102),
                 BigDecimal(98),

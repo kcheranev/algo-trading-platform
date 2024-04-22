@@ -10,7 +10,7 @@ import io.mockk.mockk
 import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseBar
 import org.ta4j.core.BaseBarSeriesBuilder
-import ru.kcheranev.trading.common.MskDateUtil
+import ru.kcheranev.trading.common.toMskZonedDateTime
 import ru.kcheranev.trading.core.port.income.trading.ProcessIncomeCandleCommand
 import ru.kcheranev.trading.core.service.TradeService
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
@@ -61,7 +61,6 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 StrategyConfigurationEntity(
                     null,
                     "DUMMY",
-                    10,
                     CandleInterval.ONE_MIN,
                     MapWrapper(mapOf("param1" to 1))
                 )
@@ -70,7 +69,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
         mockedSeries.addBar(
             BaseBar(
                 Duration.ofMinutes(1),
-                MskDateUtil.toZonedDateTime(LocalDateTime.parse("2024-01-30T10:15:00")),
+                LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
                 BigDecimal(100),
                 BigDecimal(102),
                 BigDecimal(98),
@@ -154,7 +153,6 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 StrategyConfigurationEntity(
                     null,
                     "DUMMY",
-                    10,
                     CandleInterval.ONE_MIN,
                     MapWrapper(mapOf("param1" to 1))
                 )
@@ -163,7 +161,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
         mockedSeries.addBar(
             BaseBar(
                 Duration.ofMinutes(1),
-                MskDateUtil.toZonedDateTime(LocalDateTime.parse("2024-01-30T10:15:00")),
+                LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
                 BigDecimal(100),
                 BigDecimal(102),
                 BigDecimal(98),
@@ -247,7 +245,6 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 StrategyConfigurationEntity(
                     null,
                     "DUMMY",
-                    10,
                     CandleInterval.ONE_MIN,
                     MapWrapper(mapOf("param1" to 1))
                 )
@@ -256,7 +253,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
         mockedSeries.addBar(
             BaseBar(
                 Duration.ofMinutes(1),
-                MskDateUtil.toZonedDateTime(LocalDateTime.parse("2024-01-30T10:15:00")),
+                LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
                 BigDecimal(100),
                 BigDecimal(102),
                 BigDecimal(98),

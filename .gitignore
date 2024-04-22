@@ -6,6 +6,7 @@ build/
 !**/src/test/**/build/
 src/test/resources/testcontainers.properties
 src/main/resources/application-local.yml
+logs/
 
 ### STS ###
 .apt_generated

@@ -18,7 +18,6 @@ class StrategyConfigurationEntityRowMapper(
         StrategyConfigurationEntity(
             id = UUID.fromString(rs.getString("id")),
             type = rs.getString("type"),
-            initCandleAmount = rs.getInt("init_candle_amount"),
             candleInterval = CandleInterval.valueOf(rs.getString("candle_interval")),
             params = mapToJsonbReadConverter.convert(rs.getObject("params", PGobject::class.java))
         )

@@ -1,6 +1,6 @@
-package ru.kcheranev.trading.core.strategy
+package ru.kcheranev.trading.core.strategy.factory
 
-import org.ta4j.core.BarSeries
+import ru.kcheranev.trading.domain.model.CustomizedBarSeries
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.TradeStrategy
 
@@ -8,7 +8,7 @@ interface StrategyFactory {
 
     fun initStrategy(
         params: StrategyParameters,
-        series: BarSeries
+        series: CustomizedBarSeries
     ): TradeStrategy
 
     fun strategyType(): String

@@ -3,7 +3,8 @@ package ru.kcheranev.trading.domain.entity
 import org.slf4j.LoggerFactory
 import org.ta4j.core.BaseBarSeriesBuilder
 import ru.kcheranev.trading.common.DateSupplier
-import ru.kcheranev.trading.core.strategy.StrategyFactory
+import ru.kcheranev.trading.core.strategy.factory.StrategyFactory
+import ru.kcheranev.trading.domain.DomainException
 import ru.kcheranev.trading.domain.TradeSessionCreatedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionDomainException
 import ru.kcheranev.trading.domain.TradeSessionEnteredDomainEvent
@@ -23,13 +24,14 @@ import ru.kcheranev.trading.domain.entity.TradeSessionStatus.WAITING
 import ru.kcheranev.trading.domain.mapper.domainModelMapper
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
+import ru.kcheranev.trading.domain.model.CustomizedBarSeries
 import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.domain.model.TradeStrategy
 import java.time.LocalDateTime
 import java.util.UUID
 import java.util.function.Supplier
 
-private const val MAX_STRATEGY_BARS_COUNT = 100
+private const val MAX_STRATEGY_BARS_COUNT = 200
 
 data class TradeSession(
     val id: TradeSessionId?,
@@ -48,7 +50,12 @@ data class TradeSession(
 
     val instrument = Instrument(instrumentId, ticker)
 
-    fun readyForOrder() = status == WAITING || status == IN_POSITION
+    fun initStrategySeries(candles: List<Candle>) {
+        if (strategy.series.barCount != 0) {
+            throw DomainException("Trade session $this strategy already initialized")
+        }
+        candles.forEach { strategy.addBar(domainModelMapper.map(it)) }
+    }
 
     fun processIncomeCandle(candle: Candle, availableCandleDelay: Long) {
         if (!readyForOrder()) {
@@ -62,7 +69,7 @@ data class TradeSession(
                 "Unable to process income candle: new candle date intersects trade session $this series dates"
             )
         }
-        if (lastCandleDate.plus(candleInterval.duration.multipliedBy(availableCandleDelay)) < candle.endTime) {
+        if (lastCandleDate + candleInterval.duration.multipliedBy(availableCandleDelay) < candle.endTime) {
             expire()
             return
         }
@@ -70,6 +77,8 @@ data class TradeSession(
         registerEvent(TradeStrategySeriesCandleAddedDomainEvent(id!!))
         executeStrategy()
     }
+
+    fun readyForOrder() = status == WAITING || status == IN_POSITION
 
     private fun lastCandleDate() =
         strategy.series
@@ -112,10 +121,10 @@ data class TradeSession(
         status = PENDING_EXIT
         registerEvent(
             TradeSessionPendedForExitDomainEvent(
-                id!!,
-                instrument,
-                candleInterval,
-                lotsQuantityInPosition
+                tradeSessionId = id!!,
+                instrument = instrument,
+                candleInterval = candleInterval,
+                lotsQuantityInPosition = lotsQuantityInPosition
             )
         )
         log.info("Trade session $this is pended for exit")
@@ -183,7 +192,6 @@ data class TradeSession(
             ticker: String,
             instrumentId: String,
             lotsQuantity: Int,
-            candles: List<Candle>,
             strategyFactory: StrategyFactory,
             dateSupplier: DateSupplier
         ): TradeSession {
@@ -192,8 +200,12 @@ data class TradeSession(
                 BaseBarSeriesBuilder()
                     .withName("Trade session: ticker=$ticker, candleInterval=$candleInterval")
                     .withMaxBarCount(MAX_STRATEGY_BARS_COUNT)
-                    .withBars(candles.map { domainModelMapper.map(it) })
                     .build()
+            val tradeStrategy =
+                strategyFactory.initStrategy(
+                    strategyConfiguration.params,
+                    CustomizedBarSeries(series, candleInterval)
+                )
             val tradeSession =
                 TradeSession(
                     id = null,
@@ -204,7 +216,7 @@ data class TradeSession(
                     candleInterval = candleInterval,
                     lotsQuantity = lotsQuantity,
                     lotsQuantityInPosition = 0,
-                    strategy = strategyFactory.initStrategy(strategyConfiguration.params, series),
+                    strategy = tradeStrategy,
                     strategyConfigurationId = strategyConfiguration.id!!
                 )
             tradeSession.registerEvent(

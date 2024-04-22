@@ -20,7 +20,7 @@ abstract class BrokerIncomeAdapterMapper {
                 highestPrice = commonBrokerMapper.map(high),
                 lowestPrice = commonBrokerMapper.map(low),
                 volume = volume,
-                endTime = commonBrokerMapper.map(time).plus(candleInterval.duration),
+                endTime = commonBrokerMapper.map(time) + candleInterval.duration,
                 instrumentId = instrumentUid
             )
         }

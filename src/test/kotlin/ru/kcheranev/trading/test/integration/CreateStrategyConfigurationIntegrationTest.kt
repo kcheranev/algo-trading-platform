@@ -27,7 +27,6 @@ class CreateStrategyConfigurationIntegrationTest(
         val request =
             CreateStrategyConfigurationRequestDto(
                 type = StrategyType.MOVING_MOMENTUM.name,
-                initCandleAmount = 10,
                 candleInterval = CandleInterval.ONE_MIN,
                 params = mapOf(
                     "paramKeyInt" to 1,
@@ -46,7 +45,6 @@ class CreateStrategyConfigurationIntegrationTest(
 
         val strategyConfiguration = persistenceResult.first()
         strategyConfiguration.type shouldBe StrategyType.MOVING_MOMENTUM.name
-        strategyConfiguration.initCandleAmount shouldBe 10
         strategyConfiguration.candleInterval shouldBe CandleInterval.ONE_MIN
         strategyConfiguration.params.value shouldBe mapOf(
             "paramKeyInt" to 1,

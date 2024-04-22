@@ -59,7 +59,7 @@ abstract class BrokerOutcomeAdapterMapper {
             highestPrice = commonBrokerMapper.map(historicCandle.high),
             lowestPrice = commonBrokerMapper.map(historicCandle.low),
             volume = historicCandle.volume,
-            endTime = commonBrokerMapper.map(historicCandle.time).plus(candleInterval.duration),
+            endTime = commonBrokerMapper.map(historicCandle.time) + candleInterval.duration,
             instrumentId = instrumentId
         )
 

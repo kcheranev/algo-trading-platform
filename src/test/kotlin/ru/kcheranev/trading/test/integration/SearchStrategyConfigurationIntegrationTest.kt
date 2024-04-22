@@ -35,35 +35,30 @@ class SearchStrategyConfigurationIntegrationTest(
                 StrategyConfigurationEntity(
                     null,
                     StrategyType.MOVING_MOMENTUM.name,
-                    10,
                     CandleInterval.ONE_MIN,
                     MapWrapper(mapOf("param1" to 1))
                 ),
                 StrategyConfigurationEntity(
                     null,
                     "TEST_1",
-                    11,
                     CandleInterval.ONE_MIN,
                     MapWrapper(mapOf("param2" to 2))
                 ),
                 StrategyConfigurationEntity(
                     null,
                     "TEST_2",
-                    12,
                     CandleInterval.ONE_MIN,
                     MapWrapper(mapOf("param3" to 3))
                 ),
                 StrategyConfigurationEntity(
                     null,
                     "TEST_3",
-                    13,
                     CandleInterval.FIVE_MIN,
                     MapWrapper(mapOf("param4" to 4))
                 ),
                 StrategyConfigurationEntity(
                     null,
                     "TEST_4",
-                    14,
                     CandleInterval.FIVE_MIN,
                     MapWrapper(mapOf("param5" to 5))
                 )

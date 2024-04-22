@@ -7,7 +7,7 @@ import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeCommand
 import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeUseCase
 import ru.kcheranev.trading.core.port.outcome.broker.GetHistoricCandlesForLongPeriodCommand
 import ru.kcheranev.trading.core.port.outcome.broker.HistoricCandleBrokerPort
-import ru.kcheranev.trading.core.strategy.StrategyFactoryProvider
+import ru.kcheranev.trading.core.strategy.factory.StrategyFactoryProvider
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.backtesting.Backtesting
 import ru.kcheranev.trading.domain.model.backtesting.PeriodStrategyAnalyzeResult

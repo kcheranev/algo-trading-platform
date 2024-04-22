@@ -1,7 +1,6 @@
-package ru.kcheranev.trading.core.strategy
+package ru.kcheranev.trading.core.strategy.factory
 
 import org.springframework.stereotype.Component
-import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseStrategy
 import org.ta4j.core.indicators.EMAIndicator
 import org.ta4j.core.indicators.MACDIndicator
@@ -12,6 +11,7 @@ import org.ta4j.core.rules.CrossedUpIndicatorRule
 import org.ta4j.core.rules.OverIndicatorRule
 import org.ta4j.core.rules.UnderIndicatorRule
 import ru.kcheranev.trading.core.StrategyParamValidationException
+import ru.kcheranev.trading.domain.model.CustomizedBarSeries
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.StrategyType
 import ru.kcheranev.trading.domain.model.TradeStrategy
@@ -21,7 +21,7 @@ class MovingMomentumStrategyFactory : StrategyFactory {
 
     override fun initStrategy(
         params: StrategyParameters,
-        series: BarSeries
+        series: CustomizedBarSeries
     ): TradeStrategy {
         val shortEmaBarCount = params.getAsInt("shortEmaBarCount")
         val longEmaBarCount = params.getAsInt("longEmaBarCount")

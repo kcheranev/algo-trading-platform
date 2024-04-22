@@ -2,7 +2,6 @@ CREATE TABLE strategy_configuration
 (
     id                 uuid              NOT NULL DEFAULT gen_random_uuid(),
     type               character varying NOT NULL,
-    init_candle_amount integer           NOT NULL,
     candle_interval    character varying NOT NULL,
     params             jsonb             NOT NULL,
     CONSTRAINT strategy_configuration_pkey PRIMARY KEY (id)

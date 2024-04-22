@@ -1,4 +1,4 @@
-package ru.kcheranev.trading.core.strategy
+package ru.kcheranev.trading.core.strategy.factory
 
 import org.springframework.stereotype.Component
 

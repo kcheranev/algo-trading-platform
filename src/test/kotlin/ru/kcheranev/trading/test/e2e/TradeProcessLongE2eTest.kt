@@ -57,7 +57,6 @@ class TradeProcessLongE2eTest(
                 StrategyConfigurationEntity(
                     null,
                     "DUMMY",
-                    4,
                     CandleInterval.ONE_MIN,
                     MapWrapper(emptyMap())
                 )
@@ -169,8 +168,8 @@ class TradeProcessLongE2eTest(
             instrumentId shouldBe "e6123145-9665-43e0-8413-cd61b8aa9b1"
             date shouldBe LocalDateTime.parse("2024-01-30T10:15:30")
             lotsQuantity shouldBe 4
-            totalPrice shouldBe BigDecimal("85.000000000")
-            executedCommission shouldBe BigDecimal("1.000000000")
+            totalPrice shouldBe BigDecimal("413.000000000")
+            executedCommission shouldBe BigDecimal("7.000000000")
             direction shouldBe TradeDirection.BUY
             strategyConfigurationId.shouldNotBeNull()
         }
@@ -180,8 +179,8 @@ class TradeProcessLongE2eTest(
             instrumentId shouldBe "e6123145-9665-43e0-8413-cd61b8aa9b1"
             date shouldBe LocalDateTime.parse("2024-01-30T10:15:30")
             lotsQuantity shouldBe 4
-            totalPrice shouldBe BigDecimal("89.000000000")
-            executedCommission shouldBe BigDecimal("1.000000000")
+            totalPrice shouldBe BigDecimal("434.000000000")
+            executedCommission shouldBe BigDecimal("5.000000000")
             direction shouldBe TradeDirection.SELL
             strategyConfigurationId.shouldNotBeNull()
         }

@@ -34,7 +34,7 @@ import ru.kcheranev.trading.core.port.outcome.persistence.SaveTradeSessionComman
 import ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationPersistencePort
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderPersistencePort
 import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionPersistencePort
-import ru.kcheranev.trading.core.strategy.StrategyFactoryProvider
+import ru.kcheranev.trading.core.strategy.factory.StrategyFactoryProvider
 import ru.kcheranev.trading.domain.entity.StrategyConfiguration
 import ru.kcheranev.trading.domain.entity.TradeOrder
 import ru.kcheranev.trading.domain.entity.TradeSession
@@ -70,7 +70,6 @@ class TradeService(
         val strategyConfiguration =
             StrategyConfiguration.create(
                 type = command.type,
-                initCandleAmount = command.initCandleAmount,
                 candleInterval = command.candleInterval,
                 params = command.params
             )
@@ -84,24 +83,28 @@ class TradeService(
                 GetStrategyConfigurationCommand(command.strategyConfigurationId)
             )
         val strategyFactory = strategyFactoryProvider.getStrategyFactory(strategyConfiguration.type)
-        val candles =
-            historicCandleBrokerPort.getLastHistoricCandles(
-                GetLastHistoricCandlesCommand(
-                    command.instrument,
-                    strategyConfiguration.candleInterval,
-                    strategyConfiguration.initCandleAmount
-                )
-            )
+
         val tradeSession =
             TradeSession.start(
                 strategyConfiguration = strategyConfiguration,
                 ticker = command.instrument.ticker,
                 instrumentId = command.instrument.id,
                 lotsQuantity = command.lotsQuantity,
-                candles = candles,
                 strategyFactory = strategyFactory,
                 dateSupplier = dateSupplier
             )
+        val initCandlesAmount = tradeSession.strategy.unstablePeriod
+        if (initCandlesAmount > 0) {
+            val candles =
+                historicCandleBrokerPort.getLastHistoricCandles(
+                    GetLastHistoricCandlesCommand(
+                        command.instrument,
+                        strategyConfiguration.candleInterval,
+                        initCandlesAmount
+                    )
+                )
+            tradeSession.initStrategySeries(candles)
+        }
         return tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
     }
 

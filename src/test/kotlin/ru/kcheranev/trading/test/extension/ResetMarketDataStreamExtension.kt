@@ -10,6 +10,11 @@ class ResetMarketDataStreamExtension(
 ) : AfterEachListener {
 
     override suspend fun afterEach(testCase: TestCase, result: TestResult) {
+        marketDataStreamService.allStreams
+            .values
+            .forEach {
+                it.cancel()
+            }
         marketDataStreamService.allStreams.clear()
     }
 

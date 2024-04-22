@@ -17,9 +17,10 @@ data class StrategyAdjustAndAnalyzeDto(
 data class PeriodStrategyAnalyzeResultDto(
     val totalGrossProfit: BigDecimal,
     val totalNetProfit: BigDecimal,
-    val totalNumberOfProfitPositions: BigDecimal,
-    val totalNumberOfLosingPositions: BigDecimal,
+    val profitPositionsTotalCount: Int,
+    val losingPositionsTotalCount: Int,
     val profitLossPositionsRatio: BigDecimal,
+    val notClosedPositionsCount: Int,
     val results: Map<LocalDate, DailyStrategyAnalyzeResultDto>
 )
 
@@ -32,12 +33,12 @@ data class DailyStrategyAnalyzeResultDto(
     val netLoss: BigDecimal,
     val grossLoss: BigDecimal,
     val maximumDrawdown: BigDecimal,
-    val numberOfBars: Int,
-    val numberOfConsecutiveProfitPositions: Int,
-    val numberOfConsecutiveLosingPositions: Int,
-    val numberOfLosingPositions: Int,
-    val numberOfPositions: Int,
-    val numberOfProfitPositions: Int,
+    val barsCount: Int,
+    val consecutiveProfitPositionsCount: Int,
+    val consecutiveLosingPositionsCount: Int,
+    val losingPositionsCount: Int,
+    val positionsCount: Int,
+    val profitPositionsCount: Int,
     val netProfit: BigDecimal,
     val grossProfit: BigDecimal,
     val profitLoss: BigDecimal,
@@ -48,9 +49,9 @@ data class DailyStrategyAnalyzeResultDto(
 
 data class TradeDto(
     val entry: OrderDto,
-    val exit: OrderDto,
-    val netProfit: BigDecimal,
-    val grossProfit: BigDecimal
+    val exit: OrderDto?,
+    val netProfit: BigDecimal?,
+    val grossProfit: BigDecimal?
 )
 
 data class OrderDto(

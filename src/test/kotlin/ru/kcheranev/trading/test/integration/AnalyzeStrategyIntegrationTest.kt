@@ -4,6 +4,7 @@ import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.maps.shouldHaveSize
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -53,45 +54,56 @@ class AnalyzeStrategyIntegrationTest(
         periodAnalyzeResult.results.keys.first() shouldBe LocalDate.parse("2024-01-30")
         periodAnalyzeResult.totalGrossProfit shouldBe BigDecimal("2.000000000")
         periodAnalyzeResult.totalNetProfit shouldBe BigDecimal("1.83680000000000")
+        periodAnalyzeResult.profitPositionsTotalCount shouldBe 1
+        periodAnalyzeResult.losingPositionsTotalCount shouldBe 1
+        periodAnalyzeResult.profitLossPositionsRatio shouldBe BigDecimal("1.00000")
+        periodAnalyzeResult.notClosedPositionsCount shouldBe 1
         with(periodAnalyzeResult.results.values.first()) {
             averageLoss shouldBe BigDecimal("-7.000000000")
             averageProfit shouldBe BigDecimal("9.000000000")
             netLoss shouldBe BigDecimal("-7.07880000000000")
             grossLoss shouldBe BigDecimal("-7.000000000")
-            numberOfBars shouldBe 6
-            numberOfConsecutiveProfitPositions shouldBe 1
-            numberOfConsecutiveProfitPositions shouldBe 1
-            numberOfLosingPositions shouldBe 1
-            numberOfProfitPositions shouldBe 1
+            barsCount shouldBe 6
+            consecutiveProfitPositionsCount shouldBe 1
+            consecutiveProfitPositionsCount shouldBe 1
+            losingPositionsCount shouldBe 1
+            profitPositionsCount shouldBe 1
             netProfit shouldBe BigDecimal("8.91560000000000")
             grossProfit shouldBe BigDecimal("9.000000000")
             profitLoss shouldBe BigDecimal("1.83680000000000")
-            trades shouldHaveSize 2
+            trades shouldHaveSize 3
             totalGrossProfit shouldBe BigDecimal("2.000000000")
             totalNetProfit shouldBe BigDecimal("1.83680000000000")
             with(trades[0]) {
-                entry.date shouldBe LocalDateTime.parse("2024-01-30T10:17")
+                entry.date shouldBe LocalDateTime.parse("2024-01-30T10:18")
                 entry.direction shouldBe TradeDirection.BUY
                 entry.grossPrice shouldBe BigDecimal("101.000000000")
                 entry.netPrice shouldBe BigDecimal("101.04040000000000")
-                exit.date shouldBe LocalDateTime.parse("2024-01-30T10:19")
-                exit.direction shouldBe TradeDirection.SELL
-                exit.grossPrice shouldBe BigDecimal("110.000000000")
-                exit.netPrice shouldBe BigDecimal("109.95600000000000")
+                exit?.date shouldBe LocalDateTime.parse("2024-01-30T10:20")
+                exit?.direction shouldBe TradeDirection.SELL
+                exit?.grossPrice shouldBe BigDecimal("110.000000000")
+                exit?.netPrice shouldBe BigDecimal("109.95600000000000")
                 grossProfit shouldBe BigDecimal("9.000000000")
                 netProfit shouldBe BigDecimal("8.91560000000000")
             }
             with(trades[1]) {
-                entry.date shouldBe LocalDateTime.parse("2024-01-30T10:23")
+                entry.date shouldBe LocalDateTime.parse("2024-01-30T10:24")
                 entry.direction shouldBe TradeDirection.BUY
                 entry.grossPrice shouldBe BigDecimal("102.000000000")
                 entry.netPrice shouldBe BigDecimal("102.04080000000000")
-                exit.date shouldBe LocalDateTime.parse("2024-01-30T10:25")
-                exit.direction shouldBe TradeDirection.SELL
-                exit.grossPrice shouldBe BigDecimal("95.000000000")
-                exit.netPrice shouldBe BigDecimal("94.96200000000000")
+                exit?.date shouldBe LocalDateTime.parse("2024-01-30T10:26")
+                exit?.direction shouldBe TradeDirection.SELL
+                exit?.grossPrice shouldBe BigDecimal("95.000000000")
+                exit?.netPrice shouldBe BigDecimal("94.96200000000000")
                 grossProfit shouldBe BigDecimal("-7.000000000")
                 netProfit shouldBe BigDecimal("-7.07880000000000")
+            }
+            with(trades[2]) {
+                entry.date shouldBe LocalDateTime.parse("2024-01-30T10:28")
+                entry.direction shouldBe TradeDirection.BUY
+                entry.grossPrice shouldBe BigDecimal("102.000000000")
+                entry.netPrice shouldBe BigDecimal("102.04080000000000")
+                exit.shouldBeNull()
             }
         }
     }

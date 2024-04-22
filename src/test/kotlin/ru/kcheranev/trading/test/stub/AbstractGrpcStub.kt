@@ -1,6 +1,6 @@
 package ru.kcheranev.trading.test.stub
 
-import ru.kcheranev.trading.test.util.TestUtils.readResourceAsString
+import ru.kcheranev.trading.test.util.readResourceAsString
 
 abstract class AbstractGrpcStub(
     private val testName: String

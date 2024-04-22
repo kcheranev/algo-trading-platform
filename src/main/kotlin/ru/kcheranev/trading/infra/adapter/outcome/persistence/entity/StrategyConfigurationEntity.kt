@@ -13,8 +13,6 @@ data class StrategyConfigurationEntity(
     var id: UUID? = null,
     @Column("type")
     val type: String,
-    @Column("init_candle_amount")
-    val initCandleAmount: Int,
     @Column("candle_interval")
     val candleInterval: CandleInterval,
     @Column("params")

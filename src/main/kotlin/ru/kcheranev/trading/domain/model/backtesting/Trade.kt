@@ -4,21 +4,23 @@ import ru.kcheranev.trading.domain.model.TradeDirection
 
 data class Trade(
     val entry: Order,
-    val exit: Order
+    val exit: Order?
 ) {
 
     val netProfit =
-        if (entry.direction == TradeDirection.BUY) {
-            exit.netPrice - entry.netPrice
-        } else {
-            entry.netPrice - exit.netPrice
+        exit?.let {
+            when (entry.direction) {
+                TradeDirection.BUY -> exit.netPrice - entry.netPrice
+                TradeDirection.SELL -> entry.netPrice - exit.netPrice
+            }
         }
 
     val grossProfit =
-        if (entry.direction == TradeDirection.BUY) {
-            exit.grossPrice - entry.grossPrice
-        } else {
-            entry.grossPrice - exit.grossPrice
+        exit?.let {
+            when (entry.direction) {
+                TradeDirection.BUY -> exit.grossPrice - entry.grossPrice
+                TradeDirection.SELL -> entry.grossPrice - exit.grossPrice
+            }
         }
 
 }

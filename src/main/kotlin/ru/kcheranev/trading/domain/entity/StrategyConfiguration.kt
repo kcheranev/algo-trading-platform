@@ -7,7 +7,6 @@ import java.util.UUID
 data class StrategyConfiguration(
     val id: StrategyConfigurationId?,
     val type: String,
-    val initCandleAmount: Int,
     val candleInterval: CandleInterval,
     val params: StrategyParameters
 ) : AbstractAggregateRoot() {
@@ -16,13 +15,11 @@ data class StrategyConfiguration(
 
         fun create(
             type: String,
-            initCandleAmount: Int,
             candleInterval: CandleInterval,
             params: Map<String, Number>
         ) = StrategyConfiguration(
             id = null,
             type = type,
-            initCandleAmount = initCandleAmount,
             candleInterval = candleInterval,
             params = StrategyParameters(params)
         )

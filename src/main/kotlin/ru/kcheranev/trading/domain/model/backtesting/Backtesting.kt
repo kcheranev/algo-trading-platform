@@ -3,17 +3,19 @@ package ru.kcheranev.trading.domain.model.backtesting
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
-import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseBarSeriesBuilder
-import ru.kcheranev.trading.core.strategy.StrategyFactory
+import ru.kcheranev.trading.core.strategy.factory.StrategyFactory
 import ru.kcheranev.trading.domain.DomainException
 import ru.kcheranev.trading.domain.mapper.domainModelMapper
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
+import ru.kcheranev.trading.domain.model.CustomizedBarSeries
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
+
+const val BACKTESTING_RESULT_SCALE = 5
 
 private const val BEST_STRATEGIES_RESULT_LIMIT = 15
 
@@ -24,12 +26,15 @@ class Backtesting(
     candlesByPeriod: Map<LocalDate, List<Candle>>
 ) {
 
-    private val series: Map<LocalDate, BarSeries> =
+    private val series: Map<LocalDate, CustomizedBarSeries> =
         candlesByPeriod.mapValues { dayCandles ->
-            BaseBarSeriesBuilder()
-                .withName("Trade session: ticker=$ticker, candleInterval=$candleInterval")
-                .withBars(dayCandles.value.map { domainModelMapper.map(it) })
-                .build()
+            CustomizedBarSeries(
+                BaseBarSeriesBuilder()
+                    .withName("Trade session: ticker=$ticker, candleInterval=$candleInterval")
+                    .withBars(dayCandles.value.map { domainModelMapper.map(it) })
+                    .build(),
+                candleInterval
+            )
         }
 
     fun analyzeStrategy(
@@ -72,7 +77,10 @@ class Backtesting(
     ): List<Number> =
         when (paramValue) {
             is Int -> {
-                val minParamValue = BigDecimal(paramValue).divide(adjustFactor, RoundingMode.HALF_UP).toInt()
+                val minParamValue =
+                    BigDecimal(paramValue)
+                        .divide(adjustFactor, BACKTESTING_RESULT_SCALE, RoundingMode.HALF_UP)
+                        .toInt()
                 val maxParamValue = BigDecimal(paramValue).multiply(adjustFactor).toInt()
                 val paramValueStep =
                     ((maxParamValue - minParamValue) / (adjustVariantCount - 1))
@@ -85,9 +93,11 @@ class Backtesting(
             }
 
             is BigDecimal -> {
-                val minParamValue = paramValue.divide(adjustFactor, RoundingMode.HALF_UP)
+                val minParamValue = paramValue.divide(adjustFactor, BACKTESTING_RESULT_SCALE, RoundingMode.HALF_UP)
                 val maxParamValue = paramValue.multiply(adjustFactor)
-                val paramValueStep = (maxParamValue - minParamValue).divide(BigDecimal(adjustVariantCount - 1))
+                val paramValueStep =
+                    (maxParamValue - minParamValue)
+                        .divide(BigDecimal(adjustVariantCount - 1), BACKTESTING_RESULT_SCALE, RoundingMode.HALF_UP)
                 val paramVariants = mutableListOf(paramValue)
                 var paramVariant = minParamValue
                 while (paramValue <= maxParamValue) {

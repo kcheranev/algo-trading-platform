@@ -17,17 +17,21 @@ data class PeriodStrategyAnalyzeResult(
 
     val totalNetProfit = results.values.sumOf { it.totalNetProfit }
 
-    val totalNumberOfProfitPositions = results.values.sumOf { it.numberOfProfitPositions }
+    val profitPositionsTotalCount = results.values.sumOf { it.profitPositionsCount }
 
-    val totalNumberOfLosingPositions = results.values.sumOf { it.numberOfLosingPositions }
+    val losingPositionsTotalCount = results.values.sumOf { it.losingPositionsCount }
 
     val profitLossPositionsRatio: BigDecimal =
-        if (totalNumberOfLosingPositions == 0) {
+        if (losingPositionsTotalCount == 0) {
             BigDecimal.ZERO
         } else {
-            BigDecimal(totalNumberOfProfitPositions)
-                .divide(BigDecimal(totalNumberOfLosingPositions), 4, RoundingMode.HALF_UP)
+            BigDecimal(profitPositionsTotalCount)
+                .divide(BigDecimal(losingPositionsTotalCount), BACKTESTING_RESULT_SCALE, RoundingMode.HALF_UP)
         }
+
+    val notClosedPositionsCount =
+        results.values
+            .count { result -> result.trades.any { trade -> trade.exit == null } }
 
 }
 
@@ -38,12 +42,12 @@ data class DailyStrategyAnalyzeResult(
     val netLoss: BigDecimal,
     val grossLoss: BigDecimal,
     val maximumDrawdown: BigDecimal,
-    val numberOfBars: Int,
-    val numberOfConsecutiveProfitPositions: Int,
-    val numberOfConsecutiveLosingPositions: Int,
-    val numberOfLosingPositions: Int,
-    val numberOfPositions: Int,
-    val numberOfProfitPositions: Int,
+    val barsCount: Int,
+    val consecutiveProfitPositionsCount: Int,
+    val consecutiveLosingPositionsCount: Int,
+    val losingPositionsCount: Int,
+    val positionsCount: Int,
+    val profitPositionsCount: Int,
     val netProfit: BigDecimal,
     val grossProfit: BigDecimal,
     val profitLoss: BigDecimal,

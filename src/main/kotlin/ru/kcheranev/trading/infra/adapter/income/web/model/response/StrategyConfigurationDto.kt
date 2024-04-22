@@ -7,7 +7,6 @@ import java.util.UUID
 data class StrategyConfigurationDto(
     var id: UUID,
     var type: String,
-    var initCandleAmount: Int,
     var candleInterval: CandleInterval,
     var params: StrategyParameters
 )

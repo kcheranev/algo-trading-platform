@@ -50,11 +50,12 @@ class TradeStrategy(
         val trades =
             tradingRecord.positions
                 .map { position ->
-                    Trade(
-                        entry = mapPositionTrade(position.entry),
-                        exit = mapPositionTrade(position.exit)
-                    )
+                    Trade(mapPositionTrade(position.entry), mapPositionTrade(position.exit))
                 }
+                .toMutableList()
+        if (tradingRecord.currentPosition.entry != null && tradingRecord.currentPosition.exit == null) {
+            trades.add(Trade(mapPositionTrade(tradingRecord.currentPosition.entry), null))
+        }
         return DailyStrategyAnalyzeResult(
             averageLoss = AverageLossCriterion().calculate(series, tradingRecord).toBigDecimal(),
             averageProfit = AverageProfitCriterion().calculate(series, tradingRecord).toBigDecimal(),
@@ -63,16 +64,16 @@ class TradeStrategy(
             netLoss = NetLossCriterion().calculate(series, tradingRecord).toBigDecimal(),
             grossLoss = GrossLossCriterion().calculate(series, tradingRecord).toBigDecimal(),
             maximumDrawdown = MaximumDrawdownCriterion().calculate(series, tradingRecord).toBigDecimal(),
-            numberOfBars = NumberOfBarsCriterion().calculate(series, tradingRecord).toInt(),
-            numberOfConsecutiveProfitPositions = NumberOfConsecutivePositionsCriterion(AnalysisCriterion.PositionFilter.PROFIT)
+            barsCount = NumberOfBarsCriterion().calculate(series, tradingRecord).toInt(),
+            consecutiveProfitPositionsCount = NumberOfConsecutivePositionsCriterion(AnalysisCriterion.PositionFilter.PROFIT)
                 .calculate(series, tradingRecord).toInt(),
-            numberOfConsecutiveLosingPositions = NumberOfConsecutivePositionsCriterion(AnalysisCriterion.PositionFilter.LOSS)
+            consecutiveLosingPositionsCount = NumberOfConsecutivePositionsCriterion(AnalysisCriterion.PositionFilter.LOSS)
                 .calculate(series, tradingRecord).toInt(),
-            numberOfLosingPositions = NumberOfLosingPositionsCriterion()
+            losingPositionsCount = NumberOfLosingPositionsCriterion()
                 .calculate(series, tradingRecord).toInt(),
-            numberOfPositions = NumberOfPositionsCriterion()
+            positionsCount = NumberOfPositionsCriterion()
                 .calculate(series, tradingRecord).toInt(),
-            numberOfProfitPositions = NumberOfWinningPositionsCriterion()
+            profitPositionsCount = NumberOfWinningPositionsCriterion()
                 .calculate(series, tradingRecord).toInt(),
             netProfit = NetProfitCriterion().calculate(series, tradingRecord).toBigDecimal(),
             grossProfit = GrossProfitCriterion().calculate(series, tradingRecord).toBigDecimal(),
@@ -85,7 +86,7 @@ class TradeStrategy(
 
     private fun mapPositionTrade(trade: org.ta4j.core.Trade) =
         Order(
-            date = series.getBar(trade.index - 1).endTime.toLocalDateTime(),
+            date = series.getBar(trade.index).endTime.toLocalDateTime(),
             direction = TradeDirection.valueOf(trade.type.name),
             netPrice = trade.netPrice.toBigDecimal(),
             grossPrice = trade.pricePerAsset.toBigDecimal()

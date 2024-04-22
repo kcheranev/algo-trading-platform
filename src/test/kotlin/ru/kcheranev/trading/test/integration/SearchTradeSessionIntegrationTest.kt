@@ -40,7 +40,6 @@ class SearchTradeSessionIntegrationTest(
                 StrategyConfigurationEntity(
                     null,
                     StrategyType.MOVING_MOMENTUM.name,
-                    10,
                     CandleInterval.ONE_MIN,
                     MapWrapper(mapOf("param1" to 1))
                 )

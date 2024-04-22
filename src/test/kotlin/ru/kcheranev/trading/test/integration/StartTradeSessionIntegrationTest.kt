@@ -40,7 +40,6 @@ class StartTradeSessionIntegrationTest(
                 StrategyConfigurationEntity(
                     null,
                     "DUMMY",
-                    10,
                     CandleInterval.ONE_MIN,
                     MapWrapper(mapOf("param1" to 1))
                 )
