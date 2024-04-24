@@ -16,12 +16,12 @@ data class StrategyConfiguration(
         fun create(
             type: String,
             candleInterval: CandleInterval,
-            params: Map<String, Number>
+            params: StrategyParameters
         ) = StrategyConfiguration(
             id = null,
             type = type,
             candleInterval = candleInterval,
-            params = StrategyParameters(params)
+            params = params
         )
 
     }

@@ -63,10 +63,13 @@ class BacktestingService(
         val strategyFactory = strategyFactoryProvider.getStrategyFactory(command.strategyType)
         return backtesting.adjustAndAnalyzeStrategy(
             strategyFactory = strategyFactory,
-            params = StrategyParameters(command.strategyParams),
-            mutableParams = StrategyParameters(command.mutableStrategyParams),
+            params = command.strategyParams,
+            mutableParams = command.mutableStrategyParams,
             adjustFactor = command.adjustFactor,
-            adjustVariantCount = command.adjustVariantCount
+            adjustVariantCount = command.adjustVariantCount,
+            resultsLimit = command.resultsLimit,
+            minProfitLossPositionsRatio = command.minProfitLossPositionsRatio,
+            tradesByDayCountFactor = command.tradesByDayCountFactor
         )
     }
 

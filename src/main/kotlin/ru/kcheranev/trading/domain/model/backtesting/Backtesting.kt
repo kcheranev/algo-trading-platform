@@ -18,9 +18,11 @@ import java.time.LocalDate
 
 const val BACKTESTING_RESULT_SCALE = 5
 
-private const val BEST_STRATEGIES_RESULT_LIMIT = 15
+private const val DEFAULT_BACKTESTING_RESULTS_LIMIT = 15
 
-private val PROFIT_LOSS_POSITIONS_RATIO_LIMIT = BigDecimal(0.5)
+private val DEFAULT_MIN_PROFIT_LOSS_POSITIONS_RATIO = BigDecimal(1)
+
+private val DEFAULT_TRADES_BY_DAY_COUNT_FACTOR = BigDecimal(1)
 
 class Backtesting(
     val ticker: String,
@@ -57,7 +59,10 @@ class Backtesting(
         params: StrategyParameters,
         mutableParams: StrategyParameters,
         adjustFactor: BigDecimal,
-        adjustVariantCount: Int
+        adjustVariantCount: Int,
+        resultsLimit: Int?,
+        minProfitLossPositionsRatio: BigDecimal?,
+        tradesByDayCountFactor: BigDecimal?
     ): List<StrategyAdjustAndAnalyzeResult> {
         val adjustedParams =
             mutableParams.mapValues { (_, paramValue) ->
@@ -73,10 +78,18 @@ class Backtesting(
         }.asSequence()
             .filterNotNull()
             .filter { it.result.totalGrossProfit > BigDecimal.ZERO }
-            .filter { it.result.profitLossPositionsRatio > PROFIT_LOSS_POSITIONS_RATIO_LIMIT }
-            .filter { it.result.tradesCount >= daysCount }
+            .filter {
+                it.result.profitLossPositionsRatio >=
+                        (minProfitLossPositionsRatio ?: DEFAULT_MIN_PROFIT_LOSS_POSITIONS_RATIO)
+            }
+            .filter {
+                it.result.tradesCount >=
+                        (BigDecimal(daysCount)
+                            .multiply(tradesByDayCountFactor ?: DEFAULT_TRADES_BY_DAY_COUNT_FACTOR))
+                            .toInt()
+            }
             .sortedByDescending { it.result.totalGrossProfit }
-            .take(BEST_STRATEGIES_RESULT_LIMIT)
+            .take(resultsLimit ?: DEFAULT_BACKTESTING_RESULTS_LIMIT)
             .toList()
     }
 

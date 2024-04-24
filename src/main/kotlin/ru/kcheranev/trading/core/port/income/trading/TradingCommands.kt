@@ -5,11 +5,12 @@ import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
+import ru.kcheranev.trading.domain.model.StrategyParameters
 
 data class CreateStrategyConfigurationCommand(
     val type: String,
     val candleInterval: CandleInterval,
-    val params: Map<String, Number>
+    val params: StrategyParameters
 )
 
 data class StartTradeSessionCommand(
