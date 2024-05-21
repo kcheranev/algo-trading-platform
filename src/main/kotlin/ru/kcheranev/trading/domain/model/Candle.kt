@@ -12,4 +12,9 @@ data class Candle(
     val volume: Long,
     val endTime: LocalDateTime,
     val instrumentId: String
-)
+) {
+
+    override fun toString() =
+        "[interval=${interval}, openPrice=$openPrice, closePrice=$closePrice, endTime=$endTime, instrumentId=$instrumentId]"
+
+}

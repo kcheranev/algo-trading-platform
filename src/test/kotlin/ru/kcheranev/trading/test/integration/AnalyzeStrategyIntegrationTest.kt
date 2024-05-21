@@ -42,8 +42,8 @@ class AnalyzeStrategyIntegrationTest(
                 strategyParams = emptyMap(),
                 instrument = InstrumentDto("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
                 candleInterval = CandleInterval.ONE_MIN,
-                candlesFrom = LocalDateTime.parse("2024-01-30T10:12:00"),
-                candlesTo = LocalDateTime.parse("2024-01-30T10:26:00")
+                from = LocalDate.parse("2024-01-30"),
+                to = LocalDate.parse("2024-01-30")
             ),
             PeriodStrategyAnalyzeResultDto::class.java
         )

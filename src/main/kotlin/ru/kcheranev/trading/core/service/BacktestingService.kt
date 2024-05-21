@@ -28,8 +28,8 @@ class BacktestingService(
                 GetHistoricCandlesForLongPeriodCommand(
                     instrument = command.instrument,
                     candleInterval = command.candleInterval,
-                    from = command.candlesFrom,
-                    to = command.candlesTo
+                    from = command.from,
+                    to = command.to
                 )
             )
         val backtesting =
@@ -49,8 +49,8 @@ class BacktestingService(
                 GetHistoricCandlesForLongPeriodCommand(
                     instrument = command.instrument,
                     candleInterval = command.candleInterval,
-                    from = command.candlesFrom,
-                    to = command.candlesTo
+                    from = command.from,
+                    to = command.to
                 )
             )
         val backtesting =
@@ -67,9 +67,10 @@ class BacktestingService(
             mutableParams = command.mutableStrategyParams,
             adjustFactor = command.adjustFactor,
             adjustVariantCount = command.adjustVariantCount,
-            resultsLimit = command.resultsLimit,
-            minProfitLossPositionsRatio = command.minProfitLossPositionsRatio,
-            tradesByDayCountFactor = command.tradesByDayCountFactor
+            resultsLimit = command.resultFilter?.resultsLimit,
+            minProfitLossPositionsRatio = command.resultFilter?.minProfitLossPositionsRatio,
+            tradesByDayCountFactor = command.resultFilter?.tradesByDayCountFactor,
+            profitTypeSort = command.profitTypeSort
         )
     }
 

@@ -13,6 +13,10 @@ data class PostOrderResponse(
 
     fun executed() = status == PostOrderResponseStatus.FILL || status == PostOrderResponseStatus.PARTIALLY_FILL
 
+    override fun toString() =
+        "[orderId=$orderId, status=$status, lotsRequested=$lotsRequested, lotsExecuted=$lotsExecuted, " +
+                "totalPrice=$totalPrice, executedCommission=$executedCommission]"
+
 }
 
 enum class PostOrderResponseStatus {

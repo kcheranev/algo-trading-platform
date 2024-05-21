@@ -3,6 +3,7 @@ package ru.kcheranev.trading.core.port.outcome.broker
 import ru.kcheranev.trading.core.OutcomeCommandValidationException
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class PostBestPriceBuyOrderCommand(
@@ -43,8 +44,8 @@ data class GetHistoricCandlesCommand(
 data class GetHistoricCandlesForLongPeriodCommand(
     val instrument: Instrument,
     val candleInterval: CandleInterval,
-    val from: LocalDateTime,
-    val to: LocalDateTime
+    val from: LocalDate,
+    val to: LocalDate
 )
 
 data class GetLastHistoricCandlesCommand(

@@ -12,7 +12,7 @@ class EndTradingTimeRule(
     private val timeIndicator: DateTimeIndicator
 ) : AbstractRule() {
 
-    override fun isSatisfied(index: Int, tradingRecord: TradingRecord) =
+    override fun isSatisfied(index: Int, tradingRecord: TradingRecord?) =
         timeIndicator.getValue(index).toLocalTime() > endTradingTime - candleInterval.duration.multipliedBy(2)
 
 }

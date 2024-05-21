@@ -4,7 +4,9 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.maps.shouldContain
 import io.kotest.matchers.maps.shouldHaveSize
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.verify
 import ru.kcheranev.trading.core.port.income.trading.ReceiveCandleUseCase
 import ru.kcheranev.trading.core.port.outcome.broker.SubscribeCandlesOrderCommand
@@ -13,6 +15,7 @@ import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionCounter
 import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.MarketDataStreamSubscriptionBrokerOutcomeAdapter
+import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.subscribeCandlesWithWaitingClose
 import ru.tinkoff.piapi.contract.v1.SubscriptionInterval
 import ru.tinkoff.piapi.core.stream.MarketDataStreamService
 import ru.tinkoff.piapi.core.stream.MarketDataSubscriptionService
@@ -21,7 +24,9 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
 
     "should subscribe candles" {
         //given
-        val marketDataSubscriptionService = mockk<MarketDataSubscriptionService>(relaxed = true)
+        mockkStatic(MarketDataSubscriptionService::subscribeCandlesWithWaitingClose)
+        justRun { any<MarketDataSubscriptionService>().subscribeCandlesWithWaitingClose(any(), any()) }
+        val marketDataSubscriptionService = mockk<MarketDataSubscriptionService>()
         val marketDataStreamService =
             mockk<MarketDataStreamService> {
                 every { newStream("candles_SBER_ONE_MIN", any(), any()) } returns marketDataSubscriptionService
@@ -49,7 +54,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         subscriptions shouldContain ("candles_SBER_ONE_MIN" to 1)
 
         verify {
-            marketDataSubscriptionService.subscribeCandles(
+            marketDataSubscriptionService.subscribeCandlesWithWaitingClose(
                 listOf("e6123145-9665-43e0-8413-cd61b8aa9b1"),
                 SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE
             )
@@ -58,7 +63,9 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
 
     "should subscribe candles when there is same subscription" {
         //given
-        val marketDataSubscriptionService = mockk<MarketDataSubscriptionService>(relaxed = true)
+        mockkStatic(MarketDataSubscriptionService::subscribeCandlesWithWaitingClose)
+        justRun { any<MarketDataSubscriptionService>().subscribeCandlesWithWaitingClose(any(), any()) }
+        val marketDataSubscriptionService = mockk<MarketDataSubscriptionService>()
         val marketDataStreamService =
             mockk<MarketDataStreamService> {
                 every { newStream("candles_SBER_ONE_MIN", any(), any()) } returns marketDataSubscriptionService
@@ -87,7 +94,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         subscriptions shouldContain ("candles_SBER_ONE_MIN" to 2)
 
         verify(inverse = true) {
-            marketDataSubscriptionService.subscribeCandles(
+            marketDataSubscriptionService.subscribeCandlesWithWaitingClose(
                 listOf("e6123145-9665-43e0-8413-cd61b8aa9b1"),
                 SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE
             )

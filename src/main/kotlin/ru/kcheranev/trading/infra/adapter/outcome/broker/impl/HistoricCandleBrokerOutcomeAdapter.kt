@@ -38,8 +38,8 @@ class HistoricCandleBrokerOutcomeAdapter(
     override fun getHistoricCandlesForLongPeriod(
         command: GetHistoricCandlesForLongPeriodCommand
     ): Map<LocalDate, List<Candle>> {
-        val startDay = command.from.toLocalDate()
-        val endDay = command.to.toLocalDate()
+        val startDay = command.from
+        val endDay = command.to
         val resultMap = mutableMapOf<LocalDate, List<Candle>>()
         var currentDay = startDay
         while (currentDay <= endDay) {
@@ -47,27 +47,20 @@ class HistoricCandleBrokerOutcomeAdapter(
                 currentDay = currentDay.plusDays(1)
                 continue
             }
-            val startTime =
-                if (currentDay == startDay) {
-                    command.from.toLocalTime()
-                } else {
-                    startTradingTime
-                }
-            val endTime =
-                if (currentDay == endDay) {
-                    command.to.toLocalTime()
-                } else {
-                    endTradingTime
-                }
-            resultMap[currentDay] =
+            val candles =
                 getHistoricCandles(
                     GetHistoricCandlesCommand(
                         command.instrument,
                         command.candleInterval,
-                        currentDay.atTime(startTime),
-                        currentDay.atTime(endTime)
+                        currentDay.atTime(startTradingTime),
+                        currentDay.atTime(endTradingTime)
                     )
                 )
+            if (candles.isEmpty()) {
+                currentDay = currentDay.plusDays(1)
+                continue
+            }
+            resultMap[currentDay] = candles
             currentDay = currentDay.plusDays(1)
         }
         return resultMap

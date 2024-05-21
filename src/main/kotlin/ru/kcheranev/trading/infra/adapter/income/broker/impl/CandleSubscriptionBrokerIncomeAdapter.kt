@@ -15,10 +15,10 @@ class CandleSubscriptionBrokerIncomeAdapter(
 
     override fun process(response: MarketDataResponse) {
         if (response.hasCandle()) {
-            val candle = response.candle
-            log.info("New income candle for the instrument ${candle.instrumentUid}")
+            val candle = brokerIncomeAdapterMapper.map(response.candle)
+            log.info("New income candle $candle")
             receiveCandleUseCase.processIncomeCandle(
-                ProcessIncomeCandleCommand(brokerIncomeAdapterMapper.map(candle))
+                ProcessIncomeCandleCommand(candle)
             )
         }
     }

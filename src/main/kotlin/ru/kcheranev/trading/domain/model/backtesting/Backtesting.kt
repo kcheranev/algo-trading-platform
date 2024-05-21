@@ -62,7 +62,8 @@ class Backtesting(
         adjustVariantCount: Int,
         resultsLimit: Int?,
         minProfitLossPositionsRatio: BigDecimal?,
-        tradesByDayCountFactor: BigDecimal?
+        tradesByDayCountFactor: BigDecimal?,
+        profitTypeSort: ProfitTypeSort?
     ): List<StrategyAdjustAndAnalyzeResult> {
         val adjustedParams =
             mutableParams.mapValues { (_, paramValue) ->
@@ -77,7 +78,7 @@ class Backtesting(
             }.awaitAll()
         }.asSequence()
             .filterNotNull()
-            .filter { it.result.totalGrossProfit > BigDecimal.ZERO }
+            .filter { it.result.totalNetProfit > BigDecimal.ZERO }
             .filter {
                 it.result.profitLossPositionsRatio >=
                         (minProfitLossPositionsRatio ?: DEFAULT_MIN_PROFIT_LOSS_POSITIONS_RATIO)
@@ -88,7 +89,13 @@ class Backtesting(
                             .multiply(tradesByDayCountFactor ?: DEFAULT_TRADES_BY_DAY_COUNT_FACTOR))
                             .toInt()
             }
-            .sortedByDescending { it.result.totalGrossProfit }
+            .sortedByDescending {
+                when (profitTypeSort) {
+                    ProfitTypeSort.NET -> it.result.totalNetProfit
+                    ProfitTypeSort.GROSS -> it.result.totalGrossProfit
+                    null -> it.result.totalNetProfit
+                }
+            }
             .take(resultsLimit ?: DEFAULT_BACKTESTING_RESULTS_LIMIT)
             .toList()
     }

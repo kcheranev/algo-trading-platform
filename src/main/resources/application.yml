@@ -15,7 +15,7 @@ application:
     availableDelayedCandleCount: 5
     placeOrderRetryCount: 3
     startTradingTime: "10:00:00"
-    endTradingTime: "18:00:00"
+    endTradingTime: "18:40:00"
   infra:
     broker:
       token: ${BROKER_TOKEN}
