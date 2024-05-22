@@ -13,11 +13,10 @@ import org.ta4j.core.rules.UnderIndicatorRule
 import ru.kcheranev.trading.core.StrategyParamValidationException
 import ru.kcheranev.trading.domain.model.CustomizedBarSeries
 import ru.kcheranev.trading.domain.model.StrategyParameters
-import ru.kcheranev.trading.domain.model.StrategyType
 import ru.kcheranev.trading.domain.model.TradeStrategy
 
 @Component
-class MovingMomentumStrategyFactory : StrategyFactory {
+class MovingMomentumLongStrategyFactory : LongStrategyFactory() {
 
     override fun initStrategy(
         params: StrategyParameters,
@@ -54,9 +53,9 @@ class MovingMomentumStrategyFactory : StrategyFactory {
             .and(CrossedUpIndicatorRule(stochasticOscillK, 80))
             .and(UnderIndicatorRule(macd, emaMacd))
 
-        return TradeStrategy(series, BaseStrategy(entryRule, exitRule))
+        return buildTradeStrategy(series, BaseStrategy(entryRule, exitRule))
     }
 
-    override fun strategyType() = StrategyType.MOVING_MOMENTUM.name
+    override fun strategyName() = "MOVING_MOMENTUM"
 
 }

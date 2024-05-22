@@ -7,7 +7,6 @@ import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.domain.model.StrategyType
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.CreateStrategyConfigurationRequestDto
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
 import ru.kcheranev.trading.test.IntegrationTest
@@ -26,7 +25,7 @@ class CreateStrategyConfigurationIntegrationTest(
         //given
         val request =
             CreateStrategyConfigurationRequestDto(
-                type = StrategyType.MOVING_MOMENTUM.name,
+                type = "MOVING_MOMENTUM_LONG",
                 candleInterval = CandleInterval.ONE_MIN,
                 params = mapOf(
                     "paramKeyInt" to 1,
@@ -44,7 +43,7 @@ class CreateStrategyConfigurationIntegrationTest(
         persistenceResult shouldHaveSize 1
 
         val strategyConfiguration = persistenceResult.first()
-        strategyConfiguration.type shouldBe StrategyType.MOVING_MOMENTUM.name
+        strategyConfiguration.type shouldBe "MOVING_MOMENTUM_LONG"
         strategyConfiguration.candleInterval shouldBe CandleInterval.ONE_MIN
         strategyConfiguration.params.value shouldBe mapOf(
             "paramKeyInt" to 1,

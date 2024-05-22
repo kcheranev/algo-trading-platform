@@ -44,7 +44,7 @@ class StopTradeSessionIntegrationTest(
             strategyConfigurationRepository.save(
                 StrategyConfigurationEntity(
                     null,
-                    "DUMMY",
+                    "DUMMY_LONG",
                     CandleInterval.ONE_MIN,
                     MapWrapper(mapOf("param1" to 1))
                 )

@@ -12,7 +12,6 @@ import ru.kcheranev.trading.core.port.common.model.sort.Sort
 import ru.kcheranev.trading.core.port.common.model.sort.SortDirection
 import ru.kcheranev.trading.core.port.common.model.sort.StrategyConfigurationSort
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.domain.model.StrategyType
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.StrategyConfigurationSearchRequestDto
 import ru.kcheranev.trading.infra.adapter.income.web.model.response.StrategyConfigurationSearchResponseDto
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
@@ -34,7 +33,7 @@ class SearchStrategyConfigurationIntegrationTest(
             listOf(
                 StrategyConfigurationEntity(
                     null,
-                    StrategyType.MOVING_MOMENTUM.name,
+                    "MOVING_MOMENTUM_LONG",
                     CandleInterval.ONE_MIN,
                     MapWrapper(mapOf("param1" to 1))
                 ),
@@ -70,7 +69,7 @@ class SearchStrategyConfigurationIntegrationTest(
         //given
         val request =
             StrategyConfigurationSearchRequestDto(
-                type = StrategyType.MOVING_MOMENTUM.name
+                type = "MOVING_MOMENTUM_LONG"
             )
 
         //when
@@ -87,7 +86,7 @@ class SearchStrategyConfigurationIntegrationTest(
         }
         val strategyConfigurationsResult = response.body!!.strategyConfigurations
         strategyConfigurationsResult.size shouldBe 1
-        strategyConfigurationsResult[0].type shouldBe StrategyType.MOVING_MOMENTUM.name
+        strategyConfigurationsResult[0].type shouldBe "MOVING_MOMENTUM_LONG"
     }
 
     "should search strategy configurations" {

@@ -38,7 +38,7 @@ class AnalyzeStrategyIntegrationTest(
         val strategyAnalyzeResponse = testRestTemplate.postForEntity(
             "/backtesting/analyze",
             StrategyAnalyzeRequestDto(
-                strategyType = "DUMMY",
+                strategyType = "DUMMY_LONG",
                 strategyParams = emptyMap(),
                 instrument = InstrumentDto("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
                 candleInterval = CandleInterval.ONE_MIN,

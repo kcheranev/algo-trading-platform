@@ -15,9 +15,9 @@ import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.TradeStrategy
 
 @Component
-class RsiStrategyFactory(
+class RsiLongStrategyFactory(
     tradingProperties: TradingProperties
-) : StrategyFactory {
+) : LongStrategyFactory() {
 
     private val endTradingTime = tradingProperties.endTradingTime
 
@@ -43,9 +43,9 @@ class RsiStrategyFactory(
                         DateTimeIndicator(series) { bar -> bar.endTime }
                     )
                 )
-        return TradeStrategy(series, BaseStrategy(entryRule, exitRule, length))
+        return buildTradeStrategy(series, BaseStrategy(entryRule, exitRule, length))
     }
 
-    override fun strategyType() = "RSI"
+    override fun strategyName() = "RSI"
 
 }

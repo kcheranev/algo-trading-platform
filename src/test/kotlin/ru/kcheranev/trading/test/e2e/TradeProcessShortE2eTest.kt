@@ -30,7 +30,7 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @IntegrationTest
-class TradeProcessLongE2eTest(
+class TradeProcessShortE2eTest(
     private val tradeService: TradeService,
     private val testRestTemplate: TestRestTemplate,
     private val tradeSessionCache: TradeSessionCache,
@@ -42,7 +42,7 @@ class TradeProcessLongE2eTest(
 
     extensions(resetTestContextExtensions)
 
-    val testName = "trade-process-long-e2e"
+    val testName = "trade-process-short-e2e"
 
     val marketDataBrokerGrpcStub = MarketDataBrokerGrpcStub(testName)
 
@@ -50,13 +50,13 @@ class TradeProcessLongE2eTest(
 
     val ordersBrokerGrpcStub = OrdersBrokerGrpcStub(testName)
 
-    "should execute long trade process" {
+    "should execute short trade process" {
         //create strategy configuration
         val strategyConfiguration =
             strategyConfigurationRepository.save(
                 StrategyConfigurationEntity(
                     null,
-                    "DUMMY_LONG",
+                    "DUMMY_SHORT",
                     CandleInterval.ONE_MIN,
                     MapWrapper(emptyMap())
                 )
@@ -85,10 +85,10 @@ class TradeProcessLongE2eTest(
             ProcessIncomeCandleCommand(
                 Candle(
                     interval = CandleInterval.ONE_MIN,
-                    openPrice = BigDecimal(99),
-                    closePrice = BigDecimal(100),
-                    highestPrice = BigDecimal(100),
-                    lowestPrice = BigDecimal(98),
+                    openPrice = BigDecimal(106),
+                    closePrice = BigDecimal(105),
+                    highestPrice = BigDecimal(107),
+                    lowestPrice = BigDecimal(105),
                     volume = 10,
                     endTime = LocalDateTime.parse("2024-01-30T10:17:00"),
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
@@ -100,10 +100,10 @@ class TradeProcessLongE2eTest(
             ProcessIncomeCandleCommand(
                 Candle(
                     interval = CandleInterval.ONE_MIN,
-                    openPrice = BigDecimal(100),
-                    closePrice = BigDecimal(101),
-                    highestPrice = BigDecimal(101),
-                    lowestPrice = BigDecimal(99),
+                    openPrice = BigDecimal(105),
+                    closePrice = BigDecimal(104),
+                    highestPrice = BigDecimal(106),
+                    lowestPrice = BigDecimal(104),
                     volume = 10,
                     endTime = LocalDateTime.parse("2024-01-30T10:18:00"),
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
@@ -115,10 +115,10 @@ class TradeProcessLongE2eTest(
             ProcessIncomeCandleCommand(
                 Candle(
                     interval = CandleInterval.ONE_MIN,
-                    openPrice = BigDecimal(101),
+                    openPrice = BigDecimal(104),
                     closePrice = BigDecimal(102),
-                    highestPrice = BigDecimal(102),
-                    lowestPrice = BigDecimal(100),
+                    highestPrice = BigDecimal(105),
+                    lowestPrice = BigDecimal(102),
                     volume = 10,
                     endTime = LocalDateTime.parse("2024-01-30T10:19:00"),
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
@@ -131,7 +131,7 @@ class TradeProcessLongE2eTest(
                 Candle(
                     interval = CandleInterval.ONE_MIN,
                     openPrice = BigDecimal(102),
-                    closePrice = BigDecimal(103),
+                    closePrice = BigDecimal(101),
                     highestPrice = BigDecimal(103),
                     lowestPrice = BigDecimal(101),
                     volume = 10,
@@ -145,10 +145,10 @@ class TradeProcessLongE2eTest(
             ProcessIncomeCandleCommand(
                 Candle(
                     interval = CandleInterval.ONE_MIN,
-                    openPrice = BigDecimal(103),
-                    closePrice = BigDecimal(106),
+                    openPrice = BigDecimal(101),
+                    closePrice = BigDecimal(99),
                     highestPrice = BigDecimal(106),
-                    lowestPrice = BigDecimal(102),
+                    lowestPrice = BigDecimal(99),
                     volume = 10,
                     endTime = LocalDateTime.parse("2024-01-30T10:21:00"),
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
@@ -162,26 +162,26 @@ class TradeProcessLongE2eTest(
         //check orders
         val orders = tradeOrderRepository.findAll().toList()
         orders shouldHaveSize 2
-        val buyOrder = orders[0]
-        with(buyOrder) {
-            ticker shouldBe "SBER"
-            instrumentId shouldBe "e6123145-9665-43e0-8413-cd61b8aa9b1"
-            date shouldBe LocalDateTime.parse("2024-01-30T10:15:30")
-            lotsQuantity shouldBe 4
-            totalPrice shouldBe BigDecimal("413.000000000")
-            executedCommission shouldBe BigDecimal("7.000000000")
-            direction shouldBe TradeDirection.BUY
-            strategyConfigurationId.shouldNotBeNull()
-        }
-        val sellOrder = orders[1]
+        val sellOrder = orders[0]
         with(sellOrder) {
             ticker shouldBe "SBER"
             instrumentId shouldBe "e6123145-9665-43e0-8413-cd61b8aa9b1"
             date shouldBe LocalDateTime.parse("2024-01-30T10:15:30")
             lotsQuantity shouldBe 4
-            totalPrice shouldBe BigDecimal("434.000000000")
+            totalPrice shouldBe BigDecimal("423.000000000")
             executedCommission shouldBe BigDecimal("5.000000000")
             direction shouldBe TradeDirection.SELL
+            strategyConfigurationId.shouldNotBeNull()
+        }
+        val buyOrder = orders[1]
+        with(buyOrder) {
+            ticker shouldBe "SBER"
+            instrumentId shouldBe "e6123145-9665-43e0-8413-cd61b8aa9b1"
+            date shouldBe LocalDateTime.parse("2024-01-30T10:15:30")
+            lotsQuantity shouldBe 4
+            totalPrice shouldBe BigDecimal("404.000000000")
+            executedCommission shouldBe BigDecimal("7.000000000")
+            direction shouldBe TradeDirection.BUY
             strategyConfigurationId.shouldNotBeNull()
         }
 

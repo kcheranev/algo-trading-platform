@@ -5,6 +5,7 @@ import org.ta4j.core.Bar
 import org.ta4j.core.BarSeries
 import org.ta4j.core.BarSeriesManager
 import org.ta4j.core.Strategy
+import org.ta4j.core.Trade.TradeType
 import org.ta4j.core.analysis.cost.LinearTransactionCostModel
 import org.ta4j.core.analysis.cost.ZeroCostModel
 import org.ta4j.core.criteria.EnterAndHoldReturnCriterion
@@ -32,6 +33,7 @@ import java.math.BigDecimal
 
 class TradeStrategy(
     val series: BarSeries,
+    val margin: Boolean,
     strategy: Strategy
 ) : Strategy by strategy {
 
@@ -44,9 +46,10 @@ class TradeStrategy(
     fun shouldExit() = shouldExit(series.endIndex)
 
     fun analyze(commission: BigDecimal): DailyStrategyAnalyzeResult {
+        val tradeType = if (margin) TradeType.SELL else TradeType.BUY
         val tradingRecord =
             BarSeriesManager(series, LinearTransactionCostModel(commission.toDouble()), ZeroCostModel())
-                .run(this)
+                .run(this, tradeType)
         val trades =
             tradingRecord.positions
                 .map { position ->

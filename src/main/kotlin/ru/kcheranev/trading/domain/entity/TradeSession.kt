@@ -176,6 +176,8 @@ data class TradeSession(
         log.info("Trade session $this has been stopped")
     }
 
+    fun margin() = strategy.margin
+
     private fun checkTransition(toStatus: TradeSessionStatus) {
         if (!status.transitionAvailable(toStatus)) {
             throw TradeSessionDomainException("Unexpected trade session $this status transition from $status to $toStatus")

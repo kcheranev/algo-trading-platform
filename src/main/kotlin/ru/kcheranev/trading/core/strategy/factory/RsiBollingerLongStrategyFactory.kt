@@ -21,9 +21,9 @@ import ru.kcheranev.trading.domain.model.TradeStrategy
 import kotlin.math.max
 
 @Component
-class RsiBollingerStrategyFactory(
+class RsiBollingerLongStrategyFactory(
     tradingProperties: TradingProperties
-) : StrategyFactory {
+) : LongStrategyFactory() {
 
     private val endTradingTime = tradingProperties.endTradingTime
 
@@ -58,9 +58,9 @@ class RsiBollingerStrategyFactory(
                         DateTimeIndicator(series) { bar -> bar.endTime }
                     )
                 )
-        return TradeStrategy(series, BaseStrategy(entryRule, exitRule, max(rsiLength, bollingerLength)))
+        return buildTradeStrategy(series, BaseStrategy(entryRule, exitRule, max(rsiLength, bollingerLength)))
     }
 
-    override fun strategyType() = "RSI_BOLLINGER"
+    override fun strategyName() = "RSI_BOLLINGER"
 
 }

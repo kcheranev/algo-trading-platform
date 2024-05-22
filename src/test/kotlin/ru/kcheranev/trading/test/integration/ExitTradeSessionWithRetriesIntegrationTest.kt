@@ -61,7 +61,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
             strategyConfigurationRepository.save(
                 StrategyConfigurationEntity(
                     null,
-                    "DUMMY",
+                    "DUMMY_LONG",
                     CandleInterval.ONE_MIN,
                     MapWrapper(mapOf("param1" to 1))
                 )
@@ -82,6 +82,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
             every { series } returns mockedSeries
             every { shouldExit() } returns true
             every { addBar(any()) } answers { callOriginal() }
+            every { margin } returns false
         }
         val tradeSessionId = UUID.randomUUID()
         tradeSessionCache.put(
@@ -157,7 +158,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
             strategyConfigurationRepository.save(
                 StrategyConfigurationEntity(
                     null,
-                    "DUMMY",
+                    "DUMMY_LONG",
                     CandleInterval.ONE_MIN,
                     MapWrapper(mapOf("param1" to 1))
                 )
@@ -178,6 +179,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
             every { series } returns mockedSeries
             every { shouldExit() } returns true
             every { addBar(any()) } answers { callOriginal() }
+            every { margin } returns false
         }
         val tradeSessionId = UUID.randomUUID()
         tradeSessionCache.put(
@@ -253,7 +255,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
             strategyConfigurationRepository.save(
                 StrategyConfigurationEntity(
                     null,
-                    "DUMMY",
+                    "DUMMY_LONG",
                     CandleInterval.ONE_MIN,
                     MapWrapper(mapOf("param1" to 1))
                 )
@@ -274,6 +276,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
             every { series } returns mockedSeries
             every { shouldExit() } returns true
             every { addBar(any()) } answers { callOriginal() }
+            every { margin } returns false
         }
         val tradeSessionId = UUID.randomUUID()
         tradeSessionCache.put(

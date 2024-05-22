@@ -13,7 +13,6 @@ import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.domain.model.StrategyType
 import ru.kcheranev.trading.infra.adapter.income.web.model.request.TradeSessionSearchRequestDto
 import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeSessionSearchResponseDto
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
@@ -39,7 +38,7 @@ class SearchTradeSessionIntegrationTest(
             strategyConfigurationRepository.save(
                 StrategyConfigurationEntity(
                     null,
-                    StrategyType.MOVING_MOMENTUM.name,
+                    "MOVING_MOMENTUM_LONG",
                     CandleInterval.ONE_MIN,
                     MapWrapper(mapOf("param1" to 1))
                 )

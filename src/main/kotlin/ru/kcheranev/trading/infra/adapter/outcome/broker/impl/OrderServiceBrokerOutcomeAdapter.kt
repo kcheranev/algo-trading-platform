@@ -34,7 +34,17 @@ class OrderServiceBrokerOutcomeAdapter(
                     UUID.randomUUID().toString()
                 ).let { brokerOutcomeAdapterMapper.map(it) }
             notificationPort.sendNotification(
-                SendNotificationCommand("Post best price buy order: $postOrderResponse")
+                SendNotificationCommand(
+                    """
+                        Post best price buy order for the ${command.instrument.ticker}
+                        orderId=${postOrderResponse.orderId}
+                        status=${postOrderResponse.status}
+                        lotsRequested=${postOrderResponse.lotsRequested}
+                        lotsExecuted=${postOrderResponse.lotsExecuted}
+                        totalPrice=${postOrderResponse.totalPrice}
+                        executedCommission=${postOrderResponse.executedCommission}
+                    """.trimIndent()
+                )
             )
             return postOrderResponse
         } catch (ex: Exception) {
@@ -60,7 +70,17 @@ class OrderServiceBrokerOutcomeAdapter(
                     UUID.randomUUID().toString()
                 ).let { brokerOutcomeAdapterMapper.map(it) }
             notificationPort.sendNotification(
-                SendNotificationCommand("Post best price sell order: $postOrderResponse")
+                SendNotificationCommand(
+                    """
+                        Post best price sell order for the ${command.instrument.ticker}
+                        orderId=${postOrderResponse.orderId}
+                        status=${postOrderResponse.status}
+                        lotsRequested=${postOrderResponse.lotsRequested}
+                        lotsExecuted=${postOrderResponse.lotsExecuted}
+                        totalPrice=${postOrderResponse.totalPrice}
+                        executedCommission=${postOrderResponse.executedCommission}
+                    """.trimIndent()
+                )
             )
             return postOrderResponse
         } catch (ex: Exception) {

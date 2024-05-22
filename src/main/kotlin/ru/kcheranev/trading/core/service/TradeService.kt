@@ -83,7 +83,6 @@ class TradeService(
                 GetStrategyConfigurationCommand(command.strategyConfigurationId)
             )
         val strategyFactory = strategyFactoryProvider.getStrategyFactory(strategyConfiguration.type)
-
         val tradeSession =
             TradeSession.start(
                 strategyConfiguration = strategyConfiguration,
@@ -130,9 +129,15 @@ class TradeService(
         val postOrderResultAccumulator =
             postOrderWithRetry(tradeSession.lotsQuantity) { remainLotsQuantity ->
                 val postOrderResponse =
-                    orderServiceBrokerPort.postBestPriceBuyOrder(
-                        PostBestPriceBuyOrderCommand(tradeSession.instrument, remainLotsQuantity)
-                    )
+                    if (tradeSession.margin()) {
+                        orderServiceBrokerPort.postBestPriceSellOrder(
+                            PostBestPriceSellOrderCommand(tradeSession.instrument, remainLotsQuantity)
+                        )
+                    } else {
+                        orderServiceBrokerPort.postBestPriceBuyOrder(
+                            PostBestPriceBuyOrderCommand(tradeSession.instrument, remainLotsQuantity)
+                        )
+                    }
                 if (postOrderResponse.executed()) {
                     val tradeOrder =
                         TradeOrder.create(
@@ -141,7 +146,7 @@ class TradeService(
                             lotsQuantity = postOrderResponse.lotsExecuted,
                             totalPrice = postOrderResponse.totalPrice,
                             executedCommission = postOrderResponse.executedCommission,
-                            direction = TradeDirection.BUY,
+                            direction = if (tradeSession.margin()) TradeDirection.SELL else TradeDirection.BUY,
                             strategyConfigurationId = tradeSession.strategyConfigurationId,
                             dateSupplier = dateSupplier
                         )
@@ -163,9 +168,15 @@ class TradeService(
         val postOrderResultAccumulator =
             postOrderWithRetry(tradeSession.lotsQuantityInPosition) { remainLotsQuantity ->
                 val postOrderResponse =
-                    orderServiceBrokerPort.postBestPriceSellOrder(
-                        PostBestPriceSellOrderCommand(tradeSession.instrument, remainLotsQuantity)
-                    )
+                    if (tradeSession.margin()) {
+                        orderServiceBrokerPort.postBestPriceBuyOrder(
+                            PostBestPriceBuyOrderCommand(tradeSession.instrument, remainLotsQuantity)
+                        )
+                    } else {
+                        orderServiceBrokerPort.postBestPriceSellOrder(
+                            PostBestPriceSellOrderCommand(tradeSession.instrument, remainLotsQuantity)
+                        )
+                    }
                 if (postOrderResponse.executed()) {
                     val tradeOrder =
                         TradeOrder.create(
@@ -174,7 +185,7 @@ class TradeService(
                             lotsQuantity = postOrderResponse.lotsExecuted,
                             totalPrice = postOrderResponse.totalPrice,
                             executedCommission = postOrderResponse.executedCommission,
-                            direction = TradeDirection.SELL,
+                            direction = if (tradeSession.margin()) TradeDirection.BUY else TradeDirection.SELL,
                             strategyConfigurationId = tradeSession.strategyConfigurationId,
                             dateSupplier = dateSupplier
                         )

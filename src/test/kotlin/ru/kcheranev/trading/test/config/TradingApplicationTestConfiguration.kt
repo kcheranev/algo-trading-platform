@@ -9,7 +9,8 @@ import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscription
 import ru.kcheranev.trading.infra.config.BrokerApi
 import ru.kcheranev.trading.infra.config.properties.BrokerProperties
 import ru.kcheranev.trading.infra.config.properties.TelegramNotificationProperties
-import ru.kcheranev.trading.test.strategy.DummyTestStrategyFactory
+import ru.kcheranev.trading.test.strategy.DummyTestLongStrategyFactory
+import ru.kcheranev.trading.test.strategy.DummyTestShortStrategyFactory
 import ru.kcheranev.trading.test.stub.WireMockServers.grpcWireMockServer
 import ru.kcheranev.trading.test.stub.http.TelegramNotificationHttpStub
 import ru.kcheranev.trading.test.util.MarketDataSubscriptionInitializer
@@ -28,7 +29,10 @@ class TradingApplicationTestConfiguration {
         )
 
     @Bean
-    fun dummyTestStrategyFactory() = DummyTestStrategyFactory()
+    fun dummyTestLongStrategyFactory() = DummyTestLongStrategyFactory()
+
+    @Bean
+    fun dummyTestShortStrategyFactory() = DummyTestShortStrategyFactory()
 
     @Bean
     fun dateSupplier() = spyk(
