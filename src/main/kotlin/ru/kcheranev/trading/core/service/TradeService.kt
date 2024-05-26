@@ -92,7 +92,7 @@ class TradeService(
                 strategyFactory = strategyFactory,
                 dateSupplier = dateSupplier
             )
-        val initCandlesAmount = tradeSession.strategy.unstablePeriod
+        val initCandlesAmount = tradeSession.strategy.unstableBars
         if (initCandlesAmount > 0) {
             val candles =
                 historicCandleBrokerPort.getLastHistoricCandles(

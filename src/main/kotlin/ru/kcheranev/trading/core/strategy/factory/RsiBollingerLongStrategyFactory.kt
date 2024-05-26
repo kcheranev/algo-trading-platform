@@ -2,13 +2,13 @@ package ru.kcheranev.trading.core.strategy.factory
 
 import org.springframework.stereotype.Component
 import org.ta4j.core.BaseStrategy
-import org.ta4j.core.indicators.DateTimeIndicator
 import org.ta4j.core.indicators.RSIIndicator
 import org.ta4j.core.indicators.SMAIndicator
 import org.ta4j.core.indicators.bollinger.BollingerBandsLowerIndicator
 import org.ta4j.core.indicators.bollinger.BollingerBandsMiddleIndicator
 import org.ta4j.core.indicators.bollinger.BollingerBandsUpperIndicator
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator
+import org.ta4j.core.indicators.helpers.DateTimeIndicator
 import org.ta4j.core.indicators.statistics.StandardDeviationIndicator
 import org.ta4j.core.rules.CrossedDownIndicatorRule
 import org.ta4j.core.rules.UnderIndicatorRule

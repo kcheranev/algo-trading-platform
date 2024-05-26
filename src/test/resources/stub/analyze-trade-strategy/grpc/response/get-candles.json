@@ -271,6 +271,23 @@
       "volume": "13",
       "time": "2024-01-30T07:27:00Z",
       "isComplete": true
+    },
+    {
+      "open": {
+        "units": "102"
+      },
+      "high": {
+        "units": "105"
+      },
+      "low": {
+        "units": "100"
+      },
+      "close": {
+        "units": "103"
+      },
+      "volume": "13",
+      "time": "2024-01-30T07:28:00Z",
+      "isComplete": true
     }
   ]
 }

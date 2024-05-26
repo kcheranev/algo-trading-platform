@@ -1,7 +1,7 @@
 package ru.kcheranev.trading.core.strategy.rule
 
 import org.ta4j.core.TradingRecord
-import org.ta4j.core.indicators.DateTimeIndicator
+import org.ta4j.core.indicators.helpers.DateTimeIndicator
 import org.ta4j.core.rules.AbstractRule
 import ru.kcheranev.trading.domain.model.CandleInterval
 import java.time.LocalTime

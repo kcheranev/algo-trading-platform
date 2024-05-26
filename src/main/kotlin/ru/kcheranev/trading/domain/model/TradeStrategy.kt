@@ -3,11 +3,11 @@ package ru.kcheranev.trading.domain.model
 import org.ta4j.core.AnalysisCriterion
 import org.ta4j.core.Bar
 import org.ta4j.core.BarSeries
-import org.ta4j.core.BarSeriesManager
 import org.ta4j.core.Strategy
 import org.ta4j.core.Trade.TradeType
 import org.ta4j.core.analysis.cost.LinearTransactionCostModel
 import org.ta4j.core.analysis.cost.ZeroCostModel
+import org.ta4j.core.backtest.BarSeriesManager
 import org.ta4j.core.criteria.EnterAndHoldReturnCriterion
 import org.ta4j.core.criteria.MaximumDrawdownCriterion
 import org.ta4j.core.criteria.NumberOfBarsCriterion
@@ -17,10 +17,8 @@ import org.ta4j.core.criteria.NumberOfPositionsCriterion
 import org.ta4j.core.criteria.NumberOfWinningPositionsCriterion
 import org.ta4j.core.criteria.pnl.AverageLossCriterion
 import org.ta4j.core.criteria.pnl.AverageProfitCriterion
-import org.ta4j.core.criteria.pnl.GrossLossCriterion
-import org.ta4j.core.criteria.pnl.GrossProfitCriterion
-import org.ta4j.core.criteria.pnl.NetLossCriterion
-import org.ta4j.core.criteria.pnl.NetProfitCriterion
+import org.ta4j.core.criteria.pnl.LossCriterion
+import org.ta4j.core.criteria.pnl.ProfitCriterion
 import org.ta4j.core.criteria.pnl.ProfitLossCriterion
 import org.ta4j.core.criteria.pnl.ProfitLossPercentageCriterion
 import org.ta4j.core.criteria.pnl.ProfitLossRatioCriterion
@@ -64,8 +62,8 @@ class TradeStrategy(
             averageProfit = AverageProfitCriterion().calculate(series, tradingRecord).toBigDecimal(),
             enterAndHoldReturn = EnterAndHoldReturnCriterion()
                 .calculate(series, tradingRecord).toBigDecimal(),
-            netLoss = NetLossCriterion().calculate(series, tradingRecord).toBigDecimal(),
-            grossLoss = GrossLossCriterion().calculate(series, tradingRecord).toBigDecimal(),
+            netLoss = LossCriterion().calculate(series, tradingRecord).toBigDecimal(),
+            grossLoss = LossCriterion(true).calculate(series, tradingRecord).toBigDecimal(),
             maximumDrawdown = MaximumDrawdownCriterion().calculate(series, tradingRecord).toBigDecimal(),
             barsCount = NumberOfBarsCriterion().calculate(series, tradingRecord).toInt(),
             consecutiveProfitPositionsCount = NumberOfConsecutivePositionsCriterion(AnalysisCriterion.PositionFilter.PROFIT)
@@ -78,8 +76,8 @@ class TradeStrategy(
                 .calculate(series, tradingRecord).toInt(),
             profitPositionsCount = NumberOfWinningPositionsCriterion()
                 .calculate(series, tradingRecord).toInt(),
-            netProfit = NetProfitCriterion().calculate(series, tradingRecord).toBigDecimal(),
-            grossProfit = GrossProfitCriterion().calculate(series, tradingRecord).toBigDecimal(),
+            netProfit = ProfitCriterion().calculate(series, tradingRecord).toBigDecimal(),
+            grossProfit = ProfitCriterion(true).calculate(series, tradingRecord).toBigDecimal(),
             profitLoss = ProfitLossCriterion().calculate(series, tradingRecord).toBigDecimal(),
             profitLossPercentage = ProfitLossPercentageCriterion().calculate(series, tradingRecord).toBigDecimal(),
             profitLossRatio = ProfitLossRatioCriterion().calculate(series, tradingRecord).toBigDecimal(),
@@ -89,7 +87,7 @@ class TradeStrategy(
 
     private fun mapPositionTrade(trade: org.ta4j.core.Trade) =
         Order(
-            date = series.getBar(trade.index).endTime.toLocalDateTime(),
+            date = series.getBar(trade.index).beginTime.toLocalDateTime(),
             direction = TradeDirection.valueOf(trade.type.name),
             netPrice = trade.netPrice.toBigDecimal(),
             grossPrice = trade.pricePerAsset.toBigDecimal()
