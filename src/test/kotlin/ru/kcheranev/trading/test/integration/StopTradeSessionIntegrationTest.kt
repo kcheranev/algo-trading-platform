@@ -8,15 +8,13 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
-import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
+import ru.kcheranev.trading.domain.model.Instrument
+import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeSessionCache
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
 import ru.kcheranev.trading.test.IntegrationTest
 import ru.kcheranev.trading.test.stub.grpc.MarketDataBrokerGrpcStub
 import ru.kcheranev.trading.test.util.MarketDataSubscriptionInitializer
@@ -27,7 +25,6 @@ import java.util.UUID
 class StopTradeSessionIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
     private val tradeSessionCache: TradeSessionCache,
-    private val strategyConfigurationRepository: StrategyConfigurationRepository,
     private val marketDataSubscriptionInitializer: MarketDataSubscriptionInitializer,
     private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
@@ -40,15 +37,6 @@ class StopTradeSessionIntegrationTest(
 
     "should stop trade session" {
         //given
-        val strategyConfiguration =
-            strategyConfigurationRepository.save(
-                StrategyConfigurationEntity(
-                    null,
-                    "DUMMY_LONG",
-                    CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param1" to 1))
-                )
-            )
         val tradeSessionId = UUID.randomUUID()
         tradeSessionCache.put(
             tradeSessionId,
@@ -61,10 +49,14 @@ class StopTradeSessionIntegrationTest(
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 strategy = mockk(),
-                strategyConfigurationId = StrategyConfigurationId(strategyConfiguration.id!!)
+                strategyType = "DUMMY",
+                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
             )
         )
-        marketDataSubscriptionInitializer.init("SBER", CandleInterval.ONE_MIN)
+        marketDataSubscriptionInitializer.init(
+            Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
+            CandleInterval.ONE_MIN
+        )
 
         //when
         val response = testRestTemplate.exchange(

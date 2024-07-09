@@ -1,8 +1,8 @@
 package ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom
 
 import org.springframework.jdbc.core.JdbcTemplate
-import ru.kcheranev.trading.core.port.common.model.sort.TradeOrderSort
-import ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderSearchCommand
+import ru.kcheranev.trading.core.port.model.sort.TradeOrderSort
+import ru.kcheranev.trading.core.port.outcome.persistence.tradeorder.SearchTradeOrderCommand
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.addAndCondition
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.ComparstionCondition
@@ -18,7 +18,7 @@ class CustomizedTradeOrderRepositoryImpl(
     private val tradeOrderEntityRowMapper: TradeOrderEntityRowMapper
 ) : CustomizedTradeOrderRepository {
 
-    override fun search(command: TradeOrderSearchCommand): List<TradeOrderEntity> {
+    override fun search(command: SearchTradeOrderCommand): List<TradeOrderEntity> {
         val queryBuilder = StringBuilder()
         queryBuilder.append("SELECT * FROM trade_order")
         val conditionsBuilder = StringBuilder()
@@ -43,11 +43,11 @@ class CustomizedTradeOrderRepositoryImpl(
         if (command.direction != null) {
             conditionsBuilder.addAndCondition(EqualsCondition("direction", command.direction))
         }
-        if (command.strategyConfigurationId != null) {
+        if (command.tradeSessionId != null) {
             conditionsBuilder.addAndCondition(
                 EqualsCondition(
-                    "strategy_configuration_id",
-                    command.strategyConfigurationId.value
+                    "trade_session_id",
+                    command.tradeSessionId.value
                 )
             )
         }

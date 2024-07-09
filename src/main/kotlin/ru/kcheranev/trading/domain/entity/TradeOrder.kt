@@ -1,6 +1,6 @@
 package ru.kcheranev.trading.domain.entity
 
-import ru.kcheranev.trading.common.DateSupplier
+import ru.kcheranev.trading.common.date.DateSupplier
 import ru.kcheranev.trading.domain.model.TradeDirection
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -15,7 +15,7 @@ data class TradeOrder(
     val totalPrice: BigDecimal,
     val executedCommission: BigDecimal,
     val direction: TradeDirection,
-    val strategyConfigurationId: StrategyConfigurationId
+    val tradeSessionId: TradeSessionId
 ) : AbstractAggregateRoot() {
 
     companion object {
@@ -27,7 +27,7 @@ data class TradeOrder(
             totalPrice: BigDecimal,
             executedCommission: BigDecimal,
             direction: TradeDirection,
-            strategyConfigurationId: StrategyConfigurationId,
+            tradeSessionId: TradeSessionId,
             dateSupplier: DateSupplier
         ) = TradeOrder(
             id = null,
@@ -38,7 +38,7 @@ data class TradeOrder(
             totalPrice = totalPrice,
             executedCommission = executedCommission,
             direction = direction,
-            strategyConfigurationId = strategyConfigurationId
+            tradeSessionId = tradeSessionId
         )
 
     }
@@ -47,4 +47,8 @@ data class TradeOrder(
 
 data class TradeOrderId(
     val value: UUID
-)
+) {
+
+    override fun toString() = value.toString()
+
+}

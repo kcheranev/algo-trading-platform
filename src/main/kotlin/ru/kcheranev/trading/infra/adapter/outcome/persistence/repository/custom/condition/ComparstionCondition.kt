@@ -1,7 +1,7 @@
 package ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition
 
-import ru.kcheranev.trading.core.port.common.model.ComparedField
-import ru.kcheranev.trading.core.port.common.model.Comparsion
+import ru.kcheranev.trading.core.port.model.ComparedField
+import ru.kcheranev.trading.core.port.model.Comparsion
 
 class ComparstionCondition(
     private val fieldName: String,

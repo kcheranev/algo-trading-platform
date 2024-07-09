@@ -10,20 +10,18 @@ import io.mockk.mockk
 import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseBar
 import org.ta4j.core.BaseBarSeriesBuilder
-import ru.kcheranev.trading.common.toMskZonedDateTime
-import ru.kcheranev.trading.core.port.income.trading.ProcessIncomeCandleCommand
-import ru.kcheranev.trading.core.service.TradeService
-import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
+import ru.kcheranev.trading.common.date.toMskZonedDateTime
+import ru.kcheranev.trading.core.port.income.marketdata.ProcessIncomeCandleCommand
+import ru.kcheranev.trading.core.service.MarketDataProcessingService
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
+import ru.kcheranev.trading.domain.model.Instrument
+import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.TradeStrategy
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeSessionCache
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeOrderRepository
 import ru.kcheranev.trading.test.IntegrationTest
 import ru.kcheranev.trading.test.stub.grpc.OrdersBrokerGrpcStub
@@ -37,8 +35,7 @@ import java.util.UUID
 
 @IntegrationTest
 class EnterTradeSessionWithRetriesIntegrationTest(
-    private val tradeService: TradeService,
-    private val strategyConfigurationRepository: StrategyConfigurationRepository,
+    private val marketDataProcessingService: MarketDataProcessingService,
     private val tradeOrderRepository: TradeOrderRepository,
     private val tradeSessionCache: TradeSessionCache,
     private val marketDataSubscriptionInitializer: MarketDataSubscriptionInitializer,
@@ -56,15 +53,6 @@ class EnterTradeSessionWithRetriesIntegrationTest(
 
     "should enter trade session with retries" {
         //given
-        val strategyConfiguration =
-            strategyConfigurationRepository.save(
-                StrategyConfigurationEntity(
-                    null,
-                    "DUMMY_LONG",
-                    CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param1" to 1))
-                )
-            )
         val mockedSeries: BarSeries = BaseBarSeriesBuilder().build()
         mockedSeries.addBar(
             BaseBar(
@@ -95,10 +83,14 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 strategy = tradeStrategy,
-                strategyConfigurationId = StrategyConfigurationId(strategyConfiguration.id!!)
+                strategyType = "DUMMY",
+                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
             )
         )
-        marketDataSubscriptionInitializer.init("SBER", CandleInterval.ONE_MIN)
+        marketDataSubscriptionInitializer.init(
+            Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
+            CandleInterval.ONE_MIN
+        )
         val candle =
             Candle(
                 interval = CandleInterval.ONE_MIN,
@@ -126,7 +118,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
         telegramNotificationHttpStub.stubForSendNotification()
 
         //when
-        tradeService.processIncomeCandle(ProcessIncomeCandleCommand(candle))
+        marketDataProcessingService.processIncomeCandle(ProcessIncomeCandleCommand(candle))
 
         //then
         ordersBrokerGrpcStub.verifyForPostBuyOrder("post-buy-order-quantity-10.json", mapOf("quantity" to "10"))
@@ -149,15 +141,6 @@ class EnterTradeSessionWithRetriesIntegrationTest(
 
     "should enter trade session with retries when executed lots quantity not equals to requested lots quantity" {
         //given
-        val strategyConfiguration =
-            strategyConfigurationRepository.save(
-                StrategyConfigurationEntity(
-                    null,
-                    "DUMMY_LONG",
-                    CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param1" to 1))
-                )
-            )
         val mockedSeries: BarSeries = BaseBarSeriesBuilder().build()
         mockedSeries.addBar(
             BaseBar(
@@ -188,10 +171,14 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 strategy = tradeStrategy,
-                strategyConfigurationId = StrategyConfigurationId(strategyConfiguration.id!!)
+                strategyType = "DUMMY",
+                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
             )
         )
-        marketDataSubscriptionInitializer.init("SBER", CandleInterval.ONE_MIN)
+        marketDataSubscriptionInitializer.init(
+            Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
+            CandleInterval.ONE_MIN
+        )
         val candle =
             Candle(
                 interval = CandleInterval.ONE_MIN,
@@ -219,7 +206,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
         telegramNotificationHttpStub.stubForSendNotification()
 
         //when
-        tradeService.processIncomeCandle(ProcessIncomeCandleCommand(candle))
+        marketDataProcessingService.processIncomeCandle(ProcessIncomeCandleCommand(candle))
 
         //then
         ordersBrokerGrpcStub.verifyForPostBuyOrder("post-buy-order-quantity-10.json", mapOf("quantity" to "10"))
@@ -242,15 +229,6 @@ class EnterTradeSessionWithRetriesIntegrationTest(
 
     "should trade session waiting for entry when there are no executed orders" {
         //given
-        val strategyConfiguration =
-            strategyConfigurationRepository.save(
-                StrategyConfigurationEntity(
-                    null,
-                    "DUMMY_LONG",
-                    CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param1" to 1))
-                )
-            )
         val mockedSeries: BarSeries = BaseBarSeriesBuilder().build()
         mockedSeries.addBar(
             BaseBar(
@@ -281,10 +259,14 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 strategy = tradeStrategy,
-                strategyConfigurationId = StrategyConfigurationId(strategyConfiguration.id!!)
+                strategyType = "DUMMY",
+                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
             )
         )
-        marketDataSubscriptionInitializer.init("SBER", CandleInterval.ONE_MIN)
+        marketDataSubscriptionInitializer.init(
+            Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
+            CandleInterval.ONE_MIN
+        )
         val candle =
             Candle(
                 interval = CandleInterval.ONE_MIN,
@@ -304,7 +286,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
         telegramNotificationHttpStub.stubForSendNotification()
 
         //when
-        tradeService.processIncomeCandle(ProcessIncomeCandleCommand(candle))
+        marketDataProcessingService.processIncomeCandle(ProcessIncomeCandleCommand(candle))
 
         //then
         ordersBrokerGrpcStub.verifyForPostBuyOrder("post-buy-order-quantity-10.json", mapOf("quantity" to "10"), 3)

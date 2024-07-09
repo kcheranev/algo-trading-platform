@@ -3,7 +3,7 @@ package ru.kcheranev.trading.infra.adapter.mapper
 import com.google.protobuf.Timestamp
 import org.mapstruct.Mapper
 import org.mapstruct.factory.Mappers
-import ru.kcheranev.trading.common.mskZoneId
+import ru.kcheranev.trading.common.date.mskZoneId
 import ru.tinkoff.piapi.contract.v1.MoneyValue
 import ru.tinkoff.piapi.contract.v1.Quotation
 import ru.tinkoff.piapi.core.utils.MapperUtils

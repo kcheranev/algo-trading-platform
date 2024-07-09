@@ -30,4 +30,8 @@ data class StrategyConfiguration(
 
 data class StrategyConfigurationId(
     val value: UUID
-)
+) {
+
+    override fun toString() = value.toString()
+
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg" th:fragment="header">
+        <div class="container fs-2">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" th:href="@{/ui/strategy-configurations}">Configurations</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" th:href="@{/ui/trade-sessions}">Sessions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" th:href="@{/ui/subscriptions}">Subscriptions</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        Backtesting
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="#" th:href="@{/ui/backtesting/adjust-and-analyze}">
+                                Adjust and analyze
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" th:href="@{/ui/backtesting/analyze}">Analyze</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
+</body>
+</html>

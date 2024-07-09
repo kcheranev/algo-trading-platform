@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<body>
+<th:block layout:fragment="content">
+    <h2>Strategy configurations</h2>
+    <div th:switch="${#lists.isEmpty(strategyConfigurations)}">
+        <span th:case="true">There are no strategy configurations</span>
+        <div th:case="false">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Type</th>
+                    <th>Candle interval</th>
+                    <th>Parameters</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="strategyConfiguration : ${strategyConfigurations}">
+                    <td th:text="${strategyConfiguration.id}"></td>
+                    <td th:text="${strategyConfiguration.type}"></td>
+                    <td th:text="${strategyConfiguration.candleInterval}"></td>
+                    <td th:text="${strategyConfiguration.params}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

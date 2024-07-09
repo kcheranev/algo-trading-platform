@@ -20,7 +20,7 @@ class TradeOrderEntityRowMapper : RowMapper<TradeOrderEntity> {
             totalPrice = rs.getBigDecimal("total_price"),
             executedCommission = rs.getBigDecimal("executed_commission"),
             direction = TradeDirection.valueOf(rs.getString("direction")),
-            strategyConfigurationId = UUID.fromString(rs.getString("strategy_configuration_id"))
+            tradeSessionId = UUID.fromString(rs.getString("trade_session_id"))
         )
 
 }

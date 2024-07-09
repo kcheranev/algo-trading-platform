@@ -3,10 +3,11 @@ package ru.kcheranev.trading.infra.adapter.outcome.broker.impl
 import io.grpc.stub.StreamObserver
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import ru.kcheranev.trading.core.port.income.trading.ReceiveCandleUseCase
+import ru.kcheranev.trading.core.port.income.marketdata.ProcessCandleUseCase
 import ru.kcheranev.trading.core.port.outcome.broker.MarketDataStreamSubscriptionBrokerPort
 import ru.kcheranev.trading.core.port.outcome.broker.SubscribeCandlesOrderCommand
 import ru.kcheranev.trading.core.port.outcome.broker.UnsubscribeCandlesOrderCommand
+import ru.kcheranev.trading.domain.model.subscription.CandleSubscription
 import ru.kcheranev.trading.infra.adapter.income.broker.impl.CandleSubscriptionBrokerIncomeAdapter
 import ru.kcheranev.trading.infra.adapter.outcome.broker.brokerOutcomeAdapterMapper
 import ru.tinkoff.piapi.contract.v1.CandleInstrument
@@ -19,13 +20,11 @@ import ru.tinkoff.piapi.core.stream.MarketDataSubscriptionService
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-private const val CANDLES_STREAM_ID_FORMAT = "candles_%s_%s"
-
 @Component
 class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
     private val marketDataStreamService: MarketDataStreamService,
-    private val receiveCandleUseCase: ReceiveCandleUseCase,
-    private val candleSubscriptionCounter: CandleSubscriptionCounter
+    private val processCandleUseCase: ProcessCandleUseCase,
+    private val candleSubscriptionHolder: CandleSubscriptionHolder
 ) : MarketDataStreamSubscriptionBrokerPort {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -34,42 +33,44 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
 
     override fun subscribeCandles(command: SubscribeCandlesOrderCommand): Unit =
         lock.withLock {
-            val ticker = command.instrument.ticker
+            val instrument = command.instrument
             val candleInterval = command.candleInterval
-            val candlesStreamId = CANDLES_STREAM_ID_FORMAT.format(ticker, candleInterval)
-            if (!candleSubscriptionCounter.checkSubscriptionExists(candlesStreamId)) {
-                log.info("Activate subscription for the trade session ticker=$ticker, candleInterval=$candleInterval")
+            val subscriptionId = CandleSubscription.candleSubscriptionId(instrument, candleInterval)
+            if (!candleSubscriptionHolder.checkSubscriptionExists(subscriptionId)) {
+                log.info("Activate subscription for the trade session ticker=${instrument.ticker}, candleInterval=$candleInterval")
                 marketDataStreamService.newStream(
-                    candlesStreamId,
-                    CandleSubscriptionBrokerIncomeAdapter(receiveCandleUseCase)
+                    CandleSubscription.candleSubscriptionId(instrument, candleInterval),
+                    CandleSubscriptionBrokerIncomeAdapter(processCandleUseCase)
                 ) { log.error(it.toString()) }
                     .subscribeCandlesWithWaitingClose(
                         listOf(command.instrument.id),
                         brokerOutcomeAdapterMapper.mapToSubscriptionInterval(candleInterval)
                     )
             }
-            candleSubscriptionCounter.addCandleSubscription(candlesStreamId)
+            candleSubscriptionHolder.incrementSubscriptionCount(instrument, candleInterval)
         }
 
 
     override fun unsubscribeCandles(command: UnsubscribeCandlesOrderCommand): Unit =
         lock.withLock {
-            val ticker = command.instrument.ticker
+            val instrument = command.instrument
             val candleInterval = command.candleInterval
-            val candlesStreamId = CANDLES_STREAM_ID_FORMAT.format(ticker, candleInterval)
-            if (!candleSubscriptionCounter.checkSubscriptionExists(candlesStreamId)) {
+            val subscriptionId = CandleSubscription.candleSubscriptionId(instrument, candleInterval)
+            if (!candleSubscriptionHolder.checkSubscriptionExists(subscriptionId)) {
                 return
             }
-            if (candleSubscriptionCounter.lastSubscription(candlesStreamId)) {
-                log.info("Deactivate subscription for the trade session ticker=$ticker, candleInterval=$candleInterval")
-                marketDataStreamService.getStreamById(candlesStreamId)
+            if (candleSubscriptionHolder.lastSubscription(subscriptionId)) {
+                log.info("Deactivate subscription for the trade session ticker=${instrument.ticker}, candleInterval=$candleInterval")
+                marketDataStreamService.getStreamById(subscriptionId)
                     .unsubscribeCandles(
                         listOf(command.instrument.id),
                         brokerOutcomeAdapterMapper.mapToSubscriptionInterval(candleInterval)
                     )
             }
-            candleSubscriptionCounter.removeCandleSubscription(candlesStreamId)
+            candleSubscriptionHolder.removeCandleSubscription(subscriptionId)
         }
+
+    override fun findAllCandleSubscriptions() = candleSubscriptionHolder.getSubscriptions()
 
 }
 

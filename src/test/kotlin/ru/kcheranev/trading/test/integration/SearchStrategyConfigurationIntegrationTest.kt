@@ -7,13 +7,13 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
-import ru.kcheranev.trading.core.port.common.model.Page
-import ru.kcheranev.trading.core.port.common.model.sort.Sort
-import ru.kcheranev.trading.core.port.common.model.sort.SortDirection
-import ru.kcheranev.trading.core.port.common.model.sort.StrategyConfigurationSort
+import ru.kcheranev.trading.core.port.model.Page
+import ru.kcheranev.trading.core.port.model.sort.Sort
+import ru.kcheranev.trading.core.port.model.sort.SortDirection
+import ru.kcheranev.trading.core.port.model.sort.StrategyConfigurationSort
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.infra.adapter.income.web.model.request.StrategyConfigurationSearchRequestDto
-import ru.kcheranev.trading.infra.adapter.income.web.model.response.StrategyConfigurationSearchResponseDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.SearchStrategyConfigurationRequestDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.StrategyConfigurationSearchResponseDto
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
@@ -68,7 +68,7 @@ class SearchStrategyConfigurationIntegrationTest(
     "should search strategy configuration by type" {
         //given
         val request =
-            StrategyConfigurationSearchRequestDto(
+            SearchStrategyConfigurationRequestDto(
                 type = "MOVING_MOMENTUM_LONG"
             )
 
@@ -93,7 +93,7 @@ class SearchStrategyConfigurationIntegrationTest(
         //when
         val response = testRestTemplate.postForEntity(
             "/strategy-configurations/search",
-            StrategyConfigurationSearchRequestDto(),
+            SearchStrategyConfigurationRequestDto(),
             StrategyConfigurationSearchResponseDto::class.java
         )
 
@@ -109,7 +109,7 @@ class SearchStrategyConfigurationIntegrationTest(
     "should search strategy configuration by candleInterval" {
         //given
         val request =
-            StrategyConfigurationSearchRequestDto(
+            SearchStrategyConfigurationRequestDto(
                 candleInterval = CandleInterval.ONE_MIN
             )
 
@@ -135,7 +135,7 @@ class SearchStrategyConfigurationIntegrationTest(
     "should search strategy configuration with paging and sorting" {
         //given
         val request =
-            StrategyConfigurationSearchRequestDto(
+            SearchStrategyConfigurationRequestDto(
                 page = Page(2, 1),
                 sort = Sort(StrategyConfigurationSort.TYPE, SortDirection.DESC)
             )
@@ -161,7 +161,7 @@ class SearchStrategyConfigurationIntegrationTest(
     "should return empty result when there are no strategy configurations found" {
         //given
         val request =
-            StrategyConfigurationSearchRequestDto(
+            SearchStrategyConfigurationRequestDto(
                 type = "any other type"
             )
 

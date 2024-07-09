@@ -1,8 +1,8 @@
 package ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom
 
 import org.springframework.jdbc.core.JdbcTemplate
-import ru.kcheranev.trading.core.port.common.model.sort.StrategyConfigurationSort
-import ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationSearchCommand
+import ru.kcheranev.trading.core.port.model.sort.StrategyConfigurationSort
+import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.SearchStrategyConfigurationCommand
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.addAndCondition
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.EqualsCondition
@@ -17,7 +17,7 @@ class CustomizedStrategyConfigurationRepositoryImpl(
     private val strategyConfigurationEntityRowMapper: StrategyConfigurationEntityRowMapper
 ) : CustomizedStrategyConfigurationRepository {
 
-    override fun search(command: StrategyConfigurationSearchCommand): List<StrategyConfigurationEntity> {
+    override fun search(command: SearchStrategyConfigurationCommand): List<StrategyConfigurationEntity> {
         val queryBuilder = StringBuilder()
         queryBuilder.append("SELECT * FROM strategy_configuration")
         val conditionsBuilder = StringBuilder()

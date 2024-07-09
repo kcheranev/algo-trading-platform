@@ -2,7 +2,7 @@ package ru.kcheranev.trading.domain.entity
 
 import org.slf4j.LoggerFactory
 import org.ta4j.core.BaseBarSeriesBuilder
-import ru.kcheranev.trading.common.DateSupplier
+import ru.kcheranev.trading.common.date.DateSupplier
 import ru.kcheranev.trading.core.strategy.factory.StrategyFactory
 import ru.kcheranev.trading.domain.DomainException
 import ru.kcheranev.trading.domain.TradeSessionCreatedDomainEvent
@@ -26,6 +26,7 @@ import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.CustomizedBarSeries
 import ru.kcheranev.trading.domain.model.Instrument
+import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.TradeStrategy
 import java.time.LocalDateTime
 import java.util.UUID
@@ -43,7 +44,8 @@ data class TradeSession(
     val lotsQuantity: Int,
     var lotsQuantityInPosition: Int = 0,
     val strategy: TradeStrategy,
-    val strategyConfigurationId: StrategyConfigurationId
+    val strategyType: String,
+    val strategyParameters: StrategyParameters
 ) : AbstractAggregateRoot() {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -219,7 +221,8 @@ data class TradeSession(
                     lotsQuantity = lotsQuantity,
                     lotsQuantityInPosition = 0,
                     strategy = tradeStrategy,
-                    strategyConfigurationId = strategyConfiguration.id!!
+                    strategyType = strategyConfiguration.type,
+                    strategyParameters = strategyConfiguration.params
                 )
             tradeSession.registerEvent(
                 TradeSessionCreatedDomainEvent(
@@ -236,7 +239,11 @@ data class TradeSession(
 
 data class TradeSessionId(
     val value: UUID
-)
+) {
+
+    override fun toString() = value.toString()
+
+}
 
 enum class TradeSessionStatus(
     private val availableTransitions: Supplier<Set<TradeSessionStatus>>,

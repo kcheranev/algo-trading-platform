@@ -3,7 +3,7 @@ package ru.kcheranev.trading.test.config
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.jdbc.core.JdbcTemplate
-import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionCounter
+import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionHolder
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeSessionCache
 import ru.kcheranev.trading.test.extension.CleanDatabaseExtension
 import ru.kcheranev.trading.test.extension.ClearTradeSessionCacheExtension
@@ -23,8 +23,8 @@ class ExtensionTestConfiguration {
         ClearTradeSessionCacheExtension(tradeSessionCache)
 
     @Bean
-    fun resetCandleSubscriptionCounterExtension(candleSubscriptionCounter: CandleSubscriptionCounter) =
-        ResetCandleSubscriptionCounterExtension(candleSubscriptionCounter)
+    fun resetCandleSubscriptionCounterExtension(candleSubscriptionHolder: CandleSubscriptionHolder) =
+        ResetCandleSubscriptionCounterExtension(candleSubscriptionHolder)
 
     @Bean
     fun resetWireMockExtension() = ResetWireMockExtension()

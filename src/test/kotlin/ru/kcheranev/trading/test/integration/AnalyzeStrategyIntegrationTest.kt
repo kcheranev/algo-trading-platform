@@ -11,9 +11,9 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.TradeDirection
-import ru.kcheranev.trading.infra.adapter.income.web.model.request.InstrumentDto
-import ru.kcheranev.trading.infra.adapter.income.web.model.request.StrategyAnalyzeRequestDto
-import ru.kcheranev.trading.infra.adapter.income.web.model.response.PeriodStrategyAnalyzeResultDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.common.InstrumentDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StrategyAnalyzeRequestDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.StrategyAnalyzeResponseDto
 import ru.kcheranev.trading.test.IntegrationTest
 import ru.kcheranev.trading.test.stub.grpc.MarketDataBrokerGrpcStub
 import java.math.BigDecimal
@@ -45,10 +45,10 @@ class AnalyzeStrategyIntegrationTest(
                 from = LocalDate.parse("2024-01-30"),
                 to = LocalDate.parse("2024-01-30")
             ),
-            PeriodStrategyAnalyzeResultDto::class.java
+            StrategyAnalyzeResponseDto::class.java
         )
         strategyAnalyzeResponse.statusCode shouldBe HttpStatus.OK
-        val periodAnalyzeResult = strategyAnalyzeResponse.body
+        val periodAnalyzeResult = strategyAnalyzeResponse.body?.analyzeResult
         periodAnalyzeResult.shouldNotBeNull()
         periodAnalyzeResult.results shouldHaveSize 1
         periodAnalyzeResult.results.keys.first() shouldBe LocalDate.parse("2024-01-30")

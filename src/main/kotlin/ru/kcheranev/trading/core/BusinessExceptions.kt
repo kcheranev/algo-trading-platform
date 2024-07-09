@@ -6,6 +6,4 @@ open class BusinessException(
 
 class StrategyParamValidationException(message: String) : BusinessException(message)
 
-class IncomeCommandValidationException(message: String) : BusinessException(message)
-
 class OutcomeCommandValidationException(message: String) : BusinessException(message)

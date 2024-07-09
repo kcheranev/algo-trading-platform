@@ -4,7 +4,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.ta4j.core.BaseBarSeriesBuilder
-import ru.kcheranev.trading.common.isWeekend
+import ru.kcheranev.trading.common.date.isWeekend
 import ru.kcheranev.trading.core.strategy.factory.StrategyFactory
 import ru.kcheranev.trading.domain.DomainException
 import ru.kcheranev.trading.domain.mapper.domainModelMapper
@@ -130,7 +130,7 @@ class Backtesting(
                         .divide(BigDecimal(adjustVariantCount - 1), BACKTESTING_RESULT_SCALE, RoundingMode.HALF_UP)
                 val paramVariants = mutableListOf(paramValue)
                 var paramVariant = minParamValue
-                while (paramValue <= maxParamValue) {
+                while (paramVariant <= maxParamValue) {
                     paramVariants.add(paramVariant)
                     paramVariant += paramValueStep
                 }

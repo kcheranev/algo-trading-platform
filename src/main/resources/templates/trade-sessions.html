@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<body>
+<th:block layout:fragment="content">
+    <h2>Trade sessions</h2>
+    <div th:switch="${#lists.isEmpty(tradeSessions)}">
+        <span th:case="true">There are no trade sessions</span>
+        <div th:case="false">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Ticker</th>
+                    <th>Start date</th>
+                    <th>Status</th>
+                    <th>Candle interval</th>
+                    <th>Lots</th>
+                    <th>Strategy type</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="tradeSession : ${tradeSessions}">
+                    <td th:text="${tradeSession.id}"></td>
+                    <td th:text="${tradeSession.ticker}"></td>
+                    <td th:text="${#temporals.format(tradeSession.startDate, 'dd.MM.yyyy HH:mm:ss')}"></td>
+                    <td th:text="${tradeSession.status}"></td>
+                    <td th:text="${tradeSession.candleInterval}"></td>
+                    <td th:text="${tradeSession.lotsQuantityInPosition}"></td>
+                    <td th:text="${tradeSession.strategyType}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

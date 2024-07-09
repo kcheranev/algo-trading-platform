@@ -3,7 +3,7 @@ package ru.kcheranev.trading.domain.mapper
 import org.mapstruct.Mapper
 import org.mapstruct.factory.Mappers
 import org.ta4j.core.BaseBar
-import ru.kcheranev.trading.common.toMskZonedDateTime
+import ru.kcheranev.trading.common.date.toMskZonedDateTime
 import ru.kcheranev.trading.domain.model.Candle
 import java.math.BigDecimal
 

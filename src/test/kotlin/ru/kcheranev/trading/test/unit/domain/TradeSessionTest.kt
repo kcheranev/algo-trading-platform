@@ -17,8 +17,8 @@ import io.mockk.verify
 import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseBar
 import org.ta4j.core.BaseBarSeriesBuilder
-import ru.kcheranev.trading.common.DateSupplier
-import ru.kcheranev.trading.common.toMskZonedDateTime
+import ru.kcheranev.trading.common.date.DateSupplier
+import ru.kcheranev.trading.common.date.toMskZonedDateTime
 import ru.kcheranev.trading.core.strategy.factory.StrategyFactory
 import ru.kcheranev.trading.domain.TradeSessionCreatedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionDomainException
@@ -63,7 +63,8 @@ class TradeSessionTest : StringSpec({
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 strategy = tradeStrategy,
-                strategyConfigurationId = StrategyConfigurationId(UUID.randomUUID())
+                strategyType = "DUMMY",
+                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
             )
 
         //when
@@ -124,7 +125,8 @@ class TradeSessionTest : StringSpec({
         tradeSession.candleInterval shouldBe CandleInterval.ONE_MIN
         tradeSession.lotsQuantity shouldBe 10
         tradeSession.strategy shouldBe tradeStrategy
-        tradeSession.strategyConfigurationId shouldBe StrategyConfigurationId(strategyConfigurationId)
+        tradeSession.strategyType shouldBe "strategy-type"
+        tradeSession.strategyParameters shouldBe StrategyParameters(mapOf("key" to 1))
         strategyParamsSlot.captured shouldBe StrategyParameters(mapOf("key" to 1))
 
         val series = seriesSlot.captured
@@ -178,7 +180,8 @@ class TradeSessionTest : StringSpec({
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 strategy = tradeStrategy,
-                strategyConfigurationId = StrategyConfigurationId(UUID.randomUUID())
+                strategyType = "DUMMY",
+                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
             )
 
         //when
@@ -220,7 +223,8 @@ class TradeSessionTest : StringSpec({
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 strategy = tradeStrategy,
-                strategyConfigurationId = StrategyConfigurationId(UUID.randomUUID())
+                strategyType = "DUMMY",
+                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
             )
         val candle =
             Candle(
@@ -281,7 +285,8 @@ class TradeSessionTest : StringSpec({
                 lotsQuantity = 10,
                 lotsQuantityInPosition = 5,
                 strategy = tradeStrategy,
-                strategyConfigurationId = StrategyConfigurationId(UUID.randomUUID())
+                strategyType = "DUMMY",
+                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
             )
         val candle =
             Candle(
@@ -324,7 +329,8 @@ class TradeSessionTest : StringSpec({
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 strategy = tradeStrategy,
-                strategyConfigurationId = StrategyConfigurationId(UUID.randomUUID())
+                strategyType = "DUMMY",
+                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
             )
 
         //when
@@ -356,7 +362,8 @@ class TradeSessionTest : StringSpec({
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 strategy = tradeStrategy,
-                strategyConfigurationId = StrategyConfigurationId(UUID.randomUUID())
+                strategyType = "DUMMY",
+                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
             )
 
         //when
@@ -402,7 +409,8 @@ class TradeSessionTest : StringSpec({
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 strategy = tradeStrategy,
-                strategyConfigurationId = StrategyConfigurationId(UUID.randomUUID())
+                strategyType = "DUMMY",
+                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
             )
         val candle =
             Candle(
@@ -444,7 +452,8 @@ class TradeSessionTest : StringSpec({
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 strategy = tradeStrategy,
-                strategyConfigurationId = StrategyConfigurationId(UUID.randomUUID())
+                strategyType = "DUMMY",
+                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
             )
 
         //when
@@ -501,7 +510,8 @@ class TradeSessionTest : StringSpec({
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 strategy = tradeStrategy,
-                strategyConfigurationId = StrategyConfigurationId(UUID.randomUUID())
+                strategyType = "DUMMY",
+                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
             )
 
         //when
@@ -531,7 +541,8 @@ class TradeSessionTest : StringSpec({
                     candleInterval = CandleInterval.ONE_MIN,
                     lotsQuantity = 10,
                     strategy = tradeStrategy,
-                    strategyConfigurationId = StrategyConfigurationId(UUID.randomUUID())
+                    strategyType = "DUMMY",
+                    strategyParameters = StrategyParameters(mapOf("paramName" to 1))
                 )
 
             //when

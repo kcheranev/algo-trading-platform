@@ -4,10 +4,10 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation.MANDATORY
 import org.springframework.transaction.annotation.Transactional
-import ru.kcheranev.trading.core.port.outcome.persistence.GetOrderCommand
-import ru.kcheranev.trading.core.port.outcome.persistence.SaveOrderCommand
-import ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderPersistencePort
-import ru.kcheranev.trading.core.port.outcome.persistence.TradeOrderSearchCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.tradeorder.GetOrderCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.tradeorder.SaveOrderCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.tradeorder.SearchTradeOrderCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.tradeorder.TradeOrderPersistencePort
 import ru.kcheranev.trading.domain.entity.TradeOrderId
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.PersistenceNotFoundException
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.persistenceOutcomeAdapterMapper
@@ -36,7 +36,7 @@ class TradeOrderPersistenceOutcomeAdapter(
             .let { persistenceOutcomeAdapterMapper.map(it) }
 
 
-    override fun search(command: TradeOrderSearchCommand) =
+    override fun search(command: SearchTradeOrderCommand) =
         tradeOrderRepository.search(command).map { persistenceOutcomeAdapterMapper.map(it) }
 
 }

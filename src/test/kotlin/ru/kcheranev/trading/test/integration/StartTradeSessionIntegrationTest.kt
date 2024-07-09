@@ -9,9 +9,9 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.infra.adapter.income.web.model.request.InstrumentDto
-import ru.kcheranev.trading.infra.adapter.income.web.model.request.StartTradeSessionRequestDto
-import ru.kcheranev.trading.infra.adapter.income.web.model.response.StartTradeSessionResponseDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.common.InstrumentDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StartTradeSessionRequestDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.StartTradeSessionResponseDto
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeSessionCache
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper

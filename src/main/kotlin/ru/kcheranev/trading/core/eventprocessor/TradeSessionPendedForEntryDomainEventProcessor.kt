@@ -2,8 +2,8 @@ package ru.kcheranev.trading.core.eventprocessor
 
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
-import ru.kcheranev.trading.core.port.income.trading.EnterTradeSessionCommand
-import ru.kcheranev.trading.core.port.income.trading.EnterTradeSessionUseCase
+import ru.kcheranev.trading.core.port.income.tradesession.EnterTradeSessionCommand
+import ru.kcheranev.trading.core.port.income.tradesession.EnterTradeSessionUseCase
 import ru.kcheranev.trading.domain.TradeSessionPendedForEntryDomainEvent
 
 @Component

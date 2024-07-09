@@ -1,19 +1,20 @@
 package ru.kcheranev.trading.test.unit.adapter
 
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.maps.shouldContain
-import io.kotest.matchers.maps.shouldHaveSize
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldHaveSize
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
-import ru.kcheranev.trading.core.port.income.trading.ReceiveCandleUseCase
+import ru.kcheranev.trading.core.port.income.marketdata.ProcessCandleUseCase
 import ru.kcheranev.trading.core.port.outcome.broker.SubscribeCandlesOrderCommand
 import ru.kcheranev.trading.core.port.outcome.broker.UnsubscribeCandlesOrderCommand
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
-import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionCounter
+import ru.kcheranev.trading.domain.model.subscription.CandleSubscription
+import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionHolder
 import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.MarketDataStreamSubscriptionBrokerOutcomeAdapter
 import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.subscribeCandlesWithWaitingClose
 import ru.tinkoff.piapi.contract.v1.SubscriptionInterval
@@ -31,13 +32,13 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
             mockk<MarketDataStreamService> {
                 every { newStream("candles_SBER_ONE_MIN", any(), any()) } returns marketDataSubscriptionService
             }
-        val receiveCandleUseCase = mockk<ReceiveCandleUseCase>()
-        val candleSubscriptionCounter = CandleSubscriptionCounter()
+        val processCandleUseCase = mockk<ProcessCandleUseCase>()
+        val candleSubscriptionHolder = CandleSubscriptionHolder()
         val adapter =
             MarketDataStreamSubscriptionBrokerOutcomeAdapter(
                 marketDataStreamService,
-                receiveCandleUseCase,
-                candleSubscriptionCounter
+                processCandleUseCase,
+                candleSubscriptionHolder
             )
 
         //when
@@ -49,9 +50,14 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         )
 
         //then
-        val subscriptions = candleSubscriptionCounter.getSubscriptions()
+        val subscriptions = candleSubscriptionHolder.getSubscriptions()
         subscriptions shouldHaveSize 1
-        subscriptions shouldContain ("candles_SBER_ONE_MIN" to 1)
+        subscriptions shouldContain
+                CandleSubscription(
+                    Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
+                    CandleInterval.ONE_MIN,
+                    1
+                )
 
         verify {
             marketDataSubscriptionService.subscribeCandlesWithWaitingClose(
@@ -70,14 +76,17 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
             mockk<MarketDataStreamService> {
                 every { newStream("candles_SBER_ONE_MIN", any(), any()) } returns marketDataSubscriptionService
             }
-        val receiveCandleUseCase = mockk<ReceiveCandleUseCase>()
-        val candleSubscriptionCounter = CandleSubscriptionCounter()
-        candleSubscriptionCounter.addCandleSubscription("candles_SBER_ONE_MIN")
+        val processCandleUseCase = mockk<ProcessCandleUseCase>()
+        val candleSubscriptionHolder = CandleSubscriptionHolder()
+        candleSubscriptionHolder.incrementSubscriptionCount(
+            Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
+            CandleInterval.ONE_MIN
+        )
         val adapter =
             MarketDataStreamSubscriptionBrokerOutcomeAdapter(
                 marketDataStreamService,
-                receiveCandleUseCase,
-                candleSubscriptionCounter
+                processCandleUseCase,
+                candleSubscriptionHolder
             )
 
         //when
@@ -89,9 +98,14 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         )
 
         //then
-        val subscriptions = candleSubscriptionCounter.getSubscriptions()
+        val subscriptions = candleSubscriptionHolder.getSubscriptions()
         subscriptions shouldHaveSize 1
-        subscriptions shouldContain ("candles_SBER_ONE_MIN" to 2)
+        subscriptions shouldContain
+                CandleSubscription(
+                    Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
+                    CandleInterval.ONE_MIN,
+                    2
+                )
 
         verify(inverse = true) {
             marketDataSubscriptionService.subscribeCandlesWithWaitingClose(
@@ -108,14 +122,17 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
             mockk<MarketDataStreamService> {
                 every { getStreamById("candles_SBER_ONE_MIN") } returns marketDataSubscriptionService
             }
-        val receiveCandleUseCase = mockk<ReceiveCandleUseCase>()
-        val candleSubscriptionCounter = CandleSubscriptionCounter()
-        candleSubscriptionCounter.addCandleSubscription("candles_SBER_ONE_MIN")
+        val processCandleUseCase = mockk<ProcessCandleUseCase>()
+        val candleSubscriptionHolder = CandleSubscriptionHolder()
+        candleSubscriptionHolder.incrementSubscriptionCount(
+            Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
+            CandleInterval.ONE_MIN
+        )
         val adapter =
             MarketDataStreamSubscriptionBrokerOutcomeAdapter(
                 marketDataStreamService,
-                receiveCandleUseCase,
-                candleSubscriptionCounter
+                processCandleUseCase,
+                candleSubscriptionHolder
             )
 
         //when
@@ -127,7 +144,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         )
 
         //then
-        val subscriptions = candleSubscriptionCounter.getSubscriptions()
+        val subscriptions = candleSubscriptionHolder.getSubscriptions()
         subscriptions shouldHaveSize 0
 
         verify {
@@ -138,22 +155,23 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         }
     }
 
-    "should unsubscribe candles when there are two same subscriptions exist" {
+    "should not unsubscribe candles when there are two same subscriptions exist" {
         //given
         val marketDataSubscriptionService = mockk<MarketDataSubscriptionService>(relaxed = true)
         val marketDataStreamService =
             mockk<MarketDataStreamService> {
                 every { getStreamById("candles_SBER_ONE_MIN") } returns marketDataSubscriptionService
             }
-        val receiveCandleUseCase = mockk<ReceiveCandleUseCase>()
-        val candleSubscriptionCounter = CandleSubscriptionCounter()
-        candleSubscriptionCounter.addCandleSubscription("candles_SBER_ONE_MIN")
-        candleSubscriptionCounter.addCandleSubscription("candles_SBER_ONE_MIN")
+        val processCandleUseCase = mockk<ProcessCandleUseCase>()
+        val candleSubscriptionHolder = CandleSubscriptionHolder()
+        val instrument = Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
+        candleSubscriptionHolder.incrementSubscriptionCount(instrument, CandleInterval.ONE_MIN)
+        candleSubscriptionHolder.incrementSubscriptionCount(instrument, CandleInterval.ONE_MIN)
         val adapter =
             MarketDataStreamSubscriptionBrokerOutcomeAdapter(
                 marketDataStreamService,
-                receiveCandleUseCase,
-                candleSubscriptionCounter
+                processCandleUseCase,
+                candleSubscriptionHolder
             )
 
         //when
@@ -165,9 +183,14 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         )
 
         //then
-        val subscriptions = candleSubscriptionCounter.getSubscriptions()
+        val subscriptions = candleSubscriptionHolder.getSubscriptions()
         subscriptions shouldHaveSize 1
-        subscriptions shouldContain ("candles_SBER_ONE_MIN" to 1)
+        subscriptions shouldContain
+                CandleSubscription(
+                    Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
+                    CandleInterval.ONE_MIN,
+                    1
+                )
 
         verify(inverse = true) {
             marketDataSubscriptionService.unsubscribeCandles(

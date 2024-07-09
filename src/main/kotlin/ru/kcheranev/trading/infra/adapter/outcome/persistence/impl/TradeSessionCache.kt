@@ -1,9 +1,9 @@
 package ru.kcheranev.trading.infra.adapter.outcome.persistence.impl
 
 import org.springframework.stereotype.Component
-import ru.kcheranev.trading.core.port.common.model.sort.SortDirection
-import ru.kcheranev.trading.core.port.common.model.sort.TradeSessionSort
-import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionSearchCommand
+import ru.kcheranev.trading.core.port.model.sort.SortDirection
+import ru.kcheranev.trading.core.port.model.sort.TradeSessionSort
+import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.SearchTradeSessionCommand
 import ru.kcheranev.trading.domain.entity.TradeSession
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -29,7 +29,7 @@ class TradeSessionCache {
         tradeSessions.clear()
     }
 
-    fun search(command: TradeSessionSearchCommand) =
+    fun search(command: SearchTradeSessionCommand) =
         tradeSessions.values
             .asSequence()
             .filter { if (command.id == null) true else it.id == command.id }

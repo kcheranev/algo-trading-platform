@@ -4,11 +4,11 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation.MANDATORY
 import org.springframework.transaction.annotation.Transactional
-import ru.kcheranev.trading.core.port.outcome.persistence.GetReadyToOrderTradeSessionsCommand
-import ru.kcheranev.trading.core.port.outcome.persistence.GetTradeSessionCommand
-import ru.kcheranev.trading.core.port.outcome.persistence.SaveTradeSessionCommand
-import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionPersistencePort
-import ru.kcheranev.trading.core.port.outcome.persistence.TradeSessionSearchCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.GetReadyToOrderTradeSessionsCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.GetTradeSessionCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.SaveTradeSessionCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.SearchTradeSessionCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.TradeSessionPersistencePort
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.PersistenceNotFoundException
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.persistenceOutcomeAdapterMapper
@@ -46,7 +46,7 @@ class TradeSessionPersistenceOutcomeAdapter(
         tradeSessionCache.get(command.tradeSessionId.value)
             ?: throw PersistenceNotFoundException("Trade session entity with id ${command.tradeSessionId.value} is not exists")
 
-    override fun search(command: TradeSessionSearchCommand) =
+    override fun search(command: SearchTradeSessionCommand) =
         tradeSessionCache.search(command)
 
     override fun getReadyToOrderTradeSessions(command: GetReadyToOrderTradeSessionsCommand) =

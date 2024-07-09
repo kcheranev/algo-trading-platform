@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<body>
+<th:block layout:fragment="content">
+    <h2>Candle subscriptions</h2>
+    <div th:switch="${#lists.isEmpty(candleSubscriptions)}">
+        <span th:case="true">There are no candle subscriptions</span>
+        <div th:case="false">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Instrument id</th>
+                    <th>Ticker</th>
+                    <th>Candle interval</th>
+                    <th>Count</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="candleSubscription : ${candleSubscriptions}">
+                    <td th:text="${candleSubscription.instrument.id}"></td>
+                    <td th:text="${candleSubscription.instrument.ticker}"></td>
+                    <td th:text="${candleSubscription.candleInterval}"></td>
+                    <td th:text="${candleSubscription.subscriptionCount}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

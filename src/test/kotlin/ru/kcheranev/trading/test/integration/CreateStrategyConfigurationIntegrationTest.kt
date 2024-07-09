@@ -7,7 +7,7 @@ import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.infra.adapter.income.web.model.request.CreateStrategyConfigurationRequestDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.CreateStrategyConfigurationRequestDto
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
 import ru.kcheranev.trading.test.IntegrationTest
 import java.math.BigDecimal

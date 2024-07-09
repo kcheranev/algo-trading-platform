@@ -8,17 +8,14 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
-import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.infra.adapter.income.web.model.request.TradeSessionSearchRequestDto
-import ru.kcheranev.trading.infra.adapter.income.web.model.response.TradeSessionSearchResponseDto
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
+import ru.kcheranev.trading.domain.model.StrategyParameters
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.SearchTradeSessionRequestDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.TradeSessionSearchResponseDto
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeSessionCache
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
 import ru.kcheranev.trading.test.IntegrationTest
 import java.time.LocalDateTime
 import java.util.UUID
@@ -26,7 +23,6 @@ import java.util.UUID
 @IntegrationTest
 class SearchTradeSessionIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
-    private val strategyConfigurationRepository: StrategyConfigurationRepository,
     private val tradeSessionCache: TradeSessionCache,
     private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
@@ -34,15 +30,6 @@ class SearchTradeSessionIntegrationTest(
     extensions(resetTestContextExtensions)
 
     beforeEach {
-        val strategyConfiguration =
-            strategyConfigurationRepository.save(
-                StrategyConfigurationEntity(
-                    null,
-                    "MOVING_MOMENTUM_LONG",
-                    CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param1" to 1))
-                )
-            )
         val tradeSession1Id = UUID.randomUUID()
         tradeSessionCache.put(
             tradeSession1Id,
@@ -55,7 +42,8 @@ class SearchTradeSessionIntegrationTest(
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 strategy = mockk(),
-                strategyConfigurationId = StrategyConfigurationId(strategyConfiguration.id!!)
+                strategyType = "DUMMY",
+                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
             )
         )
         val tradeSession2Id = UUID.randomUUID()
@@ -70,7 +58,8 @@ class SearchTradeSessionIntegrationTest(
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 strategy = mockk(),
-                strategyConfigurationId = StrategyConfigurationId(strategyConfiguration.id!!)
+                strategyType = "DUMMY",
+                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
             )
         )
     }
@@ -79,7 +68,7 @@ class SearchTradeSessionIntegrationTest(
         //when
         val response = testRestTemplate.postForEntity(
             "/trade-sessions/search",
-            TradeSessionSearchRequestDto(),
+            SearchTradeSessionRequestDto(),
             TradeSessionSearchResponseDto::class.java
         )
 

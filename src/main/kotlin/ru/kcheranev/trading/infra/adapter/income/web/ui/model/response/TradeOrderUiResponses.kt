@@ -1,0 +1,18 @@
+package ru.kcheranev.trading.infra.adapter.income.web.ui.model.response
+
+import ru.kcheranev.trading.domain.model.TradeDirection
+import java.math.BigDecimal
+import java.time.LocalDateTime
+import java.util.UUID
+
+data class TradeOrderUiDto(
+    val id: UUID,
+    val ticker: String,
+    val instrumentId: String,
+    val date: LocalDateTime,
+    val lotsQuantity: Int,
+    val totalPrice: BigDecimal,
+    val executedCommission: BigDecimal,
+    val direction: TradeDirection,
+    val tradeSessionId: UUID
+)

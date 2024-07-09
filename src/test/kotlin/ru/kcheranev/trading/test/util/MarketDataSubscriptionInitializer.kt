@@ -1,17 +1,18 @@
 package ru.kcheranev.trading.test.util
 
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionCounter
+import ru.kcheranev.trading.domain.model.Instrument
+import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionHolder
 import ru.tinkoff.piapi.core.stream.MarketDataStreamService
 
 class MarketDataSubscriptionInitializer(
-    private val candleSubscriptionCounter: CandleSubscriptionCounter,
+    private val candleSubscriptionHolder: CandleSubscriptionHolder,
     private val marketDataStreamService: MarketDataStreamService
 ) {
 
-    fun init(ticker: String, candleInterval: CandleInterval) {
-        val subscriptionKey = "candles_${ticker}_$candleInterval"
-        candleSubscriptionCounter.addCandleSubscription(subscriptionKey)
+    fun init(instrument: Instrument, candleInterval: CandleInterval) {
+        val subscriptionKey = "candles_${instrument.ticker}_$candleInterval"
+        candleSubscriptionHolder.incrementSubscriptionCount(instrument, candleInterval)
         marketDataStreamService.newStream(subscriptionKey, {}) {}
     }
 

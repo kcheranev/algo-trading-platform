@@ -4,10 +4,10 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import ru.kcheranev.trading.core.port.outcome.persistence.GetStrategyConfigurationCommand
-import ru.kcheranev.trading.core.port.outcome.persistence.SaveStrategyConfigurationCommand
-import ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationPersistencePort
-import ru.kcheranev.trading.core.port.outcome.persistence.StrategyConfigurationSearchCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.GetStrategyConfigurationCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.SaveStrategyConfigurationCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.SearchStrategyConfigurationCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.StrategyConfigurationPersistencePort
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.PersistenceNotFoundException
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.persistenceOutcomeAdapterMapper
@@ -33,7 +33,6 @@ class StrategyConfigurationPersistenceOutcomeAdapter(
         return strategyConfigurationId
     }
 
-
     override fun get(command: GetStrategyConfigurationCommand) =
         strategyConfigurationRepository.findById(command.strategyConfigurationId.value)
             .orElseThrow {
@@ -41,8 +40,8 @@ class StrategyConfigurationPersistenceOutcomeAdapter(
             }
             .let { persistenceOutcomeAdapterMapper.map(it) }
 
-
-    override fun search(command: StrategyConfigurationSearchCommand) =
-        strategyConfigurationRepository.search(command).map { persistenceOutcomeAdapterMapper.map(it) }
+    override fun search(command: SearchStrategyConfigurationCommand) =
+        strategyConfigurationRepository.search(command)
+            .map { persistenceOutcomeAdapterMapper.map(it) }
 
 }

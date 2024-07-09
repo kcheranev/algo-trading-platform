@@ -26,6 +26,6 @@ data class TradeOrderEntity(
     val executedCommission: BigDecimal,
     @Column("direction")
     val direction: TradeDirection,
-    @Column("strategy_configuration_id")
-    val strategyConfigurationId: UUID
+    @Column("trade_session_id")
+    val tradeSessionId: UUID
 )
