@@ -26,4 +26,6 @@ class DummyTestShortStrategyFactory : ShortStrategyFactory() {
 
     override fun strategyName() = "DUMMY"
 
+    override fun strategyParameterNames() = emptyList<String>()
+
 }

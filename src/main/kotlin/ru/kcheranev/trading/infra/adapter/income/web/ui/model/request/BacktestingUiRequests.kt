@@ -2,35 +2,34 @@ package ru.kcheranev.trading.infra.adapter.income.web.ui.model.request
 
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.backtesting.ProfitTypeSort
-import ru.kcheranev.trading.infra.adapter.income.web.ui.model.common.InstrumentUiDto
 import java.math.BigDecimal
 import java.time.LocalDate
 
 data class StrategyAnalyzeRequestUiDto(
-    val strategyType: String,
-    val strategyParams: Map<String, Number>,
-    val instrument: InstrumentUiDto,
-    val candleInterval: CandleInterval,
-    val from: LocalDate,
-    val to: LocalDate
+    var strategyType: String? = null,
+    var strategyParams: MutableList<StrategyParamDto> = mutableListOf(),
+    var instrument: InstrumentUiRequestDto? = null,
+    var candleInterval: CandleInterval? = null,
+    var from: LocalDate? = null,
+    var to: LocalDate? = null
 )
 
 data class StrategyAdjustAndAnalyzeRequestUiDto(
-    val strategyType: String,
-    val strategyParams: Map<String, Number> = emptyMap(),
-    val mutableStrategyParams: Map<String, Number> = emptyMap(),
-    val adjustFactor: BigDecimal,
-    val adjustVariantCount: Int,
-    val resultFilter: StrategyAnalyzeResultFilterUiDto?,
-    val profitTypeSort: ProfitTypeSort?,
-    val instrument: InstrumentUiDto,
-    val candleInterval: CandleInterval,
-    val from: LocalDate,
-    val to: LocalDate
+    var strategyType: String?,
+    var strategyParams: MutableList<StrategyParamDto> = mutableListOf(),
+    var mutableStrategyParams: MutableList<StrategyParamDto> = mutableListOf(),
+    var adjustFactor: BigDecimal?,
+    var adjustVariantCount: Int?,
+    var resultFilter: StrategyAnalyzeResultFilterUiDto?,
+    var profitTypeSort: ProfitTypeSort?,
+    var instrument: InstrumentUiRequestDto?,
+    var candleInterval: CandleInterval?,
+    var from: LocalDate?,
+    var to: LocalDate?
 )
 
 data class StrategyAnalyzeResultFilterUiDto(
-    val resultsLimit: Int?,
-    val minProfitLossPositionsRatio: BigDecimal?,
-    val tradesByDayCountFactor: BigDecimal?
+    var resultsLimit: Int?,
+    var minProfitLossPositionsRatio: BigDecimal?,
+    var tradesByDayCountFactor: BigDecimal?
 )

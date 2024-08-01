@@ -14,8 +14,13 @@ import org.ta4j.core.rules.CrossedDownIndicatorRule
 import org.ta4j.core.rules.UnderIndicatorRule
 import ru.kcheranev.trading.core.StrategyParamValidationException
 import ru.kcheranev.trading.core.config.TradingProperties
+import ru.kcheranev.trading.core.strategy.factory.RsiBollingerStrategyParameter.BOLLINGER_LENGTH
+import ru.kcheranev.trading.core.strategy.factory.RsiBollingerStrategyParameter.OVER_BOUGHT
+import ru.kcheranev.trading.core.strategy.factory.RsiBollingerStrategyParameter.OVER_SOLD
+import ru.kcheranev.trading.core.strategy.factory.RsiBollingerStrategyParameter.RSI_LENGTH
 import ru.kcheranev.trading.core.strategy.rule.EndTradingTimeRule
 import ru.kcheranev.trading.domain.model.CustomizedBarSeries
+import ru.kcheranev.trading.domain.model.StrategyParameter
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.TradeStrategy
 import kotlin.math.max
@@ -28,10 +33,10 @@ class RsiBollingerLongStrategyFactory(
     private val endTradingTime = tradingProperties.endTradingTime
 
     override fun initStrategy(params: StrategyParameters, series: CustomizedBarSeries): TradeStrategy {
-        val overSold = params.getAsInt("overSold")
-        val overBought = params.getAsInt("overBought")
-        val rsiLength = params.getAsInt("rsiLength")
-        val bollingerLength = params.getAsInt("bollingerLength")
+        val overSold = params.getAsInt(OVER_SOLD)
+        val overBought = params.getAsInt(OVER_BOUGHT)
+        val rsiLength = params.getAsInt(RSI_LENGTH)
+        val bollingerLength = params.getAsInt(BOLLINGER_LENGTH)
 
         if (overSold >= overBought) {
             throw StrategyParamValidationException("overSold must be greater than overBought")
@@ -62,5 +67,18 @@ class RsiBollingerLongStrategyFactory(
     }
 
     override fun strategyName() = "RSI_BOLLINGER"
+
+    override fun strategyParameterNames() = RsiBollingerStrategyParameter.values().map { it.alias() }
+
+}
+
+private enum class RsiBollingerStrategyParameter(private val alias: String) : StrategyParameter {
+
+    OVER_SOLD("overSold"),
+    OVER_BOUGHT("overBought"),
+    RSI_LENGTH("rsiLength"),
+    BOLLINGER_LENGTH("bollingerLength");
+
+    override fun alias() = alias
 
 }

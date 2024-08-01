@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<body>
+<th:block layout:fragment="content">
+    <h3 class="mb-5">Backtesting analyze</h3>
+    <form id="analyzeForm" action="#" th:action="@{/ui/backtesting/analyze}" th:object="${analyzeStrategyRequest}"
+          method="post" class="row g-3 mb-3">
+        <div class="col-6">
+            <label for="strategyType" class="form-label">Strategy type</label>
+            <select id="strategyType" class="form-select" th:field="*{strategyType}">
+                <option value="" selected hidden>Select a strategy type</option>
+                <option th:each="strategyType : ${strategyTypes}"
+                        th:value="${strategyType}"
+                        th:text="${strategyType}">
+                    Strategy type
+                </option>
+            </select>
+        </div>
+        <div class="col-6">
+            <label for="candleInterval" class="form-label">Candle interval</label>
+            <select id="candleInterval" class="form-select" th:field="*{candleInterval}">
+                <option value="" selected hidden>Select a candle interval</option>
+                <option th:each="candleInterval : ${candleIntervals}"
+                        th:value="${candleInterval}"
+                        th:text="${candleInterval}">
+                    Candle interval
+                </option>
+            </select>
+        </div>
+        <div class="col-6">
+            <label for="instrumentId" class="form-label">Instrument id</label>
+            <input id="instrumentId" type="text" class="form-control" th:field="*{instrument.id}">
+        </div>
+        <div class="col-6">
+            <label for="instrumentTicker" class="form-label">Ticker</label>
+            <input id="instrumentTicker" type="text" class="form-control" th:field="*{instrument.ticker}">
+        </div>
+        <div class="col-6">
+            <label for="fromDate" class="form-label">Date from</label>
+            <input id="fromDate" type="date" name="from" class="form-control" th:value="*{from}">
+        </div>
+        <div class="col-6">
+            <label for="toDate" class="form-label">Date to</label>
+            <input id="toDate" type="date" name="to" class="form-control" th:value="*{to}">
+        </div>
+        <div class="col-12" th:if="*{not #lists.isEmpty(strategyParams)}">
+            <span>Strategy parameters</span>
+        </div>
+        <th:block th:each="strategyParam,strategyParamStat : *{strategyParams}">
+            <div class="col-6">
+                <input type="text" class="form-control" readonly
+                       th:field="*{strategyParams[__${strategyParamStat.index}__].name}">
+            </div>
+            <div class="col-6">
+                <input type="text" class="form-control"
+                       th:field="*{strategyParams[__${strategyParamStat.index}__].value}">
+            </div>
+        </th:block>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Analyze</button>
+        </div>
+    </form>
+
+    <th:block th:if="${analyzeResult != null}">
+        <table class="table caption-top w-50">
+            <caption>Strategy analyze results</caption>
+            <tbody>
+            <tr>
+                <td>Total gross profit</td>
+                <td th:text="${#numbers.formatDecimal(analyzeResult.totalGrossProfit,1,4)}"></td>
+            </tr>
+            <tr>
+                <td>Total net profit</td>
+                <td th:text="${#numbers.formatDecimal(analyzeResult.totalNetProfit,1,4)}"></td>
+            </tr>
+            <tr>
+                <td>Total profit position count</td>
+                <td th:text="${analyzeResult.profitPositionsTotalCount}"></td>
+            </tr>
+            <tr>
+                <td>Total losing position count</td>
+                <td th:text="${analyzeResult.losingPositionsTotalCount}"></td>
+            </tr>
+            <tr>
+                <td>Not closed positions count</td>
+                <td th:text="${analyzeResult.notClosedPositionsCount}"></td>
+            </tr>
+            <tr>
+                <td>Trades count</td>
+                <td th:text="${analyzeResult.tradesCount}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="accordion" id="accordionPanelsStayOpenExample">
+            <div class="accordion-item" th:each="dayAnalyzeResult,dayAnalyzeResultStat : ${analyzeResult.results}">
+                <h2 class="accordion-header">
+                    <button class="accordion-button  collapsed" type="button" data-bs-toggle="collapse"
+                            aria-expanded="false" data-bs-target="#panelsStayOpen-" aria-controls="panelsStayOpen-"
+                            th:attrappend="data-bs-target=${dayAnalyzeResultStat.index},aria-controls=${dayAnalyzeResultStat.index}"
+                            th:text="|${dayAnalyzeResult.key} / Gross profit ${#numbers.formatDecimal(dayAnalyzeResult.value.totalGrossProfit,1,4)} / Net profit ${#numbers.formatDecimal(dayAnalyzeResult.value.totalNetProfit,1,4)}|">
+                        Day analyze result
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-" th:attrappend="id=${dayAnalyzeResultStat.index}"
+                     class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <table class="table caption-top w-50">
+                            <caption>Strategy analyze results for a day</caption>
+                            <tbody>
+                            <tr>
+                                <td>Total gross profit</td>
+                                <td th:text="${#numbers.formatDecimal(dayAnalyzeResult.value.totalGrossProfit,1,4)}"></td>
+                            </tr>
+                            <tr>
+                                <td>Total net profit</td>
+                                <td th:text="${#numbers.formatDecimal(dayAnalyzeResult.value.totalNetProfit,1,4)}"></td>
+                            </tr>
+                            <tr>
+                                <td>Profit position count</td>
+                                <td th:text="${dayAnalyzeResult.value.profitPositionsCount}"></td>
+                            </tr>
+                            <tr>
+                                <td>Losing position count</td>
+                                <td th:text="${dayAnalyzeResult.value.losingPositionsCount}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="table  caption-top">
+                            <caption>Trades</caption>
+                            <thead>
+                            <tr>
+                                <th>Entry time</th>
+                                <th>Exit time</th>
+                                <th>Direction</th>
+                                <th>Entry net price</th>
+                                <th>Exit net price</th>
+                                <th>Entry gross price</th>
+                                <th>Exit gross price</th>
+                                <th>Net profit</th>
+                                <th>Gross profit</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="trade : ${dayAnalyzeResult.value.trades}">
+                                <td th:text="${#temporals.format(trade.entry.date, 'HH:mm')}"></td>
+                                <td th:text="${#temporals.format(trade.exit.date, 'HH:mm')}"></td>
+                                <td th:text="${trade.entry.direction.name() == 'BUY'}? 'LONG' : 'SHORT'"></td>
+                                <td th:text="${#numbers.formatDecimal(trade.entry.netPrice,1,4)}"></td>
+                                <td th:text="${#numbers.formatDecimal(trade.exit.netPrice,1,4)}"></td>
+                                <td th:text="${#numbers.formatDecimal(trade.entry.grossPrice,1,4)}"></td>
+                                <td th:text="${#numbers.formatDecimal(trade.exit.grossPrice,1,4)}"></td>
+                                <td th:text="${#numbers.formatDecimal(trade.netProfit,1,4)}"></td>
+                                <td th:text="${#numbers.formatDecimal(trade.grossProfit,1,4)}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</th:block>
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        function changeStrategyTypeListener() {
+            return () => {
+                const form = document.querySelector("#analyzeForm");
+                const formData = new FormData(form);
+                formData.append("reloadStrategyParameters", "")
+                fetch("[(@{/ui/backtesting/analyze})]", {
+                    method: "POST",
+                    body: formData
+                }).then(response => {
+                    response.text()
+                        .then(responseText => {
+                            const htmlPage = new DOMParser().parseFromString(responseText, "text/html");
+                            document.querySelector("#analyzeForm").replaceWith(htmlPage.querySelector("#analyzeForm"));
+                            document.querySelector("#strategyType")
+                                .addEventListener("change", changeStrategyTypeListener());
+                        });
+                });
+            }
+        }
+
+        document.querySelector("#strategyType")
+            .addEventListener("change", changeStrategyTypeListener());
+    </script>
+</th:block>
+</body>
+</html>

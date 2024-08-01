@@ -15,6 +15,8 @@ interface StrategyFactory {
 
     fun strategyType(): String
 
+    fun strategyParameterNames(): List<String>
+
 }
 
 abstract class LongStrategyFactory : StrategyFactory {

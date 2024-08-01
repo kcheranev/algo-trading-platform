@@ -7,4 +7,6 @@ class StrategyFactoryProvider(private val strategyFactories: List<StrategyFactor
 
     fun getStrategyFactory(strategyType: String) = strategyFactories.first { it.strategyType() == strategyType }
 
+    fun getStrategyTypes() = strategyFactories.map { it.strategyType() }
+
 }

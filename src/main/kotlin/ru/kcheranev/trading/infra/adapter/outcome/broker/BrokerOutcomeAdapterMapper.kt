@@ -39,14 +39,12 @@ abstract class BrokerOutcomeAdapterMapper {
 
     fun mapToSubscriptionInterval(source: CandleInterval) =
         when (source) {
-            CandleInterval.UNDEFINED -> throw UnexpectedCandleIntervalException(source)
             CandleInterval.ONE_MIN -> SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE
             CandleInterval.FIVE_MIN -> SubscriptionInterval.SUBSCRIPTION_INTERVAL_FIVE_MINUTES
         }
 
     fun mapToBrokerCandleInterval(source: CandleInterval) =
         when (source) {
-            CandleInterval.UNDEFINED -> throw UnexpectedCandleIntervalException(source)
             CandleInterval.ONE_MIN -> ru.tinkoff.piapi.contract.v1.CandleInterval.CANDLE_INTERVAL_1_MIN
             CandleInterval.FIVE_MIN -> ru.tinkoff.piapi.contract.v1.CandleInterval.CANDLE_INTERVAL_5_MIN
         }
