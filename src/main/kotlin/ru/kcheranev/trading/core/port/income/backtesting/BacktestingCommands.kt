@@ -9,7 +9,7 @@ import java.time.LocalDate
 
 data class StrategyAnalyzeCommand(
     val strategyType: String,
-    val strategyParams: StrategyParameters,
+    val strategyParameters: StrategyParameters,
     val instrument: Instrument,
     val candleInterval: CandleInterval,
     val from: LocalDate,
@@ -18,8 +18,8 @@ data class StrategyAnalyzeCommand(
 
 data class StrategyAdjustAndAnalyzeCommand(
     val strategyType: String,
-    val strategyParams: StrategyParameters,
-    val mutableStrategyParams: StrategyParameters,
+    val strategyParameters: StrategyParameters,
+    val mutableStrategyParameters: StrategyParameters,
     val adjustFactor: BigDecimal,
     val adjustVariantCount: Int,
     val resultFilter: StrategyAnalyzeResultFilter?,

@@ -1,27 +1,39 @@
 package ru.kcheranev.trading.infra.adapter.income.web.rest.model.mapper
 
 import org.mapstruct.Mapper
+import org.mapstruct.Mapping
+import org.mapstruct.Named
 import org.mapstruct.factory.Mappers
 import ru.kcheranev.trading.core.port.income.backtesting.StrategyAdjustAndAnalyzeCommand
 import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeCommand
-import ru.kcheranev.trading.domain.model.backtesting.PeriodStrategyAnalyzeResult
-import ru.kcheranev.trading.domain.model.backtesting.StrategyAdjustAndAnalyzeResult
+import ru.kcheranev.trading.domain.model.backtesting.DailyStrategyAnalyzeResult
+import ru.kcheranev.trading.domain.model.backtesting.ParametrizedStrategyResult
+import ru.kcheranev.trading.domain.model.backtesting.StrategyAnalyzeResult
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StrategyAdjustAndAnalyzeRequestDto
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StrategyAnalyzeRequestDto
-import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.PeriodStrategyAnalyzeResultDto
-import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.StrategyAdjustAndAnalyzeDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.DailyStrategyAnalyzeResultDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.ParametrizedStrategyAnalyzeResultDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.StrategyAnalyzeResultDto
 import ru.kcheranev.trading.infra.adapter.mapper.EntityIdMapper
 
 @Mapper(uses = [EntityIdMapper::class])
-interface BacktestingWebIncomeAdapterMapper {
+abstract class BacktestingWebIncomeAdapterMapper {
 
-    fun map(source: StrategyAnalyzeRequestDto): StrategyAnalyzeCommand
+    abstract fun map(source: StrategyAnalyzeRequestDto): StrategyAnalyzeCommand
 
-    fun map(source: StrategyAdjustAndAnalyzeRequestDto): StrategyAdjustAndAnalyzeCommand
+    abstract fun map(source: StrategyAdjustAndAnalyzeRequestDto): StrategyAdjustAndAnalyzeCommand
 
-    fun map(source: PeriodStrategyAnalyzeResult): PeriodStrategyAnalyzeResultDto
+    @Mapping(target = "results", source = ".", qualifiedByName = ["mapResults"])
+    abstract fun map(source: StrategyAnalyzeResult): StrategyAnalyzeResultDto
 
-    fun map(source: StrategyAdjustAndAnalyzeResult): StrategyAdjustAndAnalyzeDto
+    @Named("mapResults")
+    fun mapResults(source: StrategyAnalyzeResult) =
+        source.splitByDay()
+            .mapValues { map(it.value) }
+
+    abstract fun map(source: DailyStrategyAnalyzeResult): DailyStrategyAnalyzeResultDto
+
+    abstract fun map(source: ParametrizedStrategyResult): ParametrizedStrategyAnalyzeResultDto
 
 }
 

@@ -7,15 +7,15 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import org.springframework.http.HttpStatus
-import ru.kcheranev.trading.domain.entity.TradeSession
-import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.SearchTradeSessionRequestDto
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.TradeSessionSearchResponseDto
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeSessionCache
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeStrategyCache
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.test.IntegrationTest
 import java.time.LocalDateTime
 import java.util.UUID
@@ -23,7 +23,8 @@ import java.util.UUID
 @IntegrationTest
 class SearchTradeSessionIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
-    private val tradeSessionCache: TradeSessionCache,
+    private val jdbcTemplate: JdbcAggregateTemplate,
+    private val tradeStrategyCache: TradeStrategyCache,
     private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
 
@@ -31,37 +32,37 @@ class SearchTradeSessionIntegrationTest(
 
     beforeEach {
         val tradeSession1Id = UUID.randomUUID()
-        tradeSessionCache.put(
-            tradeSession1Id,
-            TradeSession(
-                id = TradeSessionId(tradeSession1Id),
+        jdbcTemplate.insert(
+            TradeSessionEntity(
+                id = tradeSession1Id,
                 ticker = "SBER",
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.WAITING,
                 startDate = LocalDateTime.parse("2024-01-01T10:15:30"),
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
-                strategy = mockk(),
+                lotsQuantityInPosition = 0,
                 strategyType = "DUMMY",
-                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
+                strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
         )
+        tradeStrategyCache.put(tradeSession1Id, mockk())
         val tradeSession2Id = UUID.randomUUID()
-        tradeSessionCache.put(
-            tradeSession2Id,
-            TradeSession(
-                id = TradeSessionId(tradeSession2Id),
+        jdbcTemplate.insert(
+            TradeSessionEntity(
+                id = tradeSession2Id,
                 ticker = "MOEX",
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b2",
                 status = TradeSessionStatus.WAITING,
                 startDate = LocalDateTime.parse("2024-01-01T10:15:30"),
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
-                strategy = mockk(),
+                lotsQuantityInPosition = 0,
                 strategyType = "DUMMY",
-                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
+                strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
         )
+        tradeStrategyCache.put(tradeSession2Id, mockk())
     }
 
     "should search trade sessions" {

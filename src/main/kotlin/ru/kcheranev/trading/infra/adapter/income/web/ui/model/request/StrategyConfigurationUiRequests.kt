@@ -7,9 +7,10 @@ import ru.kcheranev.trading.domain.model.CandleInterval
 import java.util.UUID
 
 data class CreateStrategyConfigurationRequestUiDto(
+    val name: String,
     val type: String,
     val candleInterval: CandleInterval,
-    val params: Map<String, Number>
+    val parameters: Map<String, Number>
 )
 
 data class SearchStrategyConfigurationRequestUiDto(

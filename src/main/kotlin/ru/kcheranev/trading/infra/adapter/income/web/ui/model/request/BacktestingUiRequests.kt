@@ -7,8 +7,8 @@ import java.time.LocalDate
 
 data class StrategyAnalyzeRequestUiDto(
     var strategyType: String? = null,
-    var strategyParams: MutableList<StrategyParamDto> = mutableListOf(),
-    var instrument: InstrumentUiRequestDto? = null,
+    var strategyParameters: MutableList<StrategyParameterUiDto> = mutableListOf(),
+    var instrument: InstrumentRequestUiDto? = null,
     var candleInterval: CandleInterval? = null,
     var from: LocalDate? = null,
     var to: LocalDate? = null
@@ -16,13 +16,13 @@ data class StrategyAnalyzeRequestUiDto(
 
 data class StrategyAdjustAndAnalyzeRequestUiDto(
     var strategyType: String?,
-    var strategyParams: MutableList<StrategyParamDto> = mutableListOf(),
-    var mutableStrategyParams: MutableList<StrategyParamDto> = mutableListOf(),
+    var strategyParameters: MutableList<StrategyParameterUiDto> = mutableListOf(),
+    var mutableStrategyParameters: MutableList<StrategyParameterUiDto> = mutableListOf(),
     var adjustFactor: BigDecimal?,
     var adjustVariantCount: Int?,
     var resultFilter: StrategyAnalyzeResultFilterUiDto?,
     var profitTypeSort: ProfitTypeSort?,
-    var instrument: InstrumentUiRequestDto?,
+    var instrument: InstrumentRequestUiDto?,
     var candleInterval: CandleInterval?,
     var from: LocalDate?,
     var to: LocalDate?

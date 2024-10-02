@@ -21,14 +21,16 @@ class MarketDataProcessingService(
 
     private val availableDelayedCandleCount = tradingProperties.availableDelayedCandleCount
 
+    private val tradingSchedule = tradingProperties.tradingSchedule
+
     override fun processIncomeCandle(command: ProcessIncomeCandleCommand) {
         val candle = command.candle
-        tradeSessionPersistencePort.getReadyToOrderTradeSessions(
+        tradeSessionPersistencePort.getReadyForOrderTradeSessions(
             GetReadyToOrderTradeSessionsCommand(candle.instrumentId, candle.interval)
         ).forEach { tradeSession ->
             try {
                 transactionalTemplate.execute {
-                    tradeSession.processIncomeCandle(candle, availableDelayedCandleCount.toLong())
+                    tradeSession.processIncomeCandle(candle, availableDelayedCandleCount.toLong(), tradingSchedule)
                     tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
                 }
             } catch (ex: Exception) {

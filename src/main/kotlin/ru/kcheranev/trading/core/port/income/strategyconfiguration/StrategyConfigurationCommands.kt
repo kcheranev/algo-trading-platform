@@ -9,9 +9,10 @@ import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.StrategyParameters
 
 data class CreateStrategyConfigurationCommand(
+    val name: String,
     val type: String,
     val candleInterval: CandleInterval,
-    val params: StrategyParameters
+    val parameters: StrategyParameters
 )
 
 data class SearchStrategyConfigurationCommand @Default constructor(

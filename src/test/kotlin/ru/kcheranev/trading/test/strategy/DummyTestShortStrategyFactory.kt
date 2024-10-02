@@ -13,7 +13,7 @@ import java.math.BigDecimal
 class DummyTestShortStrategyFactory : ShortStrategyFactory() {
 
     override fun initStrategy(
-        params: StrategyParameters,
+        parameters: StrategyParameters,
         series: CustomizedBarSeries
     ): TradeStrategy {
         val closePrice = ClosePriceIndicator(series)

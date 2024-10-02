@@ -7,7 +7,7 @@ import ru.kcheranev.trading.core.port.income.strategyconfiguration.CreateStrateg
 import ru.kcheranev.trading.core.port.income.strategyconfiguration.SearchStrategyConfigurationCommand
 import ru.kcheranev.trading.core.port.income.strategyconfiguration.SearchStrategyConfigurationUseCase
 import ru.kcheranev.trading.core.port.mapper.commandMapper
-import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.SaveStrategyConfigurationCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.InsertStrategyConfigurationCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.StrategyConfigurationPersistencePort
 import ru.kcheranev.trading.domain.entity.StrategyConfiguration
 
@@ -21,11 +21,12 @@ class StrategyConfigurationService(
     override fun createStrategyConfiguration(command: CreateStrategyConfigurationCommand) {
         val strategyConfiguration =
             StrategyConfiguration.create(
+                name = command.name,
                 type = command.type,
                 candleInterval = command.candleInterval,
-                params = command.params
+                parameters = command.parameters
             )
-        strategyConfigurationPersistencePort.save(SaveStrategyConfigurationCommand(strategyConfiguration))
+        strategyConfigurationPersistencePort.insert(InsertStrategyConfigurationCommand(strategyConfiguration))
     }
 
     override fun search(command: SearchStrategyConfigurationCommand) =

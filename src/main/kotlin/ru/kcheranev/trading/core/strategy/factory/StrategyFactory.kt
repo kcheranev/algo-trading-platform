@@ -9,7 +9,7 @@ import ru.kcheranev.trading.domain.model.TradeStrategy
 interface StrategyFactory {
 
     fun initStrategy(
-        params: StrategyParameters,
+        parameters: StrategyParameters,
         series: CustomizedBarSeries
     ): TradeStrategy
 

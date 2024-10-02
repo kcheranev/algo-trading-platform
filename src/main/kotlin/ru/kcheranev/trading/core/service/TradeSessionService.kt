@@ -9,6 +9,8 @@ import ru.kcheranev.trading.core.port.income.tradesession.EnterTradeSessionComma
 import ru.kcheranev.trading.core.port.income.tradesession.EnterTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.ExitTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.ExitTradeSessionUseCase
+import ru.kcheranev.trading.core.port.income.tradesession.ReinitStrategyCommand
+import ru.kcheranev.trading.core.port.income.tradesession.ResumeTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.SearchTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.SearchTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.StartTradeSessionCommand
@@ -16,20 +18,20 @@ import ru.kcheranev.trading.core.port.income.tradesession.StartTradeSessionUseCa
 import ru.kcheranev.trading.core.port.income.tradesession.StopTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.StopTradeSessionUseCase
 import ru.kcheranev.trading.core.port.mapper.commandMapper
-import ru.kcheranev.trading.core.port.outcome.broker.GetLastHistoricCandlesCommand
-import ru.kcheranev.trading.core.port.outcome.broker.HistoricCandleBrokerPort
 import ru.kcheranev.trading.core.port.outcome.broker.OrderServiceBrokerPort
 import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceBuyOrderCommand
 import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceSellOrderCommand
 import ru.kcheranev.trading.core.port.outcome.broker.model.PostOrderResponse
 import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.GetStrategyConfigurationCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.StrategyConfigurationPersistencePort
-import ru.kcheranev.trading.core.port.outcome.persistence.tradeorder.SaveOrderCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.tradeorder.InsertTradeOrderCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.tradeorder.TradeOrderPersistencePort
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.GetTradeSessionCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.InsertTradeSessionCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.SaveTradeSessionCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.TradeSessionPersistencePort
-import ru.kcheranev.trading.core.strategy.factory.StrategyFactoryProvider
+import ru.kcheranev.trading.core.port.service.TradeStrategyServicePort
+import ru.kcheranev.trading.core.port.service.command.InitTradeStrategyCommand
 import ru.kcheranev.trading.domain.entity.TradeOrder
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
@@ -38,18 +40,18 @@ import ru.kcheranev.trading.domain.model.TradeDirection
 @Service
 class TradeSessionService(
     tradingProperties: TradingProperties,
+    private val tradeStrategyServicePort: TradeStrategyServicePort,
     private val strategyConfigurationPersistencePort: StrategyConfigurationPersistencePort,
     private val tradeSessionPersistencePort: TradeSessionPersistencePort,
     private val orderServiceBrokerPort: OrderServiceBrokerPort,
     private val tradeOrderPersistencePort: TradeOrderPersistencePort,
-    private val historicCandleBrokerPort: HistoricCandleBrokerPort,
-    private val strategyFactoryProvider: StrategyFactoryProvider,
     private val dateSupplier: DateSupplier
 ) : SearchTradeSessionUseCase,
     StartTradeSessionUseCase,
     EnterTradeSessionUseCase,
     ExitTradeSessionUseCase,
-    StopTradeSessionUseCase {
+    StopTradeSessionUseCase,
+    ResumeTradeSessionUseCase {
 
     private val placeOrderRetryCount = tradingProperties.placeOrderRetryCount
 
@@ -59,29 +61,25 @@ class TradeSessionService(
             strategyConfigurationPersistencePort.get(
                 GetStrategyConfigurationCommand(command.strategyConfigurationId)
             )
-        val strategyFactory = strategyFactoryProvider.getStrategyFactory(strategyConfiguration.type)
+        val tradeStrategy =
+            tradeStrategyServicePort.initTradeStrategy(
+                InitTradeStrategyCommand(
+                    strategyType = strategyConfiguration.type,
+                    instrument = command.instrument,
+                    candleInterval = strategyConfiguration.candleInterval,
+                    strategyParameters = strategyConfiguration.parameters
+                )
+            )
         val tradeSession =
             TradeSession.start(
                 strategyConfiguration = strategyConfiguration,
                 ticker = command.instrument.ticker,
                 instrumentId = command.instrument.id,
                 lotsQuantity = command.lotsQuantity,
-                strategyFactory = strategyFactory,
+                tradeStrategy = tradeStrategy,
                 dateSupplier = dateSupplier
             )
-        val initCandlesAmount = tradeSession.strategy.unstableBars
-        if (initCandlesAmount > 0) {
-            val candles =
-                historicCandleBrokerPort.getLastHistoricCandles(
-                    GetLastHistoricCandlesCommand(
-                        command.instrument,
-                        strategyConfiguration.candleInterval,
-                        initCandlesAmount
-                    )
-                )
-            tradeSession.initStrategySeries(candles)
-        }
-        return tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
+        return tradeSessionPersistencePort.insert(InsertTradeSessionCommand(tradeSession))
     }
 
     @Transactional
@@ -90,7 +88,7 @@ class TradeSessionService(
         val postOrderResultAccumulator =
             postOrderWithRetry(tradeSession.lotsQuantity) { remainLotsQuantity ->
                 val postOrderResponse =
-                    if (tradeSession.margin()) {
+                    if (tradeSession.isMargin()) {
                         orderServiceBrokerPort.postBestPriceSellOrder(
                             PostBestPriceSellOrderCommand(tradeSession.instrument, remainLotsQuantity)
                         )
@@ -107,18 +105,18 @@ class TradeSessionService(
                             lotsQuantity = postOrderResponse.lotsExecuted,
                             totalPrice = postOrderResponse.totalPrice,
                             executedCommission = postOrderResponse.executedCommission,
-                            direction = if (tradeSession.margin()) TradeDirection.SELL else TradeDirection.BUY,
-                            tradeSessionId = tradeSession.id!!,
+                            direction = if (tradeSession.isMargin()) TradeDirection.SELL else TradeDirection.BUY,
+                            tradeSessionId = tradeSession.id,
                             dateSupplier = dateSupplier
                         )
-                    tradeOrderPersistencePort.save(SaveOrderCommand(tradeOrder))
+                    tradeOrderPersistencePort.insert(InsertTradeOrderCommand(tradeOrder))
                 }
                 return@postOrderWithRetry postOrderResponse
             }
         if (postOrderResultAccumulator.haveOrders()) {
             tradeSession.enter(postOrderResultAccumulator.lotsExecuted)
         } else {
-            tradeSession.waitForEntry()
+            tradeSession.await()
         }
         tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
     }
@@ -129,7 +127,7 @@ class TradeSessionService(
         val postOrderResultAccumulator =
             postOrderWithRetry(tradeSession.lotsQuantityInPosition) { remainLotsQuantity ->
                 val postOrderResponse =
-                    if (tradeSession.margin()) {
+                    if (tradeSession.isMargin()) {
                         orderServiceBrokerPort.postBestPriceBuyOrder(
                             PostBestPriceBuyOrderCommand(tradeSession.instrument, remainLotsQuantity)
                         )
@@ -146,18 +144,18 @@ class TradeSessionService(
                             lotsQuantity = postOrderResponse.lotsExecuted,
                             totalPrice = postOrderResponse.totalPrice,
                             executedCommission = postOrderResponse.executedCommission,
-                            direction = if (tradeSession.margin()) TradeDirection.BUY else TradeDirection.SELL,
-                            tradeSessionId = tradeSession.id!!,
+                            direction = if (tradeSession.isMargin()) TradeDirection.BUY else TradeDirection.SELL,
+                            tradeSessionId = tradeSession.id,
                             dateSupplier = dateSupplier
                         )
-                    tradeOrderPersistencePort.save(SaveOrderCommand(tradeOrder))
+                    tradeOrderPersistencePort.insert(InsertTradeOrderCommand(tradeOrder))
                 }
                 return@postOrderWithRetry postOrderResponse
             }
         if (postOrderResultAccumulator.haveOrders()) {
             tradeSession.exit(postOrderResultAccumulator.lotsExecuted)
         } else {
-            tradeSession.waitForEntry()
+            tradeSession.await()
         }
         tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
     }
@@ -182,6 +180,22 @@ class TradeSessionService(
         val tradeSession = tradeSessionPersistencePort.get(GetTradeSessionCommand(command.tradeSessionId))
         tradeSession.stop()
         tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
+    }
+
+    @Transactional
+    override fun reinitStrategy(command: ReinitStrategyCommand) {
+        val tradeSession = tradeSessionPersistencePort.get(GetTradeSessionCommand(command.tradeSessionId))
+        val tradeStrategy =
+            tradeStrategyServicePort.initTradeStrategy(
+                InitTradeStrategyCommand(
+                    strategyType = tradeSession.strategyType,
+                    instrument = tradeSession.instrument,
+                    candleInterval = tradeSession.candleInterval,
+                    strategyParameters = tradeSession.strategyParameters
+                )
+            )
+        tradeSession.reinitStrategy(tradeStrategy)
+        tradeSession.await()
     }
 
     override fun search(command: SearchTradeSessionCommand) =

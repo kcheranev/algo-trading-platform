@@ -9,6 +9,7 @@ import io.kotest.matchers.ints.shouldBeLessThanOrEqual
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.core.port.model.ComparedField
 import ru.kcheranev.trading.core.port.model.Comparsion
@@ -16,11 +17,14 @@ import ru.kcheranev.trading.core.port.model.Page
 import ru.kcheranev.trading.core.port.model.sort.Sort
 import ru.kcheranev.trading.core.port.model.sort.SortDirection
 import ru.kcheranev.trading.core.port.model.sort.TradeOrderSort
+import ru.kcheranev.trading.domain.entity.TradeSessionStatus
+import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.TradeDirection
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.SearchTradeOrderRequestDto
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.TradeOrderSearchResponseDto
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeOrderRepository
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.test.IntegrationTest
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -29,16 +33,47 @@ import java.util.UUID
 @IntegrationTest
 class SearchTradeOrderIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
-    private val tradeOrderRepository: TradeOrderRepository,
+    private val jdbcTemplate: JdbcAggregateTemplate,
     private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
 
     extensions(resetTestContextExtensions)
 
     beforeEach {
+        val tradeSession1Id = UUID.fromString("e74e3deb-2630-43bb-a37b-a7b59cc66389")
+        jdbcTemplate.insert(
+            TradeSessionEntity(
+                id = tradeSession1Id,
+                ticker = "SBER",
+                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                status = TradeSessionStatus.WAITING,
+                startDate = LocalDateTime.parse("2024-01-01T10:15:30"),
+                candleInterval = CandleInterval.ONE_MIN,
+                lotsQuantity = 10,
+                lotsQuantityInPosition = 0,
+                strategyType = "DUMMY",
+                strategyParameters = MapWrapper(mapOf("paramName" to 1))
+            )
+        )
+        val tradeSession2Id = UUID.randomUUID()
+        jdbcTemplate.insert(
+            TradeSessionEntity(
+                id = tradeSession2Id,
+                ticker = "MOEX",
+                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b2",
+                status = TradeSessionStatus.WAITING,
+                startDate = LocalDateTime.parse("2024-01-01T10:15:30"),
+                candleInterval = CandleInterval.ONE_MIN,
+                lotsQuantity = 10,
+                lotsQuantityInPosition = 0,
+                strategyType = "DUMMY",
+                strategyParameters = MapWrapper(mapOf("paramName" to 1))
+            )
+        )
         val tradeOrders =
             listOf(
                 TradeOrderEntity(
+                    id = UUID.randomUUID(),
                     ticker = "SBER",
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                     date = LocalDateTime.parse("2024-01-01T10:15:35"),
@@ -46,9 +81,10 @@ class SearchTradeOrderIntegrationTest(
                     totalPrice = BigDecimal(100),
                     executedCommission = BigDecimal(1),
                     direction = TradeDirection.BUY,
-                    tradeSessionId = UUID.fromString("6c88b2bc-ee2a-4cdc-9c22-e1b6338411b3")
+                    tradeSessionId = tradeSession1Id
                 ),
                 TradeOrderEntity(
+                    id = UUID.randomUUID(),
                     ticker = "SBER",
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                     date = LocalDateTime.parse("2024-01-01T10:15:40"),
@@ -56,9 +92,10 @@ class SearchTradeOrderIntegrationTest(
                     totalPrice = BigDecimal(100),
                     executedCommission = BigDecimal(2),
                     direction = TradeDirection.SELL,
-                    tradeSessionId = UUID.randomUUID()
+                    tradeSessionId = tradeSession2Id
                 ),
                 TradeOrderEntity(
+                    id = UUID.randomUUID(),
                     ticker = "SBER",
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                     date = LocalDateTime.parse("2024-01-01T10:15:45"),
@@ -66,9 +103,10 @@ class SearchTradeOrderIntegrationTest(
                     totalPrice = BigDecimal(110),
                     executedCommission = BigDecimal(3),
                     direction = TradeDirection.BUY,
-                    tradeSessionId = UUID.randomUUID()
+                    tradeSessionId = tradeSession2Id
                 ),
                 TradeOrderEntity(
+                    id = UUID.randomUUID(),
                     ticker = "SBER",
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                     date = LocalDateTime.parse("2024-01-01T10:15:50"),
@@ -76,9 +114,10 @@ class SearchTradeOrderIntegrationTest(
                     totalPrice = BigDecimal(120),
                     executedCommission = BigDecimal(4),
                     direction = TradeDirection.SELL,
-                    tradeSessionId = UUID.randomUUID()
+                    tradeSessionId = tradeSession2Id
                 ),
                 TradeOrderEntity(
+                    id = UUID.randomUUID(),
                     ticker = "SBER",
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                     date = LocalDateTime.parse("2024-01-01T10:15:55"),
@@ -86,9 +125,10 @@ class SearchTradeOrderIntegrationTest(
                     totalPrice = BigDecimal(130),
                     executedCommission = BigDecimal(5),
                     direction = TradeDirection.BUY,
-                    tradeSessionId = UUID.randomUUID()
+                    tradeSessionId = tradeSession2Id
                 ),
                 TradeOrderEntity(
+                    id = UUID.randomUUID(),
                     ticker = "SBER",
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                     date = LocalDateTime.parse("2024-01-01T10:16:00"),
@@ -96,9 +136,10 @@ class SearchTradeOrderIntegrationTest(
                     totalPrice = BigDecimal(140),
                     executedCommission = BigDecimal(6),
                     direction = TradeDirection.SELL,
-                    tradeSessionId = UUID.randomUUID()
+                    tradeSessionId = tradeSession2Id
                 ),
                 TradeOrderEntity(
+                    id = UUID.randomUUID(),
                     ticker = "SBER",
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                     date = LocalDateTime.parse("2024-01-01T10:16:05"),
@@ -106,9 +147,10 @@ class SearchTradeOrderIntegrationTest(
                     totalPrice = BigDecimal(150),
                     executedCommission = BigDecimal(7),
                     direction = TradeDirection.BUY,
-                    tradeSessionId = UUID.randomUUID()
+                    tradeSessionId = tradeSession2Id
                 ),
                 TradeOrderEntity(
+                    id = UUID.randomUUID(),
                     ticker = "MOEX",
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b2",
                     date = LocalDateTime.parse("2024-01-01T10:15:35"),
@@ -116,10 +158,10 @@ class SearchTradeOrderIntegrationTest(
                     totalPrice = BigDecimal(100),
                     executedCommission = BigDecimal(1),
                     direction = TradeDirection.BUY,
-                    tradeSessionId = UUID.randomUUID()
+                    tradeSessionId = tradeSession2Id
                 )
             )
-        tradeOrderRepository.saveAll(tradeOrders)
+        jdbcTemplate.insertAll(tradeOrders)
     }
 
     "should search trade orders" {
@@ -294,7 +336,7 @@ class SearchTradeOrderIntegrationTest(
         //given
         val request =
             SearchTradeOrderRequestDto(
-                tradeSessionId = UUID.fromString("6c88b2bc-ee2a-4cdc-9c22-e1b6338411b3")
+                tradeSessionId = UUID.fromString("e74e3deb-2630-43bb-a37b-a7b59cc66389")
             )
 
         //when
@@ -312,7 +354,7 @@ class SearchTradeOrderIntegrationTest(
         val tradeOrdersResult = response.body!!.tradeOrders
         tradeOrdersResult.size shouldBe 1
         tradeOrdersResult.forEach {
-            it.tradeSessionId shouldBe UUID.fromString("6c88b2bc-ee2a-4cdc-9c22-e1b6338411b3")
+            it.tradeSessionId shouldBe UUID.fromString("e74e3deb-2630-43bb-a37b-a7b59cc66389")
         }
     }
 

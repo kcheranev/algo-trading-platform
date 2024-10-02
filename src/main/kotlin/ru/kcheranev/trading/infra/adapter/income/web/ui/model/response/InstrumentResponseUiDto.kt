@@ -1,6 +1,6 @@
 package ru.kcheranev.trading.infra.adapter.income.web.ui.model.response
 
-data class InstrumentUiResponseDto(
+data class InstrumentResponseUiDto(
     val id: String,
     val ticker: String
 )

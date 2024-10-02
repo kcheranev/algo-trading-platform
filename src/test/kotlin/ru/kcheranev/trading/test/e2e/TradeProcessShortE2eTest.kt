@@ -6,6 +6,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.core.port.income.marketdata.ProcessIncomeCandleCommand
 import ru.kcheranev.trading.core.service.MarketDataProcessingService
@@ -17,10 +18,9 @@ import ru.kcheranev.trading.infra.adapter.income.web.rest.model.common.Instrumen
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StartTradeSessionRequestDto
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.StartTradeSessionResponseDto
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeSessionCache
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeOrderRepository
 import ru.kcheranev.trading.test.IntegrationTest
 import ru.kcheranev.trading.test.stub.grpc.MarketDataBrokerGrpcStub
 import ru.kcheranev.trading.test.stub.grpc.OrdersBrokerGrpcStub
@@ -28,14 +28,13 @@ import ru.kcheranev.trading.test.stub.grpc.UsersBrokerGrpcStub
 import ru.kcheranev.trading.test.stub.http.TelegramNotificationHttpStub
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import java.util.UUID
 
 @IntegrationTest
 class TradeProcessShortE2eTest(
     private val marketDataProcessingService: MarketDataProcessingService,
     private val testRestTemplate: TestRestTemplate,
-    private val tradeSessionCache: TradeSessionCache,
-    private val tradeOrderRepository: TradeOrderRepository,
-    private val strategyConfigurationRepository: StrategyConfigurationRepository,
+    private val jdbcTemplate: JdbcAggregateTemplate,
     private val telegramNotificationHttpStub: TelegramNotificationHttpStub,
     private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
@@ -53,12 +52,13 @@ class TradeProcessShortE2eTest(
     "should execute short trade process" {
         //create strategy configuration
         val strategyConfiguration =
-            strategyConfigurationRepository.save(
+            jdbcTemplate.insert(
                 StrategyConfigurationEntity(
-                    null,
-                    "DUMMY_SHORT",
-                    CandleInterval.ONE_MIN,
-                    MapWrapper(emptyMap())
+                    id = UUID.randomUUID(),
+                    name = "dummy",
+                    type = "DUMMY_SHORT",
+                    candleInterval = CandleInterval.ONE_MIN,
+                    parameters = MapWrapper(emptyMap())
                 )
             )
 
@@ -67,7 +67,7 @@ class TradeProcessShortE2eTest(
         val startTradeSessionResponse = testRestTemplate.postForEntity(
             "/trade-sessions",
             StartTradeSessionRequestDto(
-                strategyConfiguration.id!!,
+                strategyConfiguration.id,
                 4,
                 InstrumentDto("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
             ),
@@ -90,7 +90,7 @@ class TradeProcessShortE2eTest(
                     highestPrice = BigDecimal(107),
                     lowestPrice = BigDecimal(105),
                     volume = 10,
-                    endTime = LocalDateTime.parse("2024-01-30T10:17:00"),
+                    endDateTime = LocalDateTime.parse("2024-01-30T10:17:00"),
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
                 )
             )
@@ -105,7 +105,7 @@ class TradeProcessShortE2eTest(
                     highestPrice = BigDecimal(106),
                     lowestPrice = BigDecimal(104),
                     volume = 10,
-                    endTime = LocalDateTime.parse("2024-01-30T10:18:00"),
+                    endDateTime = LocalDateTime.parse("2024-01-30T10:18:00"),
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
                 )
             )
@@ -120,7 +120,7 @@ class TradeProcessShortE2eTest(
                     highestPrice = BigDecimal(105),
                     lowestPrice = BigDecimal(102),
                     volume = 10,
-                    endTime = LocalDateTime.parse("2024-01-30T10:19:00"),
+                    endDateTime = LocalDateTime.parse("2024-01-30T10:19:00"),
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
                 )
             )
@@ -135,7 +135,7 @@ class TradeProcessShortE2eTest(
                     highestPrice = BigDecimal(103),
                     lowestPrice = BigDecimal(101),
                     volume = 10,
-                    endTime = LocalDateTime.parse("2024-01-30T10:20:00"),
+                    endDateTime = LocalDateTime.parse("2024-01-30T10:20:00"),
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
                 )
             )
@@ -150,7 +150,7 @@ class TradeProcessShortE2eTest(
                     highestPrice = BigDecimal(106),
                     lowestPrice = BigDecimal(99),
                     volume = 10,
-                    endTime = LocalDateTime.parse("2024-01-30T10:21:00"),
+                    endDateTime = LocalDateTime.parse("2024-01-30T10:21:00"),
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
                 )
             )
@@ -160,7 +160,7 @@ class TradeProcessShortE2eTest(
         ordersBrokerGrpcStub.verifyForPostSellOrder("post-sell-order.json")
 
         //check orders
-        val orders = tradeOrderRepository.findAll().toList()
+        val orders = jdbcTemplate.findAll(TradeOrderEntity::class.java).toList()
         orders shouldHaveSize 2
         val sellOrder = orders[0]
         with(sellOrder) {
@@ -186,9 +186,9 @@ class TradeProcessShortE2eTest(
         }
 
         //check trade session
-        val tradeSessions = tradeSessionCache.findAll()
+        val tradeSessions = jdbcTemplate.findAll(TradeSessionEntity::class.java)
         tradeSessions shouldHaveSize 1
-        tradeSessions[0].status shouldBe TradeSessionStatus.WAITING
+        tradeSessions.first().status shouldBe TradeSessionStatus.WAITING
     }
 
 })

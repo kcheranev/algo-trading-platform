@@ -1,6 +1,6 @@
 package ru.kcheranev.trading.infra.adapter.income.web.ui.model.request
 
-data class StrategyParamDto(
+data class StrategyParameterUiDto(
     var name: String? = null,
     var value: Number? = null
 ) {

@@ -7,23 +7,24 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import org.ta4j.core.BarSeries
+import io.mockk.spyk
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import org.ta4j.core.BaseBar
 import org.ta4j.core.BaseBarSeriesBuilder
+import org.ta4j.core.Strategy
 import ru.kcheranev.trading.common.date.toMskZonedDateTime
 import ru.kcheranev.trading.core.port.income.marketdata.ProcessIncomeCandleCommand
 import ru.kcheranev.trading.core.service.MarketDataProcessingService
-import ru.kcheranev.trading.domain.entity.TradeSession
-import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
-import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.TradeDirection
 import ru.kcheranev.trading.domain.model.TradeStrategy
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeSessionCache
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.TradeOrderRepository
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeStrategyCache
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.test.IntegrationTest
 import ru.kcheranev.trading.test.stub.grpc.OrdersBrokerGrpcStub
 import ru.kcheranev.trading.test.stub.grpc.UsersBrokerGrpcStub
@@ -37,8 +38,8 @@ import java.util.UUID
 @IntegrationTest
 class ExitTradeSessionWithRetriesIntegrationTest(
     private val marketDataProcessingService: MarketDataProcessingService,
-    private val tradeOrderRepository: TradeOrderRepository,
-    private val tradeSessionCache: TradeSessionCache,
+    private val jdbcTemplate: JdbcAggregateTemplate,
+    private val tradeStrategyCache: TradeStrategyCache,
     private val marketDataSubscriptionInitializer: MarketDataSubscriptionInitializer,
     private val telegramNotificationHttpStub: TelegramNotificationHttpStub,
     private val resetTestContextExtensions: List<Extension>
@@ -54,8 +55,23 @@ class ExitTradeSessionWithRetriesIntegrationTest(
 
     "should exit trade session with retries" {
         //given
-        val mockedSeries: BarSeries = BaseBarSeriesBuilder().build()
-        mockedSeries.addBar(
+        val tradeSessionId = UUID.randomUUID()
+        jdbcTemplate.insert(
+            TradeSessionEntity(
+                id = tradeSessionId,
+                ticker = "SBER",
+                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                status = TradeSessionStatus.IN_POSITION,
+                startDate = LocalDateTime.parse("2024-01-01T10:15:00"),
+                candleInterval = CandleInterval.ONE_MIN,
+                lotsQuantity = 10,
+                lotsQuantityInPosition = 10,
+                strategyType = "DUMMY",
+                strategyParameters = MapWrapper(mapOf("paramName" to 1))
+            )
+        )
+        val barSeries = BaseBarSeriesBuilder().build()
+        barSeries.addBar(
             BaseBar(
                 Duration.ofMinutes(1),
                 LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
@@ -66,29 +82,12 @@ class ExitTradeSessionWithRetriesIntegrationTest(
                 BigDecimal(10)
             )
         )
-        val tradeStrategy = mockk<TradeStrategy> {
-            every { series } returns mockedSeries
-            every { shouldExit() } returns true
-            every { addBar(any()) } answers { callOriginal() }
-            every { margin } returns false
-        }
-        val tradeSessionId = UUID.randomUUID()
-        tradeSessionCache.put(
-            tradeSessionId,
-            TradeSession(
-                id = TradeSessionId(tradeSessionId),
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
-                status = TradeSessionStatus.IN_POSITION,
-                startDate = LocalDateTime.parse("2024-01-01T10:15:00"),
-                candleInterval = CandleInterval.ONE_MIN,
-                lotsQuantity = 10,
-                lotsQuantityInPosition = 10,
-                strategy = tradeStrategy,
-                strategyType = "DUMMY",
-                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
-            )
-        )
+        val tradeStrategy =
+            spyk(TradeStrategy(barSeries, false, mockk<Strategy>())) {
+                every { shouldEnter(any()) } returns false
+                every { shouldExit(any()) } returns true
+            }
+        tradeStrategyCache.put(tradeSessionId, tradeStrategy)
         marketDataSubscriptionInitializer.init(
             Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
             CandleInterval.ONE_MIN
@@ -101,7 +100,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
                 highestPrice = BigDecimal(104),
                 lowestPrice = BigDecimal(97),
                 volume = 10,
-                endTime = LocalDateTime.parse("2024-01-30T10:19:00"),
+                endDateTime = LocalDateTime.parse("2024-01-30T10:19:00"),
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
@@ -127,13 +126,11 @@ class ExitTradeSessionWithRetriesIntegrationTest(
         ordersBrokerGrpcStub.verifyForPostSellOrder("post-sell-order-quantity-6.json", mapOf("quantity" to "6"))
         ordersBrokerGrpcStub.verifyForPostSellOrder("post-sell-order-quantity-2.json", mapOf("quantity" to "2"))
 
-        val tradeSessions = tradeSessionCache.findAll()
-        tradeSessions shouldHaveSize 1
-        val tradeSession = tradeSessions.first()
+        val tradeSession = jdbcTemplate.findById(tradeSessionId, TradeSessionEntity::class.java)
         tradeSession.status shouldBe TradeSessionStatus.WAITING
         tradeSession.lotsQuantityInPosition shouldBe 0
 
-        val tradeOrders = tradeOrderRepository.findAll()
+        val tradeOrders = jdbcTemplate.findAll(TradeOrderEntity::class.java)
         tradeOrders shouldHaveSize 3
         val sortedTradeOrders = tradeOrders.sortedBy { it.date }
         sortedTradeOrders[0].lotsQuantity shouldBe 4
@@ -146,8 +143,23 @@ class ExitTradeSessionWithRetriesIntegrationTest(
 
     "should exit trade session with retries when executed lots quantity not equals to requested lots quantity" {
         //given
-        val mockedSeries: BarSeries = BaseBarSeriesBuilder().build()
-        mockedSeries.addBar(
+        val tradeSessionId = UUID.randomUUID()
+        jdbcTemplate.insert(
+            TradeSessionEntity(
+                id = tradeSessionId,
+                ticker = "SBER",
+                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                status = TradeSessionStatus.IN_POSITION,
+                startDate = LocalDateTime.parse("2024-01-01T10:15:00"),
+                candleInterval = CandleInterval.ONE_MIN,
+                lotsQuantity = 10,
+                lotsQuantityInPosition = 10,
+                strategyType = "DUMMY",
+                strategyParameters = MapWrapper(mapOf("paramName" to 1))
+            )
+        )
+        val barSeries = BaseBarSeriesBuilder().build()
+        barSeries.addBar(
             BaseBar(
                 Duration.ofMinutes(1),
                 LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
@@ -158,29 +170,12 @@ class ExitTradeSessionWithRetriesIntegrationTest(
                 BigDecimal(10)
             )
         )
-        val tradeStrategy = mockk<TradeStrategy> {
-            every { series } returns mockedSeries
-            every { shouldExit() } returns true
-            every { addBar(any()) } answers { callOriginal() }
-            every { margin } returns false
-        }
-        val tradeSessionId = UUID.randomUUID()
-        tradeSessionCache.put(
-            tradeSessionId,
-            TradeSession(
-                id = TradeSessionId(tradeSessionId),
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
-                status = TradeSessionStatus.IN_POSITION,
-                startDate = LocalDateTime.parse("2024-01-01T10:15:00"),
-                candleInterval = CandleInterval.ONE_MIN,
-                lotsQuantity = 10,
-                lotsQuantityInPosition = 10,
-                strategy = tradeStrategy,
-                strategyType = "DUMMY",
-                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
-            )
-        )
+        val tradeStrategy =
+            spyk(TradeStrategy(barSeries, false, mockk<Strategy>())) {
+                every { shouldEnter(any()) } returns false
+                every { shouldExit(any()) } returns true
+            }
+        tradeStrategyCache.put(tradeSessionId, tradeStrategy)
         marketDataSubscriptionInitializer.init(
             Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
             CandleInterval.ONE_MIN
@@ -193,7 +188,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
                 highestPrice = BigDecimal(104),
                 lowestPrice = BigDecimal(97),
                 volume = 10,
-                endTime = LocalDateTime.parse("2024-01-30T10:19:00"),
+                endDateTime = LocalDateTime.parse("2024-01-30T10:19:00"),
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
@@ -219,13 +214,11 @@ class ExitTradeSessionWithRetriesIntegrationTest(
         ordersBrokerGrpcStub.verifyForPostSellOrder("post-sell-order-quantity-6.json", mapOf("quantity" to "6"))
         ordersBrokerGrpcStub.verifyForPostSellOrder("post-sell-order-quantity-2.json", mapOf("quantity" to "2"))
 
-        val tradeSessions = tradeSessionCache.findAll()
-        tradeSessions shouldHaveSize 1
-        val tradeSession = tradeSessions.first()
+        val tradeSession = jdbcTemplate.findById(tradeSessionId, TradeSessionEntity::class.java)
         tradeSession.status shouldBe TradeSessionStatus.WAITING
         tradeSession.lotsQuantityInPosition shouldBe 0
 
-        val tradeOrders = tradeOrderRepository.findAll()
+        val tradeOrders = jdbcTemplate.findAll(TradeOrderEntity::class.java)
         tradeOrders shouldHaveSize 3
         val sortedTradeOrders = tradeOrders.sortedBy { it.date }
         sortedTradeOrders[0].lotsQuantity shouldBe 4
@@ -238,8 +231,23 @@ class ExitTradeSessionWithRetriesIntegrationTest(
 
     "should trade session waiting for entry when there are no executed orders" {
         //given
-        val mockedSeries: BarSeries = BaseBarSeriesBuilder().build()
-        mockedSeries.addBar(
+        val tradeSessionId = UUID.randomUUID()
+        jdbcTemplate.insert(
+            TradeSessionEntity(
+                id = tradeSessionId,
+                ticker = "SBER",
+                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                status = TradeSessionStatus.IN_POSITION,
+                startDate = LocalDateTime.parse("2024-01-01T10:15:00"),
+                candleInterval = CandleInterval.ONE_MIN,
+                lotsQuantity = 10,
+                lotsQuantityInPosition = 10,
+                strategyType = "DUMMY",
+                strategyParameters = MapWrapper(mapOf("paramName" to 1))
+            )
+        )
+        val barSeries = BaseBarSeriesBuilder().build()
+        barSeries.addBar(
             BaseBar(
                 Duration.ofMinutes(1),
                 LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
@@ -250,29 +258,12 @@ class ExitTradeSessionWithRetriesIntegrationTest(
                 BigDecimal(10)
             )
         )
-        val tradeStrategy = mockk<TradeStrategy> {
-            every { series } returns mockedSeries
-            every { shouldExit() } returns true
-            every { addBar(any()) } answers { callOriginal() }
-            every { margin } returns false
-        }
-        val tradeSessionId = UUID.randomUUID()
-        tradeSessionCache.put(
-            tradeSessionId,
-            TradeSession(
-                id = TradeSessionId(tradeSessionId),
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
-                status = TradeSessionStatus.IN_POSITION,
-                startDate = LocalDateTime.parse("2024-01-01T10:15:00"),
-                candleInterval = CandleInterval.ONE_MIN,
-                lotsQuantity = 10,
-                lotsQuantityInPosition = 10,
-                strategy = tradeStrategy,
-                strategyType = "DUMMY",
-                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
-            )
-        )
+        val tradeStrategy =
+            spyk(TradeStrategy(barSeries, false, mockk<Strategy>())) {
+                every { shouldEnter(any()) } returns false
+                every { shouldExit(any()) } returns true
+            }
+        tradeStrategyCache.put(tradeSessionId, tradeStrategy)
         marketDataSubscriptionInitializer.init(
             Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
             CandleInterval.ONE_MIN
@@ -285,7 +276,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
                 highestPrice = BigDecimal(104),
                 lowestPrice = BigDecimal(97),
                 volume = 10,
-                endTime = LocalDateTime.parse("2024-01-30T10:19:00"),
+                endDateTime = LocalDateTime.parse("2024-01-30T10:19:00"),
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
@@ -301,13 +292,11 @@ class ExitTradeSessionWithRetriesIntegrationTest(
         //then
         ordersBrokerGrpcStub.verifyForPostSellOrder("post-sell-order-quantity-10.json", mapOf("quantity" to "10"), 3)
 
-        val tradeSessions = tradeSessionCache.findAll()
-        tradeSessions shouldHaveSize 1
-        val tradeSession = tradeSessions.first()
+        val tradeSession = jdbcTemplate.findById(tradeSessionId, TradeSessionEntity::class.java)
         tradeSession.status shouldBe TradeSessionStatus.IN_POSITION
         tradeSession.lotsQuantityInPosition shouldBe 10
 
-        val tradeOrders = tradeOrderRepository.findAll()
+        val tradeOrders = jdbcTemplate.findAll(TradeOrderEntity::class.java)
         tradeOrders.shouldBeEmpty()
     }
 

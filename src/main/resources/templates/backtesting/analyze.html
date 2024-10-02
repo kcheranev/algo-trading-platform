@@ -5,8 +5,9 @@
 <body>
 <th:block layout:fragment="content">
     <h3 class="mb-5">Backtesting analyze</h3>
+    <h4 class="mb-4">Strategy parameters</h4>
     <form id="analyzeForm" action="#" th:action="@{/ui/backtesting/analyze}" th:object="${analyzeStrategyRequest}"
-          method="post" class="row g-3 mb-3">
+          method="post" class="row g-3 mb-5">
         <div class="col-6">
             <label for="strategyType" class="form-label">Strategy type</label>
             <select id="strategyType" class="form-select" th:field="*{strategyType}">
@@ -45,51 +46,47 @@
             <label for="toDate" class="form-label">Date to</label>
             <input id="toDate" type="date" name="to" class="form-control" th:value="*{to}">
         </div>
-        <div class="col-12" th:if="*{not #lists.isEmpty(strategyParams)}">
-            <span>Strategy parameters</span>
+        <div class="col-12">
+            <div id="strategyParameters" class="row g-3">
+                <div class="col-12" th:if="*{not #lists.isEmpty(strategyParameters)}">
+                    <span>Strategy parameters</span>
+                </div>
+                <th:block th:each="strategyParameter,strategyParameterStat : *{strategyParameters}">
+                    <div class="col-6">
+                        <input type="text" class="form-control" readonly
+                               th:field="*{strategyParameters[__${strategyParameterStat.index}__].name}">
+                    </div>
+                    <div class="col-6">
+                        <input type="text" class="form-control"
+                               th:field="*{strategyParameters[__${strategyParameterStat.index}__].value}">
+                    </div>
+                </th:block>
+            </div>
         </div>
-        <th:block th:each="strategyParam,strategyParamStat : *{strategyParams}">
-            <div class="col-6">
-                <input type="text" class="form-control" readonly
-                       th:field="*{strategyParams[__${strategyParamStat.index}__].name}">
-            </div>
-            <div class="col-6">
-                <input type="text" class="form-control"
-                       th:field="*{strategyParams[__${strategyParamStat.index}__].value}">
-            </div>
-        </th:block>
         <div class="col-12">
             <button type="submit" class="btn btn-primary">Analyze</button>
         </div>
     </form>
 
     <th:block th:if="${analyzeResult != null}">
+        <h4 class="mb-4">Strategy analyze results</h4>
         <table class="table caption-top w-50">
-            <caption>Strategy analyze results</caption>
             <tbody>
             <tr>
-                <td>Total gross profit</td>
-                <td th:text="${#numbers.formatDecimal(analyzeResult.totalGrossProfit,1,4)}"></td>
+                <td>Gross value</td>
+                <td th:text="${#numbers.formatDecimal(analyzeResult.grossValue,1,4)}"></td>
             </tr>
             <tr>
-                <td>Total net profit</td>
-                <td th:text="${#numbers.formatDecimal(analyzeResult.totalNetProfit,1,4)}"></td>
+                <td>Net value</td>
+                <td th:text="${#numbers.formatDecimal(analyzeResult.netValue,1,4)}"></td>
             </tr>
             <tr>
-                <td>Total profit position count</td>
-                <td th:text="${analyzeResult.profitPositionsTotalCount}"></td>
+                <td>Profit position count</td>
+                <td th:text="${analyzeResult.profitPositionsCount}"></td>
             </tr>
             <tr>
-                <td>Total losing position count</td>
-                <td th:text="${analyzeResult.losingPositionsTotalCount}"></td>
-            </tr>
-            <tr>
-                <td>Not closed positions count</td>
-                <td th:text="${analyzeResult.notClosedPositionsCount}"></td>
-            </tr>
-            <tr>
-                <td>Trades count</td>
-                <td th:text="${analyzeResult.tradesCount}"></td>
+                <td>Losing position count</td>
+                <td th:text="${analyzeResult.losingPositionsCount}"></td>
             </tr>
             </tbody>
         </table>
@@ -99,9 +96,14 @@
                 <h2 class="accordion-header">
                     <button class="accordion-button  collapsed" type="button" data-bs-toggle="collapse"
                             aria-expanded="false" data-bs-target="#panelsStayOpen-" aria-controls="panelsStayOpen-"
-                            th:attrappend="data-bs-target=${dayAnalyzeResultStat.index},aria-controls=${dayAnalyzeResultStat.index}"
-                            th:text="|${dayAnalyzeResult.key} / Gross profit ${#numbers.formatDecimal(dayAnalyzeResult.value.totalGrossProfit,1,4)} / Net profit ${#numbers.formatDecimal(dayAnalyzeResult.value.totalNetProfit,1,4)}|">
-                        Day analyze result
+                            th:attrappend="data-bs-target=${dayAnalyzeResultStat.index},aria-controls=${dayAnalyzeResultStat.index}">
+                        <span class="pe-2" th:text="${dayAnalyzeResult.key}"></span>
+                        <span th:class="'px-2 ' + (${dayAnalyzeResult.value.netValue >= 0} ? 'text-success' : 'text-danger')"
+                              th:text="|Net: ${#numbers.formatDecimal(dayAnalyzeResult.value.netValue,1,4)}|"></span>
+                        <span th:class="'px-2 ' + (${dayAnalyzeResult.value.grossValue >= 0} ? 'text-success' : 'text-danger')"
+                              th:text="|Gross: ${#numbers.formatDecimal(dayAnalyzeResult.value.grossValue,1,4)}|"></span>
+                        <span class="px-2"
+                              th:text="|Trades: ${#lists.size(dayAnalyzeResult.value.trades)}|"></span>
                     </button>
                 </h2>
                 <div id="panelsStayOpen-" th:attrappend="id=${dayAnalyzeResultStat.index}"
@@ -111,12 +113,12 @@
                             <caption>Strategy analyze results for a day</caption>
                             <tbody>
                             <tr>
-                                <td>Total gross profit</td>
-                                <td th:text="${#numbers.formatDecimal(dayAnalyzeResult.value.totalGrossProfit,1,4)}"></td>
+                                <td>Gross value</td>
+                                <td th:text="${#numbers.formatDecimal(dayAnalyzeResult.value.grossValue,1,4)}"></td>
                             </tr>
                             <tr>
-                                <td>Total net profit</td>
-                                <td th:text="${#numbers.formatDecimal(dayAnalyzeResult.value.totalNetProfit,1,4)}"></td>
+                                <td>Net value</td>
+                                <td th:text="${#numbers.formatDecimal(dayAnalyzeResult.value.netValue,1,4)}"></td>
                             </tr>
                             <tr>
                                 <td>Profit position count</td>
@@ -128,32 +130,32 @@
                             </tr>
                             </tbody>
                         </table>
-                        <table class="table  caption-top">
+                        <table class="table caption-top">
                             <caption>Trades</caption>
                             <thead>
                             <tr>
                                 <th>Entry time</th>
                                 <th>Exit time</th>
+                                <th>Net value</th>
+                                <th>Gross value</th>
                                 <th>Direction</th>
                                 <th>Entry net price</th>
                                 <th>Exit net price</th>
                                 <th>Entry gross price</th>
                                 <th>Exit gross price</th>
-                                <th>Net profit</th>
-                                <th>Gross profit</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr th:each="trade : ${dayAnalyzeResult.value.trades}">
                                 <td th:text="${#temporals.format(trade.entry.date, 'HH:mm')}"></td>
-                                <td th:text="${#temporals.format(trade.exit.date, 'HH:mm')}"></td>
+                                <td th:text="${trade.exit != null} ? ${#temporals.format(trade.exit.date, 'HH:mm')}: ''"></td>
+                                <td th:text="${#numbers.formatDecimal(trade.netValue,1,4)}"></td>
+                                <td th:text="${#numbers.formatDecimal(trade.grossValue,1,4)}"></td>
                                 <td th:text="${trade.entry.direction.name() == 'BUY'}? 'LONG' : 'SHORT'"></td>
                                 <td th:text="${#numbers.formatDecimal(trade.entry.netPrice,1,4)}"></td>
-                                <td th:text="${#numbers.formatDecimal(trade.exit.netPrice,1,4)}"></td>
+                                <td th:text="${trade.exit != null} ? ${#numbers.formatDecimal(trade.exit.netPrice,1,4)}: ''"></td>
                                 <td th:text="${#numbers.formatDecimal(trade.entry.grossPrice,1,4)}"></td>
-                                <td th:text="${#numbers.formatDecimal(trade.exit.grossPrice,1,4)}"></td>
-                                <td th:text="${#numbers.formatDecimal(trade.netProfit,1,4)}"></td>
-                                <td th:text="${#numbers.formatDecimal(trade.grossProfit,1,4)}"></td>
+                                <td th:text="${trade.exit != null} ? ${#numbers.formatDecimal(trade.exit.grossPrice,1,4)}: ''"></td>
                             </tr>
                             </tbody>
                         </table>
@@ -177,9 +179,8 @@
                     response.text()
                         .then(responseText => {
                             const htmlPage = new DOMParser().parseFromString(responseText, "text/html");
-                            document.querySelector("#analyzeForm").replaceWith(htmlPage.querySelector("#analyzeForm"));
-                            document.querySelector("#strategyType")
-                                .addEventListener("change", changeStrategyTypeListener());
+                            document.querySelector("#strategyParameters")
+                                .replaceWith(htmlPage.querySelector("#strategyParameters"));
                         });
                 });
             }

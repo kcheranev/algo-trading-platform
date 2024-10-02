@@ -10,11 +10,11 @@ data class Candle(
     val highestPrice: BigDecimal,
     val lowestPrice: BigDecimal,
     val volume: Long,
-    val endTime: LocalDateTime,
+    val endDateTime: LocalDateTime,
     val instrumentId: String
 ) {
 
     override fun toString() =
-        "[interval=${interval}, openPrice=$openPrice, closePrice=$closePrice, endTime=$endTime, instrumentId=$instrumentId]"
+        "[interval=${interval}, openPrice=$openPrice, closePrice=$closePrice, endDateTime=$endDateTime, instrumentId=$instrumentId]"
 
 }

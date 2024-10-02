@@ -15,6 +15,7 @@ import ru.kcheranev.trading.test.stub.WireMockServers.grpcWireMockServer
 import ru.kcheranev.trading.test.stub.http.TelegramNotificationHttpStub
 import ru.kcheranev.trading.test.util.MarketDataSubscriptionInitializer
 import ru.tinkoff.piapi.core.stream.MarketDataStreamService
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @TestConfiguration
@@ -37,7 +38,11 @@ class TradingApplicationTestConfiguration {
     @Bean
     fun dateSupplier() = spyk(
         object : DateSupplier {
-            override fun currentDate() = LocalDateTime.parse("2024-01-30T10:15:30")
+
+            override fun currentDateTime() = LocalDateTime.parse("2024-01-30T10:15:30")
+
+            override fun currentDate() = LocalDate.parse("2024-01-30")
+
         }
     )
 

@@ -24,13 +24,14 @@ import org.ta4j.core.criteria.pnl.ProfitLossPercentageCriterion
 import org.ta4j.core.criteria.pnl.ProfitLossRatioCriterion
 import org.ta4j.core.num.DecimalNum
 import org.ta4j.core.num.Num
-import ru.kcheranev.trading.domain.model.backtesting.DailyStrategyAnalyzeResult
 import ru.kcheranev.trading.domain.model.backtesting.Order
+import ru.kcheranev.trading.domain.model.backtesting.StrategyAnalyzeResult
 import ru.kcheranev.trading.domain.model.backtesting.Trade
 import java.math.BigDecimal
+import java.time.LocalDateTime
 
 class TradeStrategy(
-    val series: BarSeries,
+    private val series: BarSeries,
     val margin: Boolean,
     strategy: Strategy
 ) : Strategy by strategy {
@@ -43,7 +44,14 @@ class TradeStrategy(
 
     fun shouldExit() = shouldExit(series.endIndex)
 
-    fun analyze(commission: BigDecimal): DailyStrategyAnalyzeResult {
+    fun isCandleSeriesEmpty() = series.isEmpty
+
+    fun lastCandleDate(): LocalDateTime =
+        series.lastBar
+            .endTime
+            .toLocalDateTime()
+
+    fun analyze(commission: BigDecimal): StrategyAnalyzeResult {
         val tradeType = if (margin) TradeType.SELL else TradeType.BUY
         val tradingRecord =
             BarSeriesManager(series, LinearTransactionCostModel(commission.toDouble()), ZeroCostModel())
@@ -57,27 +65,24 @@ class TradeStrategy(
         if (tradingRecord.currentPosition.entry != null && tradingRecord.currentPosition.exit == null) {
             trades.add(Trade(mapPositionTrade(tradingRecord.currentPosition.entry), null))
         }
-        return DailyStrategyAnalyzeResult(
-            averageLoss = AverageLossCriterion().calculate(series, tradingRecord).toBigDecimal(),
-            averageProfit = AverageProfitCriterion().calculate(series, tradingRecord).toBigDecimal(),
-            enterAndHoldReturn = EnterAndHoldReturnCriterion()
-                .calculate(series, tradingRecord).toBigDecimal(),
+        return StrategyAnalyzeResult(
+            netProfit = ProfitCriterion().calculate(series, tradingRecord).toBigDecimal(),
+            grossProfit = ProfitCriterion(true).calculate(series, tradingRecord).toBigDecimal(),
             netLoss = LossCriterion().calculate(series, tradingRecord).toBigDecimal(),
             grossLoss = LossCriterion(true).calculate(series, tradingRecord).toBigDecimal(),
-            maximumDrawdown = MaximumDrawdownCriterion().calculate(series, tradingRecord).toBigDecimal(),
-            barsCount = NumberOfBarsCriterion().calculate(series, tradingRecord).toInt(),
+            profitPositionsCount = NumberOfWinningPositionsCriterion().calculate(series, tradingRecord).toInt(),
+            losingPositionsCount = NumberOfLosingPositionsCriterion().calculate(series, tradingRecord).toInt(),
+            positionsCount = NumberOfPositionsCriterion().calculate(series, tradingRecord).toInt(),
             consecutiveProfitPositionsCount = NumberOfConsecutivePositionsCriterion(AnalysisCriterion.PositionFilter.PROFIT)
                 .calculate(series, tradingRecord).toInt(),
             consecutiveLosingPositionsCount = NumberOfConsecutivePositionsCriterion(AnalysisCriterion.PositionFilter.LOSS)
                 .calculate(series, tradingRecord).toInt(),
-            losingPositionsCount = NumberOfLosingPositionsCriterion()
-                .calculate(series, tradingRecord).toInt(),
-            positionsCount = NumberOfPositionsCriterion()
-                .calculate(series, tradingRecord).toInt(),
-            profitPositionsCount = NumberOfWinningPositionsCriterion()
-                .calculate(series, tradingRecord).toInt(),
-            netProfit = ProfitCriterion().calculate(series, tradingRecord).toBigDecimal(),
-            grossProfit = ProfitCriterion(true).calculate(series, tradingRecord).toBigDecimal(),
+            averageLoss = AverageLossCriterion().calculate(series, tradingRecord).toBigDecimal(),
+            averageProfit = AverageProfitCriterion().calculate(series, tradingRecord).toBigDecimal(),
+            enterAndHoldReturn = EnterAndHoldReturnCriterion()
+                .calculate(series, tradingRecord).toBigDecimal(),
+            maximumDrawdown = MaximumDrawdownCriterion().calculate(series, tradingRecord).toBigDecimal(),
+            barsCount = NumberOfBarsCriterion().calculate(series, tradingRecord).toInt(),
             profitLoss = ProfitLossCriterion().calculate(series, tradingRecord).toBigDecimal(),
             profitLossPercentage = ProfitLossPercentageCriterion().calculate(series, tradingRecord).toBigDecimal(),
             profitLossRatio = ProfitLossRatioCriterion().calculate(series, tradingRecord).toBigDecimal(),

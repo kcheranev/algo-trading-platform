@@ -7,34 +7,44 @@ import org.mapstruct.factory.Mappers
 import ru.kcheranev.trading.core.port.income.backtesting.StrategyAdjustAndAnalyzeCommand
 import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeCommand
 import ru.kcheranev.trading.domain.model.StrategyParameters
-import ru.kcheranev.trading.domain.model.backtesting.PeriodStrategyAnalyzeResult
-import ru.kcheranev.trading.domain.model.backtesting.StrategyAdjustAndAnalyzeResult
+import ru.kcheranev.trading.domain.model.backtesting.DailyStrategyAnalyzeResult
+import ru.kcheranev.trading.domain.model.backtesting.ParametrizedStrategyResult
+import ru.kcheranev.trading.domain.model.backtesting.StrategyAnalyzeResult
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyAdjustAndAnalyzeRequestUiDto
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyAnalyzeRequestUiDto
-import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyParamDto
-import ru.kcheranev.trading.infra.adapter.income.web.ui.model.response.PeriodStrategyAnalyzeResultUiDto
-import ru.kcheranev.trading.infra.adapter.income.web.ui.model.response.StrategyAdjustAndAnalyzeUiDto
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyParameterUiDto
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.response.DailyStrategyAnalyzeResultUiDto
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.response.ParametrizedStrategyAnalyzeResultUiDto
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.response.StrategyAnalyzeResultUiDto
 import ru.kcheranev.trading.infra.adapter.mapper.EntityIdMapper
 
 @Mapper(uses = [EntityIdMapper::class])
 abstract class BacktestingWebIncomeAdapterUiMapper {
 
-    @Mapping(target = "strategyParams", qualifiedByName = ["mapStrategyParameters"])
+    @Mapping(target = "strategyParameters", qualifiedByName = ["mapStrategyParameters"])
     abstract fun map(source: StrategyAnalyzeRequestUiDto): StrategyAnalyzeCommand
 
-    @Mapping(target = "strategyParams", qualifiedByName = ["mapStrategyParameters"])
-    @Mapping(target = "mutableStrategyParams", qualifiedByName = ["mapStrategyParameters"])
+    @Mapping(target = "strategyParameters", qualifiedByName = ["mapStrategyParameters"])
+    @Mapping(target = "mutableStrategyParameters", qualifiedByName = ["mapStrategyParameters"])
     abstract fun map(source: StrategyAdjustAndAnalyzeRequestUiDto): StrategyAdjustAndAnalyzeCommand
 
-    abstract fun map(source: PeriodStrategyAnalyzeResult): PeriodStrategyAnalyzeResultUiDto
-
-    abstract fun map(source: StrategyAdjustAndAnalyzeResult): StrategyAdjustAndAnalyzeUiDto
-
     @Named("mapStrategyParameters")
-    fun mapStrategyParameters(source: List<StrategyParamDto>) =
+    fun mapStrategyParameters(source: List<StrategyParameterUiDto>) =
         StrategyParameters(
             source.associate { it.name!! to it.value!! }
         )
+
+    @Mapping(target = "results", source = ".", qualifiedByName = ["mapResults"])
+    abstract fun map(source: StrategyAnalyzeResult): StrategyAnalyzeResultUiDto
+
+    @Named("mapResults")
+    fun mapResults(source: StrategyAnalyzeResult) =
+        source.splitByDay()
+            .mapValues { map(it.value) }
+
+    abstract fun map(source: DailyStrategyAnalyzeResult): DailyStrategyAnalyzeResultUiDto
+
+    abstract fun map(source: ParametrizedStrategyResult): ParametrizedStrategyAnalyzeResultUiDto
 
 }
 

@@ -14,7 +14,7 @@ abstract class DomainModelMapper {
         return with(candle) {
             BaseBar(
                 interval.duration,
-                endTime.toMskZonedDateTime(),
+                endDateTime.toMskZonedDateTime(),
                 openPrice,
                 highestPrice,
                 lowestPrice,

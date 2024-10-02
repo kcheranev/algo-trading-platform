@@ -59,7 +59,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
             if (!candleSubscriptionHolder.checkSubscriptionExists(subscriptionId)) {
                 return
             }
-            if (candleSubscriptionHolder.lastSubscription(subscriptionId)) {
+            if (candleSubscriptionHolder.isLastSubscription(subscriptionId)) {
                 log.info("Deactivate subscription for the trade session ticker=${instrument.ticker}, candleInterval=$candleInterval")
                 marketDataStreamService.getStreamById(subscriptionId)
                     .unsubscribeCandles(

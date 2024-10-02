@@ -5,6 +5,8 @@ import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 
 interface StrategyConfigurationPersistencePort {
 
+    fun insert(command: InsertStrategyConfigurationCommand): StrategyConfigurationId
+
     fun save(command: SaveStrategyConfigurationCommand): StrategyConfigurationId
 
     fun get(command: GetStrategyConfigurationCommand): StrategyConfiguration

@@ -9,7 +9,7 @@ import java.time.LocalDate
 
 data class StrategyAnalyzeRequestDto(
     @Schema(description = "Strategy type") val strategyType: String,
-    @Schema(description = "Strategy parameters") val strategyParams: Map<String, Number>,
+    @Schema(description = "Strategy parameters") val strategyParameters: Map<String, Number>,
     @Schema(description = "Instrument") val instrument: InstrumentDto,
     @Schema(description = "Candle interval") val candleInterval: CandleInterval,
     @Schema(description = "Start of strategy backtesting period") val from: LocalDate,
@@ -18,8 +18,8 @@ data class StrategyAnalyzeRequestDto(
 
 data class StrategyAdjustAndAnalyzeRequestDto(
     @Schema(description = "Strategy type") val strategyType: String,
-    @Schema(description = "Strategy parameters") val strategyParams: Map<String, Number> = emptyMap(),
-    @Schema(description = "Mutable strategy parameters") val mutableStrategyParams: Map<String, Number> = emptyMap(),
+    @Schema(description = "Strategy parameters") val strategyParameters: Map<String, Number> = emptyMap(),
+    @Schema(description = "Mutable strategy parameters") val mutableStrategyParameters: Map<String, Number> = emptyMap(),
     @Schema(description = "Adjust factor") val adjustFactor: BigDecimal,
     @Schema(description = "Adjust variant count") val adjustVariantCount: Int,
     @Schema(description = "Backtesting result filter") val resultFilter: StrategyAnalyzeResultFilterDto?,

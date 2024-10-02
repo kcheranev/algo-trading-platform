@@ -10,8 +10,8 @@ import ru.kcheranev.trading.core.port.outcome.broker.HistoricCandleBrokerPort
 import ru.kcheranev.trading.core.strategy.factory.StrategyFactoryProvider
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.backtesting.Backtesting
-import ru.kcheranev.trading.domain.model.backtesting.PeriodStrategyAnalyzeResult
-import ru.kcheranev.trading.domain.model.backtesting.StrategyAdjustAndAnalyzeResult
+import ru.kcheranev.trading.domain.model.backtesting.ParametrizedStrategyResult
+import ru.kcheranev.trading.domain.model.backtesting.StrategyAnalyzeResult
 
 @Service
 class BacktestingService(
@@ -22,8 +22,8 @@ class BacktestingService(
 
     private val defaultCommission = tradingProperties.defaultCommission
 
-    override fun analyzeStrategy(command: StrategyAnalyzeCommand): PeriodStrategyAnalyzeResult {
-        val candlesByPeriod =
+    override fun analyzeStrategy(command: StrategyAnalyzeCommand): StrategyAnalyzeResult {
+        val candles =
             historicCandleBrokerPort.getHistoricCandlesForLongPeriod(
                 GetHistoricCandlesForLongPeriodCommand(
                     instrument = command.instrument,
@@ -37,14 +37,14 @@ class BacktestingService(
                 ticker = command.instrument.ticker,
                 candleInterval = command.candleInterval,
                 commission = defaultCommission,
-                candlesByPeriod = candlesByPeriod
+                candles = candles
             )
         val strategyFactory = strategyFactoryProvider.getStrategyFactory(command.strategyType)
-        return backtesting.analyzeStrategy(strategyFactory, StrategyParameters(command.strategyParams))
+        return backtesting.analyzeStrategy(strategyFactory, StrategyParameters(command.strategyParameters))
     }
 
-    override fun adjustAndAnalyzeStrategy(command: StrategyAdjustAndAnalyzeCommand): List<StrategyAdjustAndAnalyzeResult> {
-        val candlesByPeriod =
+    override fun adjustAndAnalyzeStrategy(command: StrategyAdjustAndAnalyzeCommand): List<ParametrizedStrategyResult> {
+        val candles =
             historicCandleBrokerPort.getHistoricCandlesForLongPeriod(
                 GetHistoricCandlesForLongPeriodCommand(
                     instrument = command.instrument,
@@ -58,13 +58,13 @@ class BacktestingService(
                 ticker = command.instrument.ticker,
                 candleInterval = command.candleInterval,
                 commission = defaultCommission,
-                candlesByPeriod = candlesByPeriod
+                candles = candles
             )
         val strategyFactory = strategyFactoryProvider.getStrategyFactory(command.strategyType)
         return backtesting.adjustAndAnalyzeStrategy(
             strategyFactory = strategyFactory,
-            params = command.strategyParams,
-            mutableParams = command.mutableStrategyParams,
+            parameters = command.strategyParameters,
+            mutableParameters = command.mutableStrategyParameters,
             adjustFactor = command.adjustFactor,
             adjustVariantCount = command.adjustVariantCount,
             resultsLimit = command.resultFilter?.resultsLimit,

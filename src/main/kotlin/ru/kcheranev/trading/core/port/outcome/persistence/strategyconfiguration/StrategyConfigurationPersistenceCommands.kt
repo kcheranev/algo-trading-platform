@@ -7,6 +7,10 @@ import ru.kcheranev.trading.domain.entity.StrategyConfiguration
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.domain.model.CandleInterval
 
+data class InsertStrategyConfigurationCommand(
+    val strategyConfiguration: StrategyConfiguration
+)
+
 data class SaveStrategyConfigurationCommand(
     val strategyConfiguration: StrategyConfiguration
 )

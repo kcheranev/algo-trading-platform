@@ -8,9 +8,10 @@ import ru.kcheranev.trading.domain.model.CandleInterval
 import java.util.UUID
 
 data class CreateStrategyConfigurationRequestDto(
+    @Schema(description = "Name") val name: String,
     @Schema(description = "Type") val type: String,
     @Schema(description = "Candle interval") val candleInterval: CandleInterval,
-    @Schema(description = "Strategy parameters") val params: Map<String, Number>
+    @Schema(description = "Strategy parameters") val parameters: Map<String, Number>
 )
 
 data class SearchStrategyConfigurationRequestDto(

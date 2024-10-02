@@ -5,23 +5,26 @@ import ru.kcheranev.trading.domain.model.StrategyParameters
 import java.util.UUID
 
 data class StrategyConfiguration(
-    val id: StrategyConfigurationId?,
+    val id: StrategyConfigurationId,
+    val name: String,
     val type: String,
     val candleInterval: CandleInterval,
-    val params: StrategyParameters
+    val parameters: StrategyParameters
 ) : AbstractAggregateRoot() {
 
     companion object {
 
         fun create(
+            name: String,
             type: String,
             candleInterval: CandleInterval,
-            params: StrategyParameters
+            parameters: StrategyParameters
         ) = StrategyConfiguration(
-            id = null,
+            id = StrategyConfigurationId.init(),
+            name = name,
             type = type,
             candleInterval = candleInterval,
-            params = params
+            parameters = parameters
         )
 
     }
@@ -33,5 +36,11 @@ data class StrategyConfigurationId(
 ) {
 
     override fun toString() = value.toString()
+
+    companion object {
+
+        fun init() = StrategyConfigurationId(UUID.randomUUID())
+
+    }
 
 }

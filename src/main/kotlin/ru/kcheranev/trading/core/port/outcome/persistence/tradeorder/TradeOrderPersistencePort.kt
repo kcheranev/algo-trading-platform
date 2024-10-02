@@ -5,9 +5,9 @@ import ru.kcheranev.trading.domain.entity.TradeOrderId
 
 interface TradeOrderPersistencePort {
 
-    fun save(command: SaveOrderCommand): TradeOrderId
+    fun insert(command: InsertTradeOrderCommand): TradeOrderId
 
-    fun get(command: GetOrderCommand): TradeOrder
+    fun get(command: GetTradeOrderCommand): TradeOrder
 
     fun search(command: SearchTradeOrderCommand): List<TradeOrder>
 

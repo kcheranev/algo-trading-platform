@@ -11,11 +11,11 @@ import ru.kcheranev.trading.domain.model.TradeDirection
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
-data class SaveOrderCommand(
+data class InsertTradeOrderCommand(
     val tradeOrder: TradeOrder
 )
 
-data class GetOrderCommand(
+data class GetTradeOrderCommand(
     val tradeOrderId: TradeOrderId
 )
 

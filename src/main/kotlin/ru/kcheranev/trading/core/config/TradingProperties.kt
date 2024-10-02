@@ -10,6 +10,22 @@ data class TradingProperties @ConstructorBinding constructor(
     val availableDelayedCandleCount: Int,
     val placeOrderRetryCount: Int,
     val defaultCommission: BigDecimal,
-    val startTradingTime: LocalTime,
-    val endTradingTime: LocalTime
+    val tradingSchedule: List<TradingScheduleInterval>
 )
+
+data class TradingScheduleInterval(
+    val from: LocalTime,
+    val to: LocalTime
+) {
+
+    fun contains(time: LocalTime) = time in from..to
+
+    fun before(time: LocalTime) = to < time
+
+    fun beforeOrContains(time: LocalTime) = before(time) || contains(time)
+
+    fun after(time: LocalTime) = from > time
+
+    fun afterOrContains(time: LocalTime) = after(time) || contains(time)
+
+}

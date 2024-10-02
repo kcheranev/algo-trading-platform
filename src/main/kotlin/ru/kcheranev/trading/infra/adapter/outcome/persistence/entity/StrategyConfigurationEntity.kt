@@ -10,11 +10,13 @@ import java.util.UUID
 @Table("strategy_configuration")
 data class StrategyConfigurationEntity(
     @Id
-    var id: UUID? = null,
+    var id: UUID,
+    @Column("name")
+    val name: String,
     @Column("type")
     val type: String,
     @Column("candle_interval")
     val candleInterval: CandleInterval,
-    @Column("params")
-    val params: MapWrapper<String>
+    @Column("parameters")
+    val parameters: MapWrapper<String>
 )

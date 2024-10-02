@@ -1,10 +1,12 @@
 package ru.kcheranev.trading.infra.adapter.outcome.persistence.impl
 
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.GetStrategyConfigurationCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.InsertStrategyConfigurationCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.SaveStrategyConfigurationCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.SearchStrategyConfigurationCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.StrategyConfigurationPersistencePort
@@ -15,9 +17,24 @@ import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.Strateg
 
 @Component
 class StrategyConfigurationPersistenceOutcomeAdapter(
+    private val jdbcTemplate: JdbcAggregateTemplate,
     private val strategyConfigurationRepository: StrategyConfigurationRepository,
     private val eventPublisher: ApplicationEventPublisher
 ) : StrategyConfigurationPersistencePort {
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    override fun insert(command: InsertStrategyConfigurationCommand): StrategyConfigurationId {
+        val strategyConfiguration = command.strategyConfiguration
+        val strategyConfigurationId =
+            StrategyConfigurationId(
+                jdbcTemplate.insert(
+                    persistenceOutcomeAdapterMapper.map(strategyConfiguration)
+                ).id
+            )
+        strategyConfiguration.events.forEach { eventPublisher.publishEvent(it) }
+        strategyConfiguration.clearEvents()
+        return strategyConfigurationId
+    }
 
     @Transactional(propagation = Propagation.MANDATORY)
     override fun save(command: SaveStrategyConfigurationCommand): StrategyConfigurationId {
@@ -26,7 +43,7 @@ class StrategyConfigurationPersistenceOutcomeAdapter(
             StrategyConfigurationId(
                 strategyConfigurationRepository.save(
                     persistenceOutcomeAdapterMapper.map(strategyConfiguration)
-                ).id!!
+                ).id
             )
         strategyConfiguration.events.forEach { eventPublisher.publishEvent(it) }
         strategyConfiguration.clearEvents()

@@ -5,58 +5,65 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-data class StrategyAdjustAndAnalyzeResponseDto(
-    val adjustedAnalyzeResults: List<StrategyAdjustAndAnalyzeDto>
+data class ParametrizedStrategyResponseDto(
+    val analyzeResults: List<ParametrizedStrategyAnalyzeResultDto>
 )
 
 data class StrategyAnalyzeResponseDto(
-    val analyzeResult: PeriodStrategyAnalyzeResultDto
+    val analyzeResult: StrategyAnalyzeResultDto
 )
 
-data class StrategyAdjustAndAnalyzeDto(
-    val params: Map<String, Number>,
-    val result: PeriodStrategyAnalyzeResultDto
+data class ParametrizedStrategyAnalyzeResultDto(
+    val parameters: Map<String, Number>,
+    val result: StrategyAnalyzeResultDto
 )
 
-data class PeriodStrategyAnalyzeResultDto(
-    val totalGrossProfit: BigDecimal,
-    val totalNetProfit: BigDecimal,
-    val profitPositionsTotalCount: Int,
-    val losingPositionsTotalCount: Int,
+data class StrategyAnalyzeResultDto(
+    val netValue: BigDecimal,
+    val grossValue: BigDecimal,
+    val netProfit: BigDecimal,
+    val grossProfit: BigDecimal,
+    val netLoss: BigDecimal,
+    val grossLoss: BigDecimal,
+    val profitPositionsCount: Int,
+    val losingPositionsCount: Int,
+    val positionsCount: Int,
+    val consecutiveProfitPositionsCount: Int,
+    val consecutiveLosingPositionsCount: Int,
+    val averageLoss: BigDecimal,
+    val averageProfit: BigDecimal,
+    val enterAndHoldReturn: BigDecimal,
+    val maximumDrawdown: BigDecimal,
+    val barsCount: Int,
+    val profitLoss: BigDecimal,
+    val profitLossPercentage: BigDecimal,
+    val profitLossRatio: BigDecimal,
     val profitLossPositionsRatio: BigDecimal,
-    val notClosedPositionsCount: Int,
-    val tradesCount: Int,
     val results: Map<LocalDate, DailyStrategyAnalyzeResultDto>
 )
 
 data class DailyStrategyAnalyzeResultDto(
-    val totalGrossProfit: BigDecimal,
-    val totalNetProfit: BigDecimal,
-    val averageLoss: BigDecimal,
-    val averageProfit: BigDecimal,
-    val enterAndHoldReturn: BigDecimal,
-    val netLoss: BigDecimal,
-    val grossLoss: BigDecimal,
-    val maximumDrawdown: BigDecimal,
-    val barsCount: Int,
-    val consecutiveProfitPositionsCount: Int,
-    val consecutiveLosingPositionsCount: Int,
-    val losingPositionsCount: Int,
-    val positionsCount: Int,
-    val profitPositionsCount: Int,
+    val netValue: BigDecimal,
+    val grossValue: BigDecimal,
     val netProfit: BigDecimal,
     val grossProfit: BigDecimal,
-    val profitLoss: BigDecimal,
-    val profitLossPercentage: BigDecimal,
-    val profitLossRatio: BigDecimal,
+    val netLoss: BigDecimal,
+    val grossLoss: BigDecimal,
+    val profitPositionsCount: Int,
+    val losingPositionsCount: Int,
+    val positionsCount: Int,
     val trades: List<TradeDto>
 )
 
 data class TradeDto(
+    val netValue: BigDecimal,
+    val grossValue: BigDecimal,
     val entry: OrderDto,
     val exit: OrderDto?,
-    val netProfit: BigDecimal?,
-    val grossProfit: BigDecimal?
+    val netProfit: BigDecimal,
+    val grossProfit: BigDecimal,
+    val netLoss: BigDecimal,
+    val grossLoss: BigDecimal
 )
 
 data class OrderDto(

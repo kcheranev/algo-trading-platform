@@ -10,7 +10,7 @@ import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeUseCase
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.mapper.backtestingWebIncomeAdapterMapper
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StrategyAdjustAndAnalyzeRequestDto
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StrategyAnalyzeRequestDto
-import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.StrategyAdjustAndAnalyzeResponseDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.ParametrizedStrategyResponseDto
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.StrategyAnalyzeResponseDto
 
 @Tag(name = "Backtesting")
@@ -32,7 +32,7 @@ class BacktestingController(
     @Operation(summary = "Adjust and analyze trade strategy")
     @PostMapping("adjust-and-analyze")
     fun adjustAndAnalyzeStrategy(@RequestBody request: StrategyAdjustAndAnalyzeRequestDto) =
-        StrategyAdjustAndAnalyzeResponseDto(
+        ParametrizedStrategyResponseDto(
             strategyAnalyzeUseCase.adjustAndAnalyzeStrategy(backtestingWebIncomeAdapterMapper.map(request))
                 .map { backtestingWebIncomeAdapterMapper.map(it) }
         )

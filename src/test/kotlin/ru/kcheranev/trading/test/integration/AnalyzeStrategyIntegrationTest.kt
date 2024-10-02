@@ -35,11 +35,13 @@ class AnalyzeStrategyIntegrationTest(
     "should analyze trade strategy" {
         //given
         marketDataBrokerGrpcStub.stubForGetCandles("get-candles.json")
+
+        //when
         val strategyAnalyzeResponse = testRestTemplate.postForEntity(
             "/backtesting/analyze",
             StrategyAnalyzeRequestDto(
                 strategyType = "DUMMY_LONG",
-                strategyParams = emptyMap(),
+                strategyParameters = emptyMap(),
                 instrument = InstrumentDto("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
                 candleInterval = CandleInterval.ONE_MIN,
                 from = LocalDate.parse("2024-01-30"),
@@ -47,36 +49,36 @@ class AnalyzeStrategyIntegrationTest(
             ),
             StrategyAnalyzeResponseDto::class.java
         )
+
+        //then
         strategyAnalyzeResponse.statusCode shouldBe HttpStatus.OK
-        val periodAnalyzeResult = strategyAnalyzeResponse.body?.analyzeResult
-        periodAnalyzeResult.shouldNotBeNull()
-        periodAnalyzeResult.results shouldHaveSize 1
-        periodAnalyzeResult.results.keys.first() shouldBe LocalDate.parse("2024-01-30")
-        periodAnalyzeResult.totalGrossProfit shouldBe BigDecimal("2.000000000")
-        periodAnalyzeResult.totalNetProfit shouldBe BigDecimal("1.83680000000000")
-        periodAnalyzeResult.profitPositionsTotalCount shouldBe 1
-        periodAnalyzeResult.losingPositionsTotalCount shouldBe 1
-        periodAnalyzeResult.profitLossPositionsRatio shouldBe BigDecimal("1.00000")
-        periodAnalyzeResult.notClosedPositionsCount shouldBe 1
-        with(periodAnalyzeResult.results.values.first()) {
-            //TODO Тут, скорее всего, неправильно вычисляются значения, вместо значения gross - значение net.
-            // Связано с багом в реализации org.ta4j.core.criteria.pnl.LossCriterion и org.ta4j.core.criteria.pnl.ProfitCriterion
-            averageLoss shouldBe BigDecimal("-7.07880000000000")
-            averageProfit shouldBe BigDecimal("8.91560000000000")
-            netLoss shouldBe BigDecimal("-7.07880000000000")
-            grossLoss shouldBe BigDecimal("-7.000000000")
-            barsCount shouldBe 6
-            consecutiveProfitPositionsCount shouldBe 1
-            consecutiveProfitPositionsCount shouldBe 1
-            losingPositionsCount shouldBe 1
-            profitPositionsCount shouldBe 1
+        val strategyAnalyzeResult = strategyAnalyzeResponse.body?.analyzeResult
+        strategyAnalyzeResult.shouldNotBeNull()
+        strategyAnalyzeResult.results shouldHaveSize 1
+        strategyAnalyzeResult.results.keys.first() shouldBe LocalDate.parse("2024-01-30")
+        strategyAnalyzeResult.grossValue shouldBe BigDecimal("2.000000000")
+        strategyAnalyzeResult.netValue shouldBe BigDecimal("1.83680000000000")
+        strategyAnalyzeResult.profitPositionsCount shouldBe 1
+        strategyAnalyzeResult.losingPositionsCount shouldBe 1
+        strategyAnalyzeResult.profitLossPositionsRatio shouldBe BigDecimal("1.00000")
+        with(strategyAnalyzeResult.results.values.first()) {
+            positionsCount shouldBe 3
             netProfit shouldBe BigDecimal("8.91560000000000")
             grossProfit shouldBe BigDecimal("9.000000000")
-            profitLoss shouldBe BigDecimal("1.83680000000000")
+            netLoss shouldBe BigDecimal("-7.07880000000000")
+            grossLoss shouldBe BigDecimal("-7.000000000")
+            losingPositionsCount shouldBe 1
+            profitPositionsCount shouldBe 1
             trades shouldHaveSize 3
-            totalGrossProfit shouldBe BigDecimal("2.000000000")
-            totalNetProfit shouldBe BigDecimal("1.83680000000000")
+            netValue shouldBe BigDecimal("1.83680000000000")
+            grossValue shouldBe BigDecimal("2.000000000")
             with(trades[0]) {
+                netValue shouldBe BigDecimal("8.91560000000000")
+                grossValue shouldBe BigDecimal("9.000000000")
+                netProfit shouldBe BigDecimal("8.91560000000000")
+                grossProfit shouldBe BigDecimal("9.000000000")
+                netLoss shouldBe BigDecimal.ZERO
+                grossLoss shouldBe BigDecimal.ZERO
                 entry.date shouldBe LocalDateTime.parse("2024-01-30T10:18")
                 entry.direction shouldBe TradeDirection.BUY
                 entry.grossPrice shouldBe BigDecimal("101.000000000")
@@ -85,10 +87,14 @@ class AnalyzeStrategyIntegrationTest(
                 exit?.direction shouldBe TradeDirection.SELL
                 exit?.grossPrice shouldBe BigDecimal("110.000000000")
                 exit?.netPrice shouldBe BigDecimal("109.95600000000000")
-                grossProfit shouldBe BigDecimal("9.000000000")
-                netProfit shouldBe BigDecimal("8.91560000000000")
             }
             with(trades[1]) {
+                netValue shouldBe BigDecimal("-7.07880000000000")
+                grossValue shouldBe BigDecimal("-7.000000000")
+                netProfit shouldBe BigDecimal.ZERO
+                grossProfit shouldBe BigDecimal.ZERO
+                netLoss shouldBe BigDecimal("-7.07880000000000")
+                grossLoss shouldBe BigDecimal("-7.000000000")
                 entry.date shouldBe LocalDateTime.parse("2024-01-30T10:24")
                 entry.direction shouldBe TradeDirection.BUY
                 entry.grossPrice shouldBe BigDecimal("102.000000000")
@@ -97,10 +103,14 @@ class AnalyzeStrategyIntegrationTest(
                 exit?.direction shouldBe TradeDirection.SELL
                 exit?.grossPrice shouldBe BigDecimal("95.000000000")
                 exit?.netPrice shouldBe BigDecimal("94.96200000000000")
-                grossProfit shouldBe BigDecimal("-7.000000000")
-                netProfit shouldBe BigDecimal("-7.07880000000000")
             }
             with(trades[2]) {
+                netLoss shouldBe BigDecimal.ZERO
+                grossValue shouldBe BigDecimal.ZERO
+                netProfit shouldBe BigDecimal.ZERO
+                grossProfit shouldBe BigDecimal.ZERO
+                netLoss shouldBe BigDecimal.ZERO
+                grossLoss shouldBe BigDecimal.ZERO
                 entry.date shouldBe LocalDateTime.parse("2024-01-30T10:28")
                 entry.direction shouldBe TradeDirection.BUY
                 entry.grossPrice shouldBe BigDecimal("102.000000000")

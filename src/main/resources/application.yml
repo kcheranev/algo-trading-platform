@@ -14,8 +14,11 @@ application:
     defaultCommission: 0.0004
     availableDelayedCandleCount: 5
     placeOrderRetryCount: 3
-    startTradingTime: "10:00:00"
-    endTradingTime: "18:40:00"
+    tradingSchedule:
+      - from: "10:00:00"
+        to: "18:40:00"
+      - from: "19:05:00"
+        to: "23:50:00"
   infra:
     broker:
       token: ${BROKER_TOKEN}

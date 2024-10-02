@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.core.port.model.Page
 import ru.kcheranev.trading.core.port.model.sort.Sort
@@ -16,13 +17,13 @@ import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.SearchSt
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.StrategyConfigurationSearchResponseDto
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
 import ru.kcheranev.trading.test.IntegrationTest
+import java.util.UUID
 
 @IntegrationTest
 class SearchStrategyConfigurationIntegrationTest(
     private val testRestTemplate: TestRestTemplate,
-    private val strategyConfigurationRepository: StrategyConfigurationRepository,
+    private val jdbcTemplate: JdbcAggregateTemplate,
     private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
 
@@ -32,37 +33,42 @@ class SearchStrategyConfigurationIntegrationTest(
         val strategyConfigurations =
             listOf(
                 StrategyConfigurationEntity(
-                    null,
-                    "MOVING_MOMENTUM_LONG",
-                    CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param1" to 1))
+                    id = UUID.randomUUID(),
+                    name = "moving momentum",
+                    type = "MOVING_MOMENTUM_LONG",
+                    candleInterval = CandleInterval.ONE_MIN,
+                    parameters = MapWrapper(mapOf("param1" to 1))
                 ),
                 StrategyConfigurationEntity(
-                    null,
-                    "TEST_1",
-                    CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param2" to 2))
+                    id = UUID.randomUUID(),
+                    name = "test1",
+                    type = "TEST_1",
+                    candleInterval = CandleInterval.ONE_MIN,
+                    parameters = MapWrapper(mapOf("param2" to 2))
                 ),
                 StrategyConfigurationEntity(
-                    null,
-                    "TEST_2",
-                    CandleInterval.ONE_MIN,
-                    MapWrapper(mapOf("param3" to 3))
+                    id = UUID.randomUUID(),
+                    name = "test2",
+                    type = "TEST_2",
+                    candleInterval = CandleInterval.ONE_MIN,
+                    parameters = MapWrapper(mapOf("param3" to 3))
                 ),
                 StrategyConfigurationEntity(
-                    null,
-                    "TEST_3",
-                    CandleInterval.FIVE_MIN,
-                    MapWrapper(mapOf("param4" to 4))
+                    id = UUID.randomUUID(),
+                    name = "test3",
+                    type = "TEST_3",
+                    candleInterval = CandleInterval.FIVE_MIN,
+                    parameters = MapWrapper(mapOf("param4" to 4))
                 ),
                 StrategyConfigurationEntity(
-                    null,
-                    "TEST_4",
-                    CandleInterval.FIVE_MIN,
-                    MapWrapper(mapOf("param5" to 5))
+                    id = UUID.randomUUID(),
+                    name = "test4",
+                    type = "TEST_4",
+                    candleInterval = CandleInterval.FIVE_MIN,
+                    parameters = MapWrapper(mapOf("param5" to 5))
                 )
             )
-        strategyConfigurationRepository.saveAll(strategyConfigurations)
+        jdbcTemplate.insertAll(strategyConfigurations)
     }
 
     "should search strategy configuration by type" {

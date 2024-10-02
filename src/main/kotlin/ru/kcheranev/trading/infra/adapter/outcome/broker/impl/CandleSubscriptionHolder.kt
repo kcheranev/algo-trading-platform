@@ -39,7 +39,7 @@ class CandleSubscriptionHolder {
     fun checkSubscriptionExists(subscriptionId: String) =
         candleSubscriptions.containsKey(subscriptionId)
 
-    fun lastSubscription(subscriptionId: String) =
+    fun isLastSubscription(subscriptionId: String) =
         candleSubscriptions[subscriptionId]?.subscriptionCount == 1
 
     fun reset() {

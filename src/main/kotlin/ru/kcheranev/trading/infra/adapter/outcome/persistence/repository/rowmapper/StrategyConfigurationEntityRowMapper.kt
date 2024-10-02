@@ -17,9 +17,10 @@ class StrategyConfigurationEntityRowMapper(
     override fun mapRow(rs: ResultSet, rowNum: Int) =
         StrategyConfigurationEntity(
             id = UUID.fromString(rs.getString("id")),
+            name = rs.getString("name"),
             type = rs.getString("type"),
             candleInterval = CandleInterval.valueOf(rs.getString("candle_interval")),
-            params = mapToJsonbReadConverter.convert(rs.getObject("params", PGobject::class.java))
+            parameters = mapToJsonbReadConverter.convert(rs.getObject("parameters", PGobject::class.java))
         )
 
 }

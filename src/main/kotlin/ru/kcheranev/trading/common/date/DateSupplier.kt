@@ -1,9 +1,12 @@
 package ru.kcheranev.trading.common.date
 
+import java.time.LocalDate
 import java.time.LocalDateTime
 
-fun interface DateSupplier {
+interface DateSupplier {
 
-    fun currentDate(): LocalDateTime
+    fun currentDateTime(): LocalDateTime
+
+    fun currentDate(): LocalDate
 
 }

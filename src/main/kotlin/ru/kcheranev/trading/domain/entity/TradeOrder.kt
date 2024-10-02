@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 data class TradeOrder(
-    val id: TradeOrderId?,
+    val id: TradeOrderId,
     val ticker: String,
     val instrumentId: String,
     val date: LocalDateTime,
@@ -30,10 +30,10 @@ data class TradeOrder(
             tradeSessionId: TradeSessionId,
             dateSupplier: DateSupplier
         ) = TradeOrder(
-            id = null,
+            id = TradeOrderId.init(),
             ticker = ticker,
             instrumentId = instrumentId,
-            date = dateSupplier.currentDate(),
+            date = dateSupplier.currentDateTime(),
             lotsQuantity = lotsQuantity,
             totalPrice = totalPrice,
             executedCommission = executedCommission,
@@ -50,5 +50,11 @@ data class TradeOrderId(
 ) {
 
     override fun toString() = value.toString()
+
+    companion object {
+
+        fun init() = TradeOrderId(UUID.randomUUID())
+
+    }
 
 }
