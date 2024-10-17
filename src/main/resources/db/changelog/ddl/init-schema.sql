@@ -14,7 +14,6 @@ CREATE TABLE trade_session
     ticker                    character varying NOT NULL,
     instrument_id             character varying NOT NULL,
     status                    character varying NOT NULL,
-    start_date                timestamp without time zone NOT NULL,
     candle_interval           character varying NOT NULL,
     lots_quantity             integer           NOT NULL,
     lots_quantity_in_position integer           NOT NULL,

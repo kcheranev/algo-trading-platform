@@ -18,7 +18,7 @@ import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyPa
 
 @Controller
 @RequestMapping("ui/backtesting")
-class BacktestingAnalyzeUiController(
+class BacktestingStrategyAnalyzeUiController(
     private val strategyAnalyzeUseCase: StrategyAnalyzeUseCase,
     private val getStrategyTypesUseCase: GetStrategyTypesUseCase,
     private val getStrategyParametersNamesUseCase: GetStrategyParametersNamesUseCase

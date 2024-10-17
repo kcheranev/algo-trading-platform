@@ -16,6 +16,8 @@ class TradeStrategyCache {
         _tradeStrategies[key] = value
     }
 
+    fun get(key: UUID) = _tradeStrategies[key]
+
     fun computeIfAbsent(key: UUID, mappingFunction: (UUID) -> TradeStrategy) =
         _tradeStrategies.computeIfAbsent(key, mappingFunction)
 

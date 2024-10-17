@@ -4,18 +4,18 @@ import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.Named
 import org.mapstruct.factory.Mappers
-import ru.kcheranev.trading.core.port.income.backtesting.StrategyAdjustAndAnalyzeCommand
 import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeCommand
+import ru.kcheranev.trading.core.port.income.backtesting.StrategyParametersAnalyzeCommand
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.backtesting.DailyStrategyAnalyzeResult
-import ru.kcheranev.trading.domain.model.backtesting.ParametrizedStrategyResult
 import ru.kcheranev.trading.domain.model.backtesting.StrategyAnalyzeResult
-import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyAdjustAndAnalyzeRequestUiDto
+import ru.kcheranev.trading.domain.model.backtesting.StrategyParametersAnalyzeResult
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyAnalyzeRequestUiDto
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyParameterUiDto
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyParametersAnalyzeRequestUiDto
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.response.DailyStrategyAnalyzeResultUiDto
-import ru.kcheranev.trading.infra.adapter.income.web.ui.model.response.ParametrizedStrategyAnalyzeResultUiDto
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.response.StrategyAnalyzeResultUiDto
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.response.StrategyParametersAnalyzeResultUiDto
 import ru.kcheranev.trading.infra.adapter.mapper.EntityIdMapper
 
 @Mapper(uses = [EntityIdMapper::class])
@@ -26,7 +26,7 @@ abstract class BacktestingWebIncomeAdapterUiMapper {
 
     @Mapping(target = "strategyParameters", qualifiedByName = ["mapStrategyParameters"])
     @Mapping(target = "mutableStrategyParameters", qualifiedByName = ["mapStrategyParameters"])
-    abstract fun map(source: StrategyAdjustAndAnalyzeRequestUiDto): StrategyAdjustAndAnalyzeCommand
+    abstract fun map(source: StrategyParametersAnalyzeRequestUiDto): StrategyParametersAnalyzeCommand
 
     @Named("mapStrategyParameters")
     fun mapStrategyParameters(source: List<StrategyParameterUiDto>) =
@@ -44,7 +44,7 @@ abstract class BacktestingWebIncomeAdapterUiMapper {
 
     abstract fun map(source: DailyStrategyAnalyzeResult): DailyStrategyAnalyzeResultUiDto
 
-    abstract fun map(source: ParametrizedStrategyResult): ParametrizedStrategyAnalyzeResultUiDto
+    abstract fun map(source: StrategyParametersAnalyzeResult): StrategyParametersAnalyzeResultUiDto
 
 }
 

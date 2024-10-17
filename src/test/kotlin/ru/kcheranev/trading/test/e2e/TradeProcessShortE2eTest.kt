@@ -15,8 +15,8 @@ import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.TradeDirection
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.common.InstrumentDto
-import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StartTradeSessionRequestDto
-import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.StartTradeSessionResponseDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.CreateTradeSessionRequestDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.CreateTradeSessionResponseDto
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
@@ -64,16 +64,16 @@ class TradeProcessShortE2eTest(
 
         //start trade session
         marketDataBrokerGrpcStub.stubForGetCandles("get-candles.json")
-        val startTradeSessionResponse = testRestTemplate.postForEntity(
+        val createTradeSessionResponse = testRestTemplate.postForEntity(
             "/trade-sessions",
-            StartTradeSessionRequestDto(
+            CreateTradeSessionRequestDto(
                 strategyConfiguration.id,
                 4,
                 InstrumentDto("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
             ),
-            StartTradeSessionResponseDto::class.java
+            CreateTradeSessionResponseDto::class.java
         )
-        startTradeSessionResponse.statusCode shouldBe HttpStatus.OK
+        createTradeSessionResponse.statusCode shouldBe HttpStatus.OK
 
         //income candle event
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")

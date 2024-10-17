@@ -8,15 +8,15 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import ru.kcheranev.trading.core.port.income.tradesession.CreateTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.SearchTradeSessionUseCase
-import ru.kcheranev.trading.core.port.income.tradesession.StartTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.StopTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.StopTradeSessionUseCase
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.mapper.tradeSessionWebIncomeAdapterMapper
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.CreateTradeSessionRequestDto
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.SearchTradeSessionRequestDto
-import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StartTradeSessionRequestDto
-import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.StartTradeSessionResponseDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.CreateTradeSessionResponseDto
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.TradeSessionSearchResponseDto
 import java.util.UUID
 
@@ -24,16 +24,16 @@ import java.util.UUID
 @RestController
 @RequestMapping("trade-sessions")
 class TradeSessionController(
-    private val startTradeSessionUseCase: StartTradeSessionUseCase,
+    private val createTradeSessionUseCase: CreateTradeSessionUseCase,
     private val stopTradeSessionUseCase: StopTradeSessionUseCase,
     private val tradeSessionSearchUseCase: SearchTradeSessionUseCase
 ) {
 
-    @Operation(summary = "Start trade session")
+    @Operation(summary = "Create trade session")
     @PostMapping
-    fun start(@RequestBody request: StartTradeSessionRequestDto) =
-        StartTradeSessionResponseDto(
-            startTradeSessionUseCase.startTradeSession(tradeSessionWebIncomeAdapterMapper.map(request)).value
+    fun create(@RequestBody request: CreateTradeSessionRequestDto) =
+        CreateTradeSessionResponseDto(
+            createTradeSessionUseCase.createTradeSession(tradeSessionWebIncomeAdapterMapper.map(request)).value
         )
 
     @Operation(summary = "Stop trade session")

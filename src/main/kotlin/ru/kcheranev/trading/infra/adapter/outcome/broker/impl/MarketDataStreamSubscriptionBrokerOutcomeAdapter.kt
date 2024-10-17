@@ -7,6 +7,8 @@ import ru.kcheranev.trading.core.port.income.marketdata.ProcessCandleUseCase
 import ru.kcheranev.trading.core.port.outcome.broker.MarketDataStreamSubscriptionBrokerPort
 import ru.kcheranev.trading.core.port.outcome.broker.SubscribeCandlesOrderCommand
 import ru.kcheranev.trading.core.port.outcome.broker.UnsubscribeCandlesOrderCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.IsReadyToOrderTradeSessionExistsCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.TradeSessionPersistencePort
 import ru.kcheranev.trading.domain.model.subscription.CandleSubscription
 import ru.kcheranev.trading.infra.adapter.income.broker.impl.CandleSubscriptionBrokerIncomeAdapter
 import ru.kcheranev.trading.infra.adapter.outcome.broker.brokerOutcomeAdapterMapper
@@ -24,53 +26,59 @@ import kotlin.concurrent.withLock
 class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
     private val marketDataStreamService: MarketDataStreamService,
     private val processCandleUseCase: ProcessCandleUseCase,
-    private val candleSubscriptionHolder: CandleSubscriptionHolder
+    private val tradeSessionPersistencePort: TradeSessionPersistencePort,
+    private val candleSubscriptionCacheHolder: CandleSubscriptionCacheHolder
 ) : MarketDataStreamSubscriptionBrokerPort {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
     private val lock = ReentrantLock()
 
-    override fun subscribeCandles(command: SubscribeCandlesOrderCommand): Unit =
+    override fun subscribeCandles(command: SubscribeCandlesOrderCommand) {
         lock.withLock {
             val instrument = command.instrument
             val candleInterval = command.candleInterval
-            val subscriptionId = CandleSubscription.candleSubscriptionId(instrument, candleInterval)
-            if (!candleSubscriptionHolder.checkSubscriptionExists(subscriptionId)) {
-                log.info("Activate subscription for the trade session ticker=${instrument.ticker}, candleInterval=$candleInterval")
+            val candleSubscription = CandleSubscription(instrument, candleInterval)
+            if (!candleSubscriptionCacheHolder.contains(candleSubscription)) {
+                log.info("Activate subscription for the trade session, ticker=${instrument.ticker}, candleInterval=$candleInterval")
                 marketDataStreamService.newStream(
-                    CandleSubscription.candleSubscriptionId(instrument, candleInterval),
+                    candleSubscription.id,
                     CandleSubscriptionBrokerIncomeAdapter(processCandleUseCase)
                 ) { log.error(it.toString()) }
                     .subscribeCandlesWithWaitingClose(
-                        listOf(command.instrument.id),
+                        listOf(instrument.id),
                         brokerOutcomeAdapterMapper.mapToSubscriptionInterval(candleInterval)
                     )
+                candleSubscriptionCacheHolder.add(candleSubscription)
             }
-            candleSubscriptionHolder.incrementSubscriptionCount(instrument, candleInterval)
         }
+    }
 
-
-    override fun unsubscribeCandles(command: UnsubscribeCandlesOrderCommand): Unit =
+    override fun unsubscribeCandles(command: UnsubscribeCandlesOrderCommand) {
         lock.withLock {
             val instrument = command.instrument
             val candleInterval = command.candleInterval
-            val subscriptionId = CandleSubscription.candleSubscriptionId(instrument, candleInterval)
-            if (!candleSubscriptionHolder.checkSubscriptionExists(subscriptionId)) {
+            val candleSubscription = CandleSubscription(instrument, candleInterval)
+            if (!candleSubscriptionCacheHolder.contains(candleSubscription)) {
                 return
             }
-            if (candleSubscriptionHolder.isLastSubscription(subscriptionId)) {
-                log.info("Deactivate subscription for the trade session ticker=${instrument.ticker}, candleInterval=$candleInterval")
-                marketDataStreamService.getStreamById(subscriptionId)
+            val isReadyForOrderTradeSessionExists =
+                tradeSessionPersistencePort.isReadyForOrderTradeSessionExists(
+                    IsReadyToOrderTradeSessionExistsCommand(instrument.id, candleInterval)
+                )
+            if (!isReadyForOrderTradeSessionExists) {
+                log.info("Deactivate subscription for the trade session, ticker=${instrument.ticker}, candleInterval=$candleInterval")
+                marketDataStreamService.getStreamById(candleSubscription.id)
                     .unsubscribeCandles(
                         listOf(command.instrument.id),
                         brokerOutcomeAdapterMapper.mapToSubscriptionInterval(candleInterval)
                     )
+                candleSubscriptionCacheHolder.remove(candleSubscription)
             }
-            candleSubscriptionHolder.removeCandleSubscription(subscriptionId)
         }
+    }
 
-    override fun findAllCandleSubscriptions() = candleSubscriptionHolder.getSubscriptions()
+    override fun findAllCandleSubscriptions(): Set<CandleSubscription> = candleSubscriptionCacheHolder.findAll()
 
 }
 

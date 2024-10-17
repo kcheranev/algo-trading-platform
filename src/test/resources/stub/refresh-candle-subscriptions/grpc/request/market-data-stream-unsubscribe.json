@@ -1,0 +1,11 @@
+{
+  "subscribeCandlesRequest": {
+    "subscriptionAction": "SUBSCRIPTION_ACTION_UNSUBSCRIBE",
+    "instruments": [
+      {
+        "interval": "SUBSCRIPTION_INTERVAL_ONE_MINUTE",
+        "instrumentId": "b993e814-9986-4434-ae88-b086066714a0"
+      }
+    ]
+  }
+}

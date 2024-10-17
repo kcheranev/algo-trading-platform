@@ -16,12 +16,12 @@ data class StrategyAnalyzeRequestDto(
     @Schema(description = "End of strategy backtesting period") val to: LocalDate
 )
 
-data class StrategyAdjustAndAnalyzeRequestDto(
+data class StrategyParametersAnalyzeRequestDto(
     @Schema(description = "Strategy type") val strategyType: String,
     @Schema(description = "Strategy parameters") val strategyParameters: Map<String, Number> = emptyMap(),
     @Schema(description = "Mutable strategy parameters") val mutableStrategyParameters: Map<String, Number> = emptyMap(),
-    @Schema(description = "Adjust factor") val adjustFactor: BigDecimal,
-    @Schema(description = "Adjust variant count") val adjustVariantCount: Int,
+    @Schema(description = "Division factor") val divisionFactor: BigDecimal,
+    @Schema(description = "Variants count") val variantsCount: Int,
     @Schema(description = "Backtesting result filter") val resultFilter: StrategyAnalyzeResultFilterDto?,
     @Schema(description = "Profit type sort") val profitTypeSort: ProfitTypeSort?,
     @Schema(description = "Instrument") val instrument: InstrumentDto,

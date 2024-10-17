@@ -149,8 +149,10 @@
                             <tr th:each="trade : ${dayAnalyzeResult.value.trades}">
                                 <td th:text="${#temporals.format(trade.entry.date, 'HH:mm')}"></td>
                                 <td th:text="${trade.exit != null} ? ${#temporals.format(trade.exit.date, 'HH:mm')}: ''"></td>
-                                <td th:text="${#numbers.formatDecimal(trade.netValue,1,4)}"></td>
-                                <td th:text="${#numbers.formatDecimal(trade.grossValue,1,4)}"></td>
+                                <td th:text="${#numbers.formatDecimal(trade.netValue,1,4)}"
+                                    th:class="${trade.netValue >= 0} ? 'text-success' : 'text-danger'"></td>
+                                <td th:text="${#numbers.formatDecimal(trade.grossValue,1,4)}"
+                                    th:class="${trade.grossValue >= 0} ? 'text-success' : 'text-danger'"></td>
                                 <td th:text="${trade.entry.direction.name() == 'BUY'}? 'LONG' : 'SHORT'"></td>
                                 <td th:text="${#numbers.formatDecimal(trade.entry.netPrice,1,4)}"></td>
                                 <td th:text="${trade.exit != null} ? ${#numbers.formatDecimal(trade.exit.netPrice,1,4)}: ''"></td>

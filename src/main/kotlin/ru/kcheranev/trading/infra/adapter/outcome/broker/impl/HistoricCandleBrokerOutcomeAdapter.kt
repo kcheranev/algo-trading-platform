@@ -56,14 +56,15 @@ class HistoricCandleBrokerOutcomeAdapter(
     }
 
     override fun getLastHistoricCandles(command: GetLastHistoricCandlesCommand): List<Candle> {
-        var currentDay = dateSupplier.currentDate()
+        val now = dateSupplier.currentDateTime()
+        var currentDay = now.toLocalDate()
         var candles =
             getHistoricCandles(
                 GetHistoricCandlesCommand(
                     instrument = command.instrument,
                     candleInterval = command.candleInterval,
                     from = currentDay.atStartOfDay(),
-                    to = dateSupplier.currentDateTime()
+                    to = now
                 )
             )
         while (candles.size < command.quantity) {

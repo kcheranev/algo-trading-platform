@@ -4,7 +4,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
 
-data class ParametrizedStrategyResult(
+data class StrategyParametersAnalyzeResult(
     val result: StrategyAnalyzeResult,
     val parameters: Map<String, Number>
 )

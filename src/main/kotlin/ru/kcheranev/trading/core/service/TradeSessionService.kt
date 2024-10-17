@@ -3,18 +3,18 @@ package ru.kcheranev.trading.core.service
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.kcheranev.trading.common.date.DateSupplier
-import ru.kcheranev.trading.core.config.TradingProperties
+import ru.kcheranev.trading.core.config.TradingProperties.Companion.tradingProperties
 import ru.kcheranev.trading.core.model.order.PostOrderResultAccumulator
+import ru.kcheranev.trading.core.port.income.tradesession.CreateTradeSessionCommand
+import ru.kcheranev.trading.core.port.income.tradesession.CreateTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.EnterTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.EnterTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.ExitTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.ExitTradeSessionUseCase
-import ru.kcheranev.trading.core.port.income.tradesession.ReinitStrategyCommand
+import ru.kcheranev.trading.core.port.income.tradesession.ResumeStrategyCommand
 import ru.kcheranev.trading.core.port.income.tradesession.ResumeTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.SearchTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.SearchTradeSessionUseCase
-import ru.kcheranev.trading.core.port.income.tradesession.StartTradeSessionCommand
-import ru.kcheranev.trading.core.port.income.tradesession.StartTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.StopTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.StopTradeSessionUseCase
 import ru.kcheranev.trading.core.port.mapper.commandMapper
@@ -39,7 +39,6 @@ import ru.kcheranev.trading.domain.model.TradeDirection
 
 @Service
 class TradeSessionService(
-    tradingProperties: TradingProperties,
     private val tradeStrategyServicePort: TradeStrategyServicePort,
     private val strategyConfigurationPersistencePort: StrategyConfigurationPersistencePort,
     private val tradeSessionPersistencePort: TradeSessionPersistencePort,
@@ -47,16 +46,14 @@ class TradeSessionService(
     private val tradeOrderPersistencePort: TradeOrderPersistencePort,
     private val dateSupplier: DateSupplier
 ) : SearchTradeSessionUseCase,
-    StartTradeSessionUseCase,
+    CreateTradeSessionUseCase,
     EnterTradeSessionUseCase,
     ExitTradeSessionUseCase,
     StopTradeSessionUseCase,
     ResumeTradeSessionUseCase {
 
-    private val placeOrderRetryCount = tradingProperties.placeOrderRetryCount
-
     @Transactional
-    override fun startTradeSession(command: StartTradeSessionCommand): TradeSessionId {
+    override fun createTradeSession(command: CreateTradeSessionCommand): TradeSessionId {
         val strategyConfiguration =
             strategyConfigurationPersistencePort.get(
                 GetStrategyConfigurationCommand(command.strategyConfigurationId)
@@ -71,13 +68,12 @@ class TradeSessionService(
                 )
             )
         val tradeSession =
-            TradeSession.start(
+            TradeSession.create(
                 strategyConfiguration = strategyConfiguration,
                 ticker = command.instrument.ticker,
                 instrumentId = command.instrument.id,
                 lotsQuantity = command.lotsQuantity,
-                tradeStrategy = tradeStrategy,
-                dateSupplier = dateSupplier
+                tradeStrategy = tradeStrategy
             )
         return tradeSessionPersistencePort.insert(InsertTradeSessionCommand(tradeSession))
     }
@@ -116,7 +112,7 @@ class TradeSessionService(
         if (postOrderResultAccumulator.haveOrders()) {
             tradeSession.enter(postOrderResultAccumulator.lotsExecuted)
         } else {
-            tradeSession.await()
+            tradeSession.resume()
         }
         tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
     }
@@ -155,18 +151,18 @@ class TradeSessionService(
         if (postOrderResultAccumulator.haveOrders()) {
             tradeSession.exit(postOrderResultAccumulator.lotsExecuted)
         } else {
-            tradeSession.await()
+            tradeSession.resume()
         }
         tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
     }
 
     private fun postOrderWithRetry(
         lotsQuantity: Int,
-        postOrder: (requestedLotsQuantity: Int) -> PostOrderResponse
+        postOrder: (Int) -> PostOrderResponse
     ): PostOrderResultAccumulator {
         val postOrderResultAccumulator = PostOrderResultAccumulator(lotsQuantity)
-        for (placeOrderTry in 1..placeOrderRetryCount) {
-            val postOrderResponse = postOrder.invoke(postOrderResultAccumulator.remainLotsQuantity())
+        for (placeOrderTry in 1..tradingProperties.placeOrderRetryCount) {
+            val postOrderResponse = postOrder(postOrderResultAccumulator.remainLotsQuantity())
             postOrderResultAccumulator.accumulate(postOrderResponse)
             if (postOrderResultAccumulator.completed()) {
                 break
@@ -183,19 +179,10 @@ class TradeSessionService(
     }
 
     @Transactional
-    override fun reinitStrategy(command: ReinitStrategyCommand) {
+    override fun resumeTradeSession(command: ResumeStrategyCommand) {
         val tradeSession = tradeSessionPersistencePort.get(GetTradeSessionCommand(command.tradeSessionId))
-        val tradeStrategy =
-            tradeStrategyServicePort.initTradeStrategy(
-                InitTradeStrategyCommand(
-                    strategyType = tradeSession.strategyType,
-                    instrument = tradeSession.instrument,
-                    candleInterval = tradeSession.candleInterval,
-                    strategyParameters = tradeSession.strategyParameters
-                )
-            )
-        tradeSession.reinitStrategy(tradeStrategy)
-        tradeSession.await()
+        tradeSession.resume()
+        tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
     }
 
     override fun search(command: SearchTradeSessionCommand) =

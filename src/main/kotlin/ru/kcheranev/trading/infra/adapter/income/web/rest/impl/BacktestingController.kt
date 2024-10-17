@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeUseCase
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.mapper.backtestingWebIncomeAdapterMapper
-import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StrategyAdjustAndAnalyzeRequestDto
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StrategyAnalyzeRequestDto
-import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.ParametrizedStrategyResponseDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StrategyParametersAnalyzeRequestDto
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.StrategyAnalyzeResponseDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.StrategyParametersAnalyzeResponseDto
 
 @Tag(name = "Backtesting")
 @RestController
@@ -29,11 +29,11 @@ class BacktestingController(
             )
         )
 
-    @Operation(summary = "Adjust and analyze trade strategy")
-    @PostMapping("adjust-and-analyze")
-    fun adjustAndAnalyzeStrategy(@RequestBody request: StrategyAdjustAndAnalyzeRequestDto) =
-        ParametrizedStrategyResponseDto(
-            strategyAnalyzeUseCase.adjustAndAnalyzeStrategy(backtestingWebIncomeAdapterMapper.map(request))
+    @Operation(summary = "Analyze strategy parameters")
+    @PostMapping("analyze-parameters")
+    fun analyzeStrategyParameters(@RequestBody request: StrategyParametersAnalyzeRequestDto) =
+        StrategyParametersAnalyzeResponseDto(
+            strategyAnalyzeUseCase.analyzeStrategyParameters(backtestingWebIncomeAdapterMapper.map(request))
                 .map { backtestingWebIncomeAdapterMapper.map(it) }
         )
 

@@ -2,7 +2,6 @@ package ru.kcheranev.trading.infra.adapter.income.web.ui.model.response
 
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
-import java.time.LocalDateTime
 import java.util.UUID
 
 data class TradeSessionUiDto(
@@ -10,7 +9,6 @@ data class TradeSessionUiDto(
     val ticker: String,
     val instrumentId: String,
     val status: TradeSessionStatus,
-    val startDate: LocalDateTime,
     val candleInterval: CandleInterval,
     val lotsQuantity: Int,
     val lotsQuantityInPosition: Int,

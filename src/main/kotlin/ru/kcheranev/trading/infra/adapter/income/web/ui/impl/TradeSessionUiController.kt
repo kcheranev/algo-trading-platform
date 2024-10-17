@@ -8,31 +8,31 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import ru.kcheranev.trading.core.port.income.tradesession.CreateTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.SearchTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.SearchTradeSessionUseCase
-import ru.kcheranev.trading.core.port.income.tradesession.StartTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.StopTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.StopTradeSessionUseCase
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.infra.adapter.income.web.ui.NotFoundException
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.mapper.tradeSessionWebIncomeAdapterUiMapper
-import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StartTradeSessionRequestUiDto
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.CreateTradeSessionRequestUiDto
 import java.util.UUID
 
 @Controller
 @RequestMapping("ui/trade-sessions")
 class TradeSessionUiController(
-    private val startTradeSessionUseCase: StartTradeSessionUseCase,
+    private val createTradeSessionUseCase: CreateTradeSessionUseCase,
     private val stopTradeSessionUseCase: StopTradeSessionUseCase,
     private val searchTradeSessionUseCase: SearchTradeSessionUseCase
 ) {
 
     @PostMapping
-    fun start(
-        @RequestBody request: StartTradeSessionRequestUiDto,
+    fun create(
+        @RequestBody request: CreateTradeSessionRequestUiDto,
         bindingResult: BindingResult
     ): String {
-        startTradeSessionUseCase.startTradeSession(tradeSessionWebIncomeAdapterUiMapper.map(request))
+        createTradeSessionUseCase.createTradeSession(tradeSessionWebIncomeAdapterUiMapper.map(request))
         return "redirect:ui/trade-sessions"
     }
 

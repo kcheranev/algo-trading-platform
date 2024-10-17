@@ -5,7 +5,7 @@ import io.mockk.spyk
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import ru.kcheranev.trading.common.date.DateSupplier
-import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionHolder
+import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionCacheHolder
 import ru.kcheranev.trading.infra.config.BrokerApi
 import ru.kcheranev.trading.infra.config.properties.BrokerProperties
 import ru.kcheranev.trading.infra.config.properties.TelegramNotificationProperties
@@ -48,9 +48,9 @@ class TradingApplicationTestConfiguration {
 
     @Bean
     fun marketDataSubscriptionInitializer(
-        candleSubscriptionHolder: CandleSubscriptionHolder,
+        candleSubscriptionCacheHolder: CandleSubscriptionCacheHolder,
         marketDataStreamService: MarketDataStreamService
-    ) = MarketDataSubscriptionInitializer(candleSubscriptionHolder, marketDataStreamService)
+    ) = MarketDataSubscriptionInitializer(candleSubscriptionCacheHolder, marketDataStreamService)
 
     @Bean
     fun telegramNotificationHttpStub(notificationProperties: TelegramNotificationProperties) =

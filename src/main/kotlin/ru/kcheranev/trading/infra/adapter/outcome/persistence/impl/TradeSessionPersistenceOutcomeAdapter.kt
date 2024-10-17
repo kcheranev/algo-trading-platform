@@ -5,9 +5,11 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation.MANDATORY
 import org.springframework.transaction.annotation.Transactional
+import ru.kcheranev.trading.common.date.DateSupplier
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.GetReadyToOrderTradeSessionsCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.GetTradeSessionCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.InsertTradeSessionCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.IsReadyToOrderTradeSessionExistsCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.SaveTradeSessionCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.SearchTradeSessionCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.TradeSessionPersistencePort
@@ -15,8 +17,10 @@ import ru.kcheranev.trading.core.port.service.TradeStrategyServicePort
 import ru.kcheranev.trading.core.port.service.command.InitTradeStrategyCommand
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
+import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.domain.model.StrategyParameters
+import ru.kcheranev.trading.domain.model.TradeStrategy
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.PersistenceNotFoundException
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.persistenceOutcomeAdapterMapper
@@ -28,7 +32,8 @@ class TradeSessionPersistenceOutcomeAdapter(
     private val tradeSessionRepository: TradeSessionRepository,
     private val tradeStrategyCache: TradeStrategyCache,
     private val tradeStrategyServicePort: TradeStrategyServicePort,
-    private val eventPublisher: ApplicationEventPublisher
+    private val eventPublisher: ApplicationEventPublisher,
+    private val dateSupplier: DateSupplier
 ) : TradeSessionPersistencePort {
 
     @Transactional(propagation = MANDATORY)
@@ -51,7 +56,7 @@ class TradeSessionPersistenceOutcomeAdapter(
         tradeSession.events.forEach { eventPublisher.publishEvent(it) }
         tradeSession.clearEvents()
         val tradeSessionId = savedTradeSessionEntity.id
-        if (tradeSession.isTerminal()) {
+        if (tradeSession.status == TradeSessionStatus.STOPPED) {
             tradeStrategyCache.remove(tradeSessionId)
         }
         return TradeSessionId(tradeSessionId)
@@ -72,20 +77,32 @@ class TradeSessionPersistenceOutcomeAdapter(
         tradeSessionRepository.search(command)
             .map { persistenceOutcomeAdapterMapper.map(it) }
 
+    override fun getReadyForOrderTradeSessions() =
+        tradeSessionRepository.getReadyForOrderTradeSessions()
+            .map { persistenceOutcomeAdapterMapper.map(it, getOrCreateTradeStrategy(it)) }
+
     override fun getReadyForOrderTradeSessions(command: GetReadyToOrderTradeSessionsCommand) =
         tradeSessionRepository.getReadyForOrderTradeSessions(command.instrumentId, command.candleInterval)
             .map { persistenceOutcomeAdapterMapper.map(it, getOrCreateTradeStrategy(it)) }
 
-    private fun getOrCreateTradeStrategy(tradeSessionEntity: TradeSessionEntity) =
-        tradeStrategyCache.computeIfAbsent(tradeSessionEntity.id) {
-            tradeStrategyServicePort.initTradeStrategy(
-                InitTradeStrategyCommand(
-                    strategyType = tradeSessionEntity.strategyType,
-                    instrument = Instrument(tradeSessionEntity.instrumentId, tradeSessionEntity.ticker),
-                    candleInterval = tradeSessionEntity.candleInterval,
-                    strategyParameters = StrategyParameters(tradeSessionEntity.strategyParameters.value)
-                )
-            )
-        }
+    override fun isReadyForOrderTradeSessionExists(command: IsReadyToOrderTradeSessionExistsCommand) =
+        tradeSessionRepository.isReadyForOrderTradeSessionExists(command.instrumentId, command.candleInterval)
+
+    private fun getOrCreateTradeStrategy(tradeSessionEntity: TradeSessionEntity): TradeStrategy =
+        tradeStrategyCache.get(tradeSessionEntity.id)
+            ?.takeIf { it.isFreshCandleSeries(dateSupplier.currentDateTime(), tradeSessionEntity.candleInterval) }
+            ?: run {
+                val tradeStrategy =
+                    tradeStrategyServicePort.initTradeStrategy(
+                        InitTradeStrategyCommand(
+                            strategyType = tradeSessionEntity.strategyType,
+                            instrument = Instrument(tradeSessionEntity.instrumentId, tradeSessionEntity.ticker),
+                            candleInterval = tradeSessionEntity.candleInterval,
+                            strategyParameters = StrategyParameters(tradeSessionEntity.strategyParameters.value)
+                        )
+                    )
+                tradeStrategyCache.put(tradeSessionEntity.id, tradeStrategy)
+                return@run tradeStrategy
+            }
 
 }

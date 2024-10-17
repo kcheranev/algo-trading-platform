@@ -14,7 +14,6 @@
                     <th>Instrument id</th>
                     <th>Ticker</th>
                     <th>Candle interval</th>
-                    <th>Count</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -22,7 +21,6 @@
                     <td th:text="${candleSubscription.instrument.id}"></td>
                     <td th:text="${candleSubscription.instrument.ticker}"></td>
                     <td th:text="${candleSubscription.candleInterval}"></td>
-                    <td th:text="${candleSubscription.subscriptionCount}"></td>
                 </tr>
                 </tbody>
             </table>

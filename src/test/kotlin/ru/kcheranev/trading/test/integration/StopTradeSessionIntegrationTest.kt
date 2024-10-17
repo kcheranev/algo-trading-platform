@@ -12,16 +12,23 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.ta4j.core.BaseBar
+import org.ta4j.core.BaseBarSeriesBuilder
+import org.ta4j.core.Strategy
+import ru.kcheranev.trading.common.date.toMskZonedDateTime
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
-import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionHolder
+import ru.kcheranev.trading.domain.model.TradeStrategy
+import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionCacheHolder
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeStrategyCache
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.test.IntegrationTest
 import ru.kcheranev.trading.test.stub.grpc.MarketDataBrokerGrpcStub
 import ru.kcheranev.trading.test.util.MarketDataSubscriptionInitializer
+import java.math.BigDecimal
+import java.time.Duration
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,7 +38,7 @@ class StopTradeSessionIntegrationTest(
     private val tradeStrategyCache: TradeStrategyCache,
     private val jdbcTemplate: JdbcAggregateTemplate,
     private val marketDataSubscriptionInitializer: MarketDataSubscriptionInitializer,
-    private val candleSubscriptionHolder: CandleSubscriptionHolder,
+    private val candleSubscriptionCacheHolder: CandleSubscriptionCacheHolder,
     private val tradeSessionCache: TradeStrategyCache,
     private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
@@ -51,16 +58,30 @@ class StopTradeSessionIntegrationTest(
                 ticker = "SBER",
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.WAITING,
-                startDate = LocalDateTime.parse("2024-01-01T10:15:30"),
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 lotsQuantityInPosition = 0,
-                strategyType = "DUMMY",
+                strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
         )
-        tradeStrategyCache.put(tradeSessionId, mockk())
-        marketDataSubscriptionInitializer.init(
+        val barSeries =
+            BaseBarSeriesBuilder().build()
+                .apply {
+                    addBar(
+                        BaseBar(
+                            Duration.ofMinutes(1),
+                            LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
+                            BigDecimal(100),
+                            BigDecimal(102),
+                            BigDecimal(98),
+                            BigDecimal(102),
+                            BigDecimal(10)
+                        )
+                    )
+                }
+        tradeStrategyCache.put(tradeSessionId, TradeStrategy(barSeries, false, mockk<Strategy>()))
+        marketDataSubscriptionInitializer.addSubscription(
             Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
             CandleInterval.ONE_MIN
         )
@@ -84,7 +105,7 @@ class StopTradeSessionIntegrationTest(
         tradeSession.status shouldBe TradeSessionStatus.STOPPED
 
         tradeSessionCache.tradeStrategies.shouldBeEmpty()
-        candleSubscriptionHolder.getSubscriptions().shouldBeEmpty()
+        candleSubscriptionCacheHolder.findAll().shouldBeEmpty()
     }
 
 })

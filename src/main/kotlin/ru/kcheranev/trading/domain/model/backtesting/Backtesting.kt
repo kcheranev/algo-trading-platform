@@ -49,26 +49,26 @@ class Backtesting(
     ) = strategyFactory.initStrategy(parameters, series)
         .analyze(commission)
 
-    fun adjustAndAnalyzeStrategy(
+    fun analyzeStrategyParameters(
         strategyFactory: StrategyFactory,
         parameters: StrategyParameters,
         mutableParameters: StrategyParameters,
-        adjustFactor: BigDecimal,
-        adjustVariantCount: Int,
+        divisionFactor: BigDecimal,
+        variantsCount: Int,
         resultsLimit: Int?,
         minProfitLossPositionsRatio: BigDecimal?,
         tradesByDayCountFactor: BigDecimal?,
         profitTypeSort: ProfitTypeSort?
-    ): List<ParametrizedStrategyResult> {
-        val adjustedParameters =
+    ): List<StrategyParametersAnalyzeResult> {
+        val mutableParametersVariants =
             mutableParameters.mapValues { (_, paramValue) ->
-                buildAdjustedParameters(paramValue, adjustFactor, adjustVariantCount)
+                buildParameterVariants(paramValue, divisionFactor, variantsCount)
             }
-        val adjustedParamVariants = cartesianProduct(adjustedParameters)
+        val mutableParametersCartesianProduct = cartesianProduct(mutableParametersVariants)
         return runBlocking {
-            adjustedParamVariants.map { paramVariant ->
+            mutableParametersCartesianProduct.map { paramVariant ->
                 async {
-                    analyzeAdjustedStrategy(strategyFactory, paramVariant + parameters)
+                    analyzeParametersVariant(strategyFactory, paramVariant + parameters)
                 }
             }.awaitAll()
         }.asSequence()
@@ -95,20 +95,20 @@ class Backtesting(
             .toList()
     }
 
-    private fun buildAdjustedParameters(
+    private fun buildParameterVariants(
         paramValue: Number,
-        adjustFactor: BigDecimal,
-        adjustVariantCount: Int
+        divisionFactor: BigDecimal,
+        variantsCount: Int
     ): List<Number> =
         when (paramValue) {
             is Int -> {
                 val minParamValue =
                     BigDecimal(paramValue)
-                        .divide(adjustFactor, BACKTESTING_RESULT_SCALE, RoundingMode.HALF_UP)
+                        .divide(divisionFactor, BACKTESTING_RESULT_SCALE, RoundingMode.HALF_UP)
                         .toInt()
-                val maxParamValue = BigDecimal(paramValue).multiply(adjustFactor).toInt()
+                val maxParamValue = BigDecimal(paramValue).multiply(divisionFactor).toInt()
                 val paramValueStep =
-                    ((maxParamValue - minParamValue) / (adjustVariantCount - 1))
+                    ((maxParamValue - minParamValue) / (variantsCount - 1))
                         .let { if (it == 0) 1 else it }
                 val paramVariants = mutableListOf(paramValue)
                 for (paramVariant in minParamValue..maxParamValue step paramValueStep) {
@@ -118,11 +118,11 @@ class Backtesting(
             }
 
             is BigDecimal -> {
-                val minParamValue = paramValue.divide(adjustFactor, BACKTESTING_RESULT_SCALE, RoundingMode.HALF_UP)
-                val maxParamValue = paramValue.multiply(adjustFactor)
+                val minParamValue = paramValue.divide(divisionFactor, BACKTESTING_RESULT_SCALE, RoundingMode.HALF_UP)
+                val maxParamValue = paramValue.multiply(divisionFactor)
                 val paramValueStep =
                     (maxParamValue - minParamValue)
-                        .divide(BigDecimal(adjustVariantCount - 1), BACKTESTING_RESULT_SCALE, RoundingMode.HALF_UP)
+                        .divide(BigDecimal(variantsCount - 1), BACKTESTING_RESULT_SCALE, RoundingMode.HALF_UP)
                 val paramVariants = mutableListOf(paramValue)
                 var paramVariant = minParamValue
                 while (paramVariant <= maxParamValue) {
@@ -144,12 +144,15 @@ class Backtesting(
                 }
             }
 
-    private fun analyzeAdjustedStrategy(
+    private fun analyzeParametersVariant(
         strategyFactory: StrategyFactory,
         parameters: Map<String, Number>
-    ): ParametrizedStrategyResult? =
+    ): StrategyParametersAnalyzeResult? =
         try {
-            ParametrizedStrategyResult(analyzeStrategy(strategyFactory, StrategyParameters(parameters)), parameters)
+            StrategyParametersAnalyzeResult(
+                analyzeStrategy(strategyFactory, StrategyParameters(parameters)),
+                parameters
+            )
         } catch (e: Exception) {
             //ignore
             null

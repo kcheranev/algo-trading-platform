@@ -3,7 +3,6 @@ package ru.kcheranev.trading.core.service
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
-import ru.kcheranev.trading.core.config.TradingProperties
 import ru.kcheranev.trading.core.port.income.marketdata.ProcessCandleUseCase
 import ru.kcheranev.trading.core.port.income.marketdata.ProcessIncomeCandleCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.GetReadyToOrderTradeSessionsCommand
@@ -12,16 +11,11 @@ import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.TradeSess
 
 @Service
 class MarketDataProcessingService(
-    tradingProperties: TradingProperties,
     private val transactionalTemplate: TransactionTemplate,
     private val tradeSessionPersistencePort: TradeSessionPersistencePort,
 ) : ProcessCandleUseCase {
 
     private val log = LoggerFactory.getLogger(javaClass)
-
-    private val availableDelayedCandleCount = tradingProperties.availableDelayedCandleCount
-
-    private val tradingSchedule = tradingProperties.tradingSchedule
 
     override fun processIncomeCandle(command: ProcessIncomeCandleCommand) {
         val candle = command.candle
@@ -30,7 +24,7 @@ class MarketDataProcessingService(
         ).forEach { tradeSession ->
             try {
                 transactionalTemplate.execute {
-                    tradeSession.processIncomeCandle(candle, availableDelayedCandleCount.toLong(), tradingSchedule)
+                    tradeSession.processIncomeCandle(candle)
                     tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
                 }
             } catch (ex: Exception) {

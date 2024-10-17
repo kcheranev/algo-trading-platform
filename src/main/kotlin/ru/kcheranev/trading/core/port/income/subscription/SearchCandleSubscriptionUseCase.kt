@@ -2,8 +2,8 @@ package ru.kcheranev.trading.core.port.income.subscription
 
 import ru.kcheranev.trading.domain.model.subscription.CandleSubscription
 
-interface SearchSubscriptionUseCase {
+interface SearchCandleSubscriptionUseCase {
 
-    fun findAllCandleSubscriptions(): List<CandleSubscription>
+    fun findAllCandleSubscriptions(): Set<CandleSubscription>
 
 }

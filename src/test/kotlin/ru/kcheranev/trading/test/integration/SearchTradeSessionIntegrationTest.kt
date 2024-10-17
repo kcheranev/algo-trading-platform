@@ -17,7 +17,6 @@ import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessio
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeStrategyCache
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.test.IntegrationTest
-import java.time.LocalDateTime
 import java.util.UUID
 
 @IntegrationTest
@@ -38,11 +37,10 @@ class SearchTradeSessionIntegrationTest(
                 ticker = "SBER",
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.WAITING,
-                startDate = LocalDateTime.parse("2024-01-01T10:15:30"),
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 lotsQuantityInPosition = 0,
-                strategyType = "DUMMY",
+                strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
         )
@@ -54,11 +52,10 @@ class SearchTradeSessionIntegrationTest(
                 ticker = "MOEX",
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b2",
                 status = TradeSessionStatus.WAITING,
-                startDate = LocalDateTime.parse("2024-01-01T10:15:30"),
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 lotsQuantityInPosition = 0,
-                strategyType = "DUMMY",
+                strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
         )

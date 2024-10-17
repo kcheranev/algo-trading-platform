@@ -24,7 +24,6 @@ abstract class PersistenceOutcomeAdapterMapper {
     @Mapping(source = "entity.ticker", target = "ticker")
     @Mapping(source = "entity.instrumentId", target = "instrumentId")
     @Mapping(source = "entity.status", target = "status")
-    @Mapping(source = "entity.startDate", target = "startDate")
     @Mapping(source = "entity.candleInterval", target = "candleInterval")
     @Mapping(source = "entity.lotsQuantity", target = "lotsQuantity")
     @Mapping(source = "tradeStrategy", target = "strategy")

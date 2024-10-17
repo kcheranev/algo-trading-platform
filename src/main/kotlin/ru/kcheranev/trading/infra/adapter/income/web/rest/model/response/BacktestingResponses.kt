@@ -5,15 +5,15 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-data class ParametrizedStrategyResponseDto(
-    val analyzeResults: List<ParametrizedStrategyAnalyzeResultDto>
+data class StrategyParametersAnalyzeResponseDto(
+    val analyzeResults: List<StrategyParametersAnalyzeResultDto>
 )
 
 data class StrategyAnalyzeResponseDto(
     val analyzeResult: StrategyAnalyzeResultDto
 )
 
-data class ParametrizedStrategyAnalyzeResultDto(
+data class StrategyParametersAnalyzeResultDto(
     val parameters: Map<String, Number>,
     val result: StrategyAnalyzeResultDto
 )

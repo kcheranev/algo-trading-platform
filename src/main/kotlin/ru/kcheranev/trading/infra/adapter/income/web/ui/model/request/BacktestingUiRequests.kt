@@ -14,12 +14,12 @@ data class StrategyAnalyzeRequestUiDto(
     var to: LocalDate? = null
 )
 
-data class StrategyAdjustAndAnalyzeRequestUiDto(
+data class StrategyParametersAnalyzeRequestUiDto(
     var strategyType: String?,
     var strategyParameters: MutableList<StrategyParameterUiDto> = mutableListOf(),
     var mutableStrategyParameters: MutableList<StrategyParameterUiDto> = mutableListOf(),
-    var adjustFactor: BigDecimal?,
-    var adjustVariantCount: Int?,
+    var divisionFactor: BigDecimal?,
+    var variantsCount: Int?,
     var resultFilter: StrategyAnalyzeResultFilterUiDto?,
     var profitTypeSort: ProfitTypeSort?,
     var instrument: InstrumentRequestUiDto?,

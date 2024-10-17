@@ -12,7 +12,7 @@ spring:
 application:
   trading:
     defaultCommission: 0.0004
-    availableDelayedCandleCount: 5
+    availableDelayedCandlesCount: 3
     placeOrderRetryCount: 3
     tradingSchedule:
       - from: "10:00:00"
@@ -28,3 +28,6 @@ application:
       token: ${TELEGRAM_TOKEN}
       chatId: ${TELEGRAM_CHAT_ID}
       apiUrl: https://api.telegram.org/bot${application.infra.notification.telegram.token}
+  schedule:
+    enabled: true
+    candleSubscriptionRefreshDelay: 15s

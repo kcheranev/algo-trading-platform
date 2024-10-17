@@ -14,6 +14,10 @@ interface TradeSessionPersistencePort {
 
     fun search(command: SearchTradeSessionCommand): List<TradeSessionView>
 
+    fun getReadyForOrderTradeSessions(): List<TradeSession>
+
     fun getReadyForOrderTradeSessions(command: GetReadyToOrderTradeSessionsCommand): List<TradeSession>
+
+    fun isReadyForOrderTradeSessionExists(command: IsReadyToOrderTradeSessionExistsCommand): Boolean
 
 }

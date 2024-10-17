@@ -4,6 +4,5 @@ import ru.kcheranev.trading.domain.model.CandleInterval
 
 data class CandleSubscriptionUiDto(
     val instrument: InstrumentResponseUiDto,
-    val candleInterval: CandleInterval,
-    val subscriptionCount: Int
+    val candleInterval: CandleInterval
 )

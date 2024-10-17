@@ -8,6 +8,6 @@ interface MarketDataStreamSubscriptionBrokerPort {
 
     fun unsubscribeCandles(command: UnsubscribeCandlesOrderCommand)
 
-    fun findAllCandleSubscriptions(): List<CandleSubscription>
+    fun findAllCandleSubscriptions(): Set<CandleSubscription>
 
 }

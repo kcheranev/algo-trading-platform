@@ -6,7 +6,6 @@ import org.springframework.data.relational.core.mapping.Table
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
-import java.time.LocalDateTime
 import java.util.UUID
 
 @Table("trade_session")
@@ -19,8 +18,6 @@ data class TradeSessionEntity(
     val instrumentId: String,
     @Column("status")
     val status: TradeSessionStatus,
-    @Column("start_date")
-    val startDate: LocalDateTime,
     @Column("candle_interval")
     val candleInterval: CandleInterval,
     @Column("lots_quantity")

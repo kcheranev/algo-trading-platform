@@ -47,11 +47,10 @@ class SearchTradeOrderIntegrationTest(
                 ticker = "SBER",
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.WAITING,
-                startDate = LocalDateTime.parse("2024-01-01T10:15:30"),
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 lotsQuantityInPosition = 0,
-                strategyType = "DUMMY",
+                strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
         )
@@ -62,11 +61,10 @@ class SearchTradeOrderIntegrationTest(
                 ticker = "MOEX",
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b2",
                 status = TradeSessionStatus.WAITING,
-                startDate = LocalDateTime.parse("2024-01-01T10:15:30"),
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 lotsQuantityInPosition = 0,
-                strategyType = "DUMMY",
+                strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
         )

@@ -5,7 +5,6 @@ import ru.kcheranev.trading.core.port.model.sort.TradeSessionSort
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.SearchTradeSessionCommand
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.addAndCondition
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.ComparstionCondition
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.EqualsCondition
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.rowmapper.TradeSessionEntityRowMapper
 
@@ -33,9 +32,6 @@ class CustomizedTradeSessionRepositoryImpl(
         }
         if (command.status != null) {
             conditionsBuilder.addAndCondition(EqualsCondition("status", command.status))
-        }
-        if (command.startDate != null) {
-            conditionsBuilder.addAndCondition(ComparstionCondition("start_date", command.startDate))
         }
         if (command.candleInterval != null) {
             conditionsBuilder.addAndCondition(EqualsCondition("candle_interval", command.candleInterval))

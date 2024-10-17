@@ -9,7 +9,7 @@ wiremock:
 
 application:
   trading:
-    availableDelayedCandleCount: 5
+    availableDelayedCandlesCount: 5
     placeOrderRetryCount: 3
   infra:
     broker:
@@ -17,3 +17,5 @@ application:
     notification.telegram:
       token: telegram-token
       chatId: telegram-chat-id
+  schedule:
+    enabled: false

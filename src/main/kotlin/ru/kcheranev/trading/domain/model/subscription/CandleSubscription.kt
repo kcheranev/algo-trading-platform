@@ -7,15 +7,10 @@ private const val CANDLES_STREAM_ID_FORMAT = "candles_%s_%s"
 
 data class CandleSubscription(
     val instrument: Instrument,
-    val candleInterval: CandleInterval,
-    val subscriptionCount: Int
+    val candleInterval: CandleInterval
 ) {
 
-    companion object {
-
-        fun candleSubscriptionId(instrument: Instrument, candleInterval: CandleInterval) =
-            CANDLES_STREAM_ID_FORMAT.format(instrument.ticker, candleInterval)
-
-    }
+    val id
+        get() = CANDLES_STREAM_ID_FORMAT.format(instrument.ticker, candleInterval)
 
 }

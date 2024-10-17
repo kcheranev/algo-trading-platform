@@ -10,29 +10,29 @@ import org.springframework.web.bind.annotation.RequestMapping
 import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeUseCase
 import ru.kcheranev.trading.core.port.income.strategy.GetStrategyTypesUseCase
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.mapper.backtestingWebIncomeAdapterUiMapper
-import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyAdjustAndAnalyzeRequestUiDto
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyParametersAnalyzeRequestUiDto
 
 @Controller
 @RequestMapping("ui/backtesting")
-class BacktestingAdjustAndAnalyzeUiController(
+class BacktestingStrategyParametersAnalyzeUiController(
     private val strategyAnalyzeUseCase: StrategyAnalyzeUseCase,
     private val getStrategyTypesUseCase: GetStrategyTypesUseCase
 ) {
 
-    @GetMapping("adjust-and-analyze")
-    fun adjustAndAnalyzeStrategy(model: Model) = "backtesting/adjust-and-analyze"
+    @GetMapping("analyze-parameters")
+    fun analyzeStrategyParameters(model: Model) = "backtesting/analyze-parameters"
 
-    @PostMapping("adjust-and-analyze")
-    fun adjustAndAnalyzeStrategy(
-        @ModelAttribute request: StrategyAdjustAndAnalyzeRequestUiDto,
+    @PostMapping("analyze-parameters")
+    fun analyzeStrategyParameters(
+        @ModelAttribute request: StrategyParametersAnalyzeRequestUiDto,
         model: Model,
         bindingResult: BindingResult
     ): String {
         val analyzeResultDto =
-            strategyAnalyzeUseCase.adjustAndAnalyzeStrategy(backtestingWebIncomeAdapterUiMapper.map(request))
+            strategyAnalyzeUseCase.analyzeStrategyParameters(backtestingWebIncomeAdapterUiMapper.map(request))
                 .map { backtestingWebIncomeAdapterUiMapper.map(it) }
         model.addAttribute("analyzeResult", analyzeResultDto)
-        return "backtesting/adjust-and-analyze"
+        return "backtesting/analyze-parameters"
     }
 
 }

@@ -62,33 +62,35 @@ class ExitTradeSessionWithRetriesIntegrationTest(
                 ticker = "SBER",
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.IN_POSITION,
-                startDate = LocalDateTime.parse("2024-01-01T10:15:00"),
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 lotsQuantityInPosition = 10,
-                strategyType = "DUMMY",
+                strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
         )
-        val barSeries = BaseBarSeriesBuilder().build()
-        barSeries.addBar(
-            BaseBar(
-                Duration.ofMinutes(1),
-                LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
-                BigDecimal(100),
-                BigDecimal(102),
-                BigDecimal(98),
-                BigDecimal(102),
-                BigDecimal(10)
-            )
-        )
+        val barSeries =
+            BaseBarSeriesBuilder().build()
+                .apply {
+                    addBar(
+                        BaseBar(
+                            Duration.ofMinutes(1),
+                            LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
+                            BigDecimal(100),
+                            BigDecimal(102),
+                            BigDecimal(98),
+                            BigDecimal(102),
+                            BigDecimal(10)
+                        )
+                    )
+                }
         val tradeStrategy =
             spyk(TradeStrategy(barSeries, false, mockk<Strategy>())) {
                 every { shouldEnter(any()) } returns false
                 every { shouldExit(any()) } returns true
             }
         tradeStrategyCache.put(tradeSessionId, tradeStrategy)
-        marketDataSubscriptionInitializer.init(
+        marketDataSubscriptionInitializer.addSubscription(
             Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
             CandleInterval.ONE_MIN
         )
@@ -150,33 +152,35 @@ class ExitTradeSessionWithRetriesIntegrationTest(
                 ticker = "SBER",
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.IN_POSITION,
-                startDate = LocalDateTime.parse("2024-01-01T10:15:00"),
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 lotsQuantityInPosition = 10,
-                strategyType = "DUMMY",
+                strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
         )
-        val barSeries = BaseBarSeriesBuilder().build()
-        barSeries.addBar(
-            BaseBar(
-                Duration.ofMinutes(1),
-                LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
-                BigDecimal(100),
-                BigDecimal(102),
-                BigDecimal(98),
-                BigDecimal(102),
-                BigDecimal(10)
-            )
-        )
+        val barSeries =
+            BaseBarSeriesBuilder().build()
+                .apply {
+                    addBar(
+                        BaseBar(
+                            Duration.ofMinutes(1),
+                            LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
+                            BigDecimal(100),
+                            BigDecimal(102),
+                            BigDecimal(98),
+                            BigDecimal(102),
+                            BigDecimal(10)
+                        )
+                    )
+                }
         val tradeStrategy =
             spyk(TradeStrategy(barSeries, false, mockk<Strategy>())) {
                 every { shouldEnter(any()) } returns false
                 every { shouldExit(any()) } returns true
             }
         tradeStrategyCache.put(tradeSessionId, tradeStrategy)
-        marketDataSubscriptionInitializer.init(
+        marketDataSubscriptionInitializer.addSubscription(
             Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
             CandleInterval.ONE_MIN
         )
@@ -238,33 +242,35 @@ class ExitTradeSessionWithRetriesIntegrationTest(
                 ticker = "SBER",
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.IN_POSITION,
-                startDate = LocalDateTime.parse("2024-01-01T10:15:00"),
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
                 lotsQuantityInPosition = 10,
-                strategyType = "DUMMY",
+                strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
         )
-        val barSeries = BaseBarSeriesBuilder().build()
-        barSeries.addBar(
-            BaseBar(
-                Duration.ofMinutes(1),
-                LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
-                BigDecimal(100),
-                BigDecimal(102),
-                BigDecimal(98),
-                BigDecimal(102),
-                BigDecimal(10)
-            )
-        )
+        val barSeries =
+            BaseBarSeriesBuilder().build()
+                .apply {
+                    addBar(
+                        BaseBar(
+                            Duration.ofMinutes(1),
+                            LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
+                            BigDecimal(100),
+                            BigDecimal(102),
+                            BigDecimal(98),
+                            BigDecimal(102),
+                            BigDecimal(10)
+                        )
+                    )
+                }
         val tradeStrategy =
             spyk(TradeStrategy(barSeries, false, mockk<Strategy>())) {
                 every { shouldEnter(any()) } returns false
                 every { shouldExit(any()) } returns true
             }
         tradeStrategyCache.put(tradeSessionId, tradeStrategy)
-        marketDataSubscriptionInitializer.init(
+        marketDataSubscriptionInitializer.addSubscription(
             Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
             CandleInterval.ONE_MIN
         )

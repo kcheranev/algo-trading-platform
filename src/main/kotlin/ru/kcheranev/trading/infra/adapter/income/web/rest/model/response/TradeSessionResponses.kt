@@ -2,7 +2,6 @@ package ru.kcheranev.trading.infra.adapter.income.web.rest.model.response
 
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
-import java.time.LocalDateTime
 import java.util.UUID
 
 data class TradeSessionDto(
@@ -10,7 +9,6 @@ data class TradeSessionDto(
     var ticker: String,
     var instrumentId: String,
     var status: TradeSessionStatus,
-    var startDate: LocalDateTime,
     var candleInterval: CandleInterval,
     var lotsQuantity: Int,
     val lotsQuantityInPosition: Int,
@@ -18,7 +16,7 @@ data class TradeSessionDto(
     val strategyParameters: Map<String, Number>
 )
 
-data class StartTradeSessionResponseDto(
+data class CreateTradeSessionResponseDto(
     val tradeSessionId: UUID
 )
 

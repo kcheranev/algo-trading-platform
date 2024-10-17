@@ -5,7 +5,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-data class ParametrizedStrategyAnalyzeResultUiDto(
+data class StrategyParametersAnalyzeResultUiDto(
     val parameters: Map<String, Number>,
     val result: StrategyAnalyzeResultUiDto
 )

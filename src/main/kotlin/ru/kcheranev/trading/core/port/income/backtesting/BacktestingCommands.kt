@@ -16,12 +16,12 @@ data class StrategyAnalyzeCommand(
     val to: LocalDate
 )
 
-data class StrategyAdjustAndAnalyzeCommand(
+data class StrategyParametersAnalyzeCommand(
     val strategyType: String,
     val strategyParameters: StrategyParameters,
     val mutableStrategyParameters: StrategyParameters,
-    val adjustFactor: BigDecimal,
-    val adjustVariantCount: Int,
+    val divisionFactor: BigDecimal,
+    val variantsCount: Int,
     val resultFilter: StrategyAnalyzeResultFilter?,
     val profitTypeSort: ProfitTypeSort?,
     val instrument: Instrument,

@@ -11,6 +11,11 @@ import java.util.UUID
 interface TradeSessionRepository : CrudRepository<TradeSessionEntity, UUID>, CustomizedTradeSessionRepository {
 
     @Query(
+        "SELECT * FROM trade_session WHERE status IN ('WAITING', 'IN_POSITION')"
+    )
+    fun getReadyForOrderTradeSessions(): List<TradeSessionEntity>
+
+    @Query(
         "SELECT * FROM trade_session WHERE instrument_id = :instrumentId AND candle_interval = :candleInterval " +
                 "AND status IN ('WAITING', 'IN_POSITION')"
     )
@@ -18,5 +23,14 @@ interface TradeSessionRepository : CrudRepository<TradeSessionEntity, UUID>, Cus
         @Param("instrumentId") instrumentId: String,
         @Param("candleInterval") candleInterval: CandleInterval
     ): List<TradeSessionEntity>
+
+    @Query(
+        "SELECT EXISTS (SELECT FROM trade_session WHERE instrument_id = :instrumentId AND candle_interval = :candleInterval " +
+                "AND status IN ('WAITING', 'IN_POSITION'))"
+    )
+    fun isReadyForOrderTradeSessionExists(
+        @Param("instrumentId") instrumentId: String,
+        @Param("candleInterval") candleInterval: CandleInterval
+    ): Boolean
 
 }

@@ -21,7 +21,6 @@ class TradeSessionEntityRowMapper(
             ticker = rs.getString("ticker"),
             instrumentId = rs.getString("instrument_id"),
             status = TradeSessionStatus.valueOf(rs.getString("status")),
-            startDate = rs.getTimestamp("start_date").toLocalDateTime(),
             candleInterval = CandleInterval.valueOf(rs.getString("candle_interval")),
             lotsQuantity = rs.getInt("lots_quantity"),
             lotsQuantityInPosition = rs.getInt("lots_quantity_in_position"),

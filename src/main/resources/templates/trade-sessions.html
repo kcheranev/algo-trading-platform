@@ -13,7 +13,6 @@
                 <tr>
                     <th>Id</th>
                     <th>Ticker</th>
-                    <th>Start date</th>
                     <th>Status</th>
                     <th>Candle interval</th>
                     <th>Lots</th>
@@ -24,7 +23,6 @@
                 <tr th:each="tradeSession : ${tradeSessions}">
                     <td th:text="${tradeSession.id}"></td>
                     <td th:text="${tradeSession.ticker}"></td>
-                    <td th:text="${#temporals.format(tradeSession.startDate, 'dd.MM.yyyy HH:mm:ss')}"></td>
                     <td th:text="${tradeSession.status}"></td>
                     <td th:text="${tradeSession.candleInterval}"></td>
                     <td th:text="${tradeSession.lotsQuantityInPosition}"></td>
