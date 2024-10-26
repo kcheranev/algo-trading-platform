@@ -14,7 +14,6 @@ import ru.kcheranev.trading.core.port.income.strategy.GetStrategyTypesUseCase
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.mapper.backtestingWebIncomeAdapterUiMapper
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyAnalyzeRequestUiDto
-import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyParameterUiDto
 
 @Controller
 @RequestMapping("ui/backtesting")
@@ -38,27 +37,27 @@ class BacktestingStrategyAnalyzeUiController(
 
     @PostMapping("analyze")
     fun analyzeStrategy(
-        @ModelAttribute("analyzeStrategyRequest") analyzeStrategyRequest: StrategyAnalyzeRequestUiDto,
+        @ModelAttribute("analyzeStrategyRequest") strategyAnalyzeRequest: StrategyAnalyzeRequestUiDto,
         model: Model,
         bindingResult: BindingResult
     ): String {
         val analyzeResultDto =
             backtestingWebIncomeAdapterUiMapper.map(
-                strategyAnalyzeUseCase.analyzeStrategy(backtestingWebIncomeAdapterUiMapper.map(analyzeStrategyRequest))
+                strategyAnalyzeUseCase.analyzeStrategy(backtestingWebIncomeAdapterUiMapper.map(strategyAnalyzeRequest))
             )
         model.addAttribute("analyzeResult", analyzeResultDto)
         return "backtesting/analyze"
     }
 
     @PostMapping(value = ["analyze"], params = ["reloadStrategyParameters"])
-    fun strategyParameterNames(
-        @ModelAttribute("analyzeStrategyRequest") analyzeStrategyRequest: StrategyAnalyzeRequestUiDto,
+    fun reloadStrategyParameters(
+        @ModelAttribute("analyzeStrategyRequest") strategyAnalyzeRequest: StrategyAnalyzeRequestUiDto,
         bindingResult: BindingResult
     ): String {
-        analyzeStrategyRequest.strategyParameters.clear()
+        strategyAnalyzeRequest.strategyParameters.clear()
         getStrategyParametersNamesUseCase.getStrategyParametersNames(
-            GetStrategyParametersNamesCommand(analyzeStrategyRequest.strategyType!!)
-        ).forEach { analyzeStrategyRequest.strategyParameters.add(StrategyParameterUiDto(it)) }
+            GetStrategyParametersNamesCommand(strategyAnalyzeRequest.strategyType!!)
+        ).forEach { strategyAnalyzeRequest.strategyParameters[it] = null }
         return "backtesting/analyze"
     }
 

@@ -24,15 +24,32 @@ abstract class BacktestingWebIncomeAdapterUiMapper {
     @Mapping(target = "strategyParameters", qualifiedByName = ["mapStrategyParameters"])
     abstract fun map(source: StrategyAnalyzeRequestUiDto): StrategyAnalyzeCommand
 
-    @Mapping(target = "strategyParameters", qualifiedByName = ["mapStrategyParameters"])
-    @Mapping(target = "mutableStrategyParameters", qualifiedByName = ["mapStrategyParameters"])
+    @Named("mapStrategyParameters")
+    fun mapStrategyParameters(source: Map<String, Number>) = StrategyParameters(source)
+
+    @Mapping(
+        target = "strategyParameters",
+        source = "strategyParameters",
+        qualifiedByName = ["mapNoMutableStrategyParameters"]
+    )
+    @Mapping(
+        target = "mutableStrategyParameters",
+        source = "strategyParameters",
+        qualifiedByName = ["mapMutableStrategyParameters"]
+    )
     abstract fun map(source: StrategyParametersAnalyzeRequestUiDto): StrategyParametersAnalyzeCommand
 
-    @Named("mapStrategyParameters")
-    fun mapStrategyParameters(source: List<StrategyParameterUiDto>) =
-        StrategyParameters(
-            source.associate { it.name!! to it.value!! }
-        )
+    @Named("mapNoMutableStrategyParameters")
+    fun mapNoMutableStrategyParameters(source: MutableMap<String, StrategyParameterUiDto>) =
+        source.filter { it.value.mutable == false }
+            .mapValues { it.value.value!! }
+            .let { StrategyParameters(it) }
+
+    @Named("mapMutableStrategyParameters")
+    fun mapMutableStrategyParameters(source: MutableMap<String, StrategyParameterUiDto>) =
+        source.filter { it.value.mutable == true }
+            .mapValues { it.value.value!! }
+            .let { StrategyParameters(it) }
 
     @Mapping(target = "results", source = ".", qualifiedByName = ["mapResults"])
     abstract fun map(source: StrategyAnalyzeResult): StrategyAnalyzeResultUiDto

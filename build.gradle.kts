@@ -48,7 +48,6 @@ dependencies {
     testImplementation("io.kotest:kotest-framework-datatest:$kotestVersion")
     testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.3")
     testImplementation("io.mockk:mockk:1.13.8")
-    testImplementation("com.ninja-squad:springmockk:4.0.2")
     testImplementation("org.wiremock:wiremock:3.3.1")
     testImplementation("org.wiremock:wiremock-grpc-extension:0.4.0")
     testImplementation("org.testcontainers:postgresql:1.19.3")

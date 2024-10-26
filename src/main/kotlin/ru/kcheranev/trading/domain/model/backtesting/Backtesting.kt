@@ -73,22 +73,22 @@ class Backtesting(
             }.awaitAll()
         }.asSequence()
             .filterNotNull()
-            .filter { it.result.netValue > BigDecimal.ZERO }
+            .filter { it.analyzeResult.netValue > BigDecimal.ZERO }
             .filter {
-                it.result.profitLossPositionsRatio >=
+                it.analyzeResult.profitLossPositionsRatio >=
                         (minProfitLossPositionsRatio ?: DEFAULT_MIN_PROFIT_LOSS_POSITIONS_RATIO)
             }
             .filter {
-                it.result.trades.size >=
+                it.analyzeResult.trades.size >=
                         BigDecimal(daysCount)
                             .multiply(tradesByDayCountFactor ?: DEFAULT_TRADES_BY_DAY_COUNT_FACTOR)
                             .toInt()
             }
             .sortedByDescending {
                 when (profitTypeSort) {
-                    ProfitTypeSort.NET -> it.result.netValue
-                    ProfitTypeSort.GROSS -> it.result.grossValue
-                    null -> it.result.netValue
+                    ProfitTypeSort.NET -> it.analyzeResult.netValue
+                    ProfitTypeSort.GROSS -> it.analyzeResult.grossValue
+                    null -> it.analyzeResult.netValue
                 }
             }
             .take(resultsLimit ?: DEFAULT_BACKTESTING_RESULTS_LIMIT)

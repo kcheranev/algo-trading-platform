@@ -7,8 +7,16 @@ import java.time.LocalDateTime
 
 data class StrategyParametersAnalyzeResultUiDto(
     val parameters: Map<String, Number>,
-    val result: StrategyAnalyzeResultUiDto
-)
+    val analyzeResult: StrategyAnalyzeResultUiDto
+) {
+
+    val tradesCount =
+        analyzeResult.results
+            .values
+            .flatMap { it.trades }
+            .count()
+
+}
 
 data class StrategyAnalyzeResultUiDto(
     val netValue: BigDecimal,

@@ -5,7 +5,7 @@ import java.math.RoundingMode
 import java.time.LocalDate
 
 data class StrategyParametersAnalyzeResult(
-    val result: StrategyAnalyzeResult,
+    val analyzeResult: StrategyAnalyzeResult,
     val parameters: Map<String, Number>
 )
 

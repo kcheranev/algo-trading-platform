@@ -30,4 +30,4 @@ application:
       apiUrl: https://api.telegram.org/bot${application.infra.notification.telegram.token}
   schedule:
     enabled: true
-    candleSubscriptionRefreshDelay: 15s
+    candleSubscriptionRefreshDelay: PT15S

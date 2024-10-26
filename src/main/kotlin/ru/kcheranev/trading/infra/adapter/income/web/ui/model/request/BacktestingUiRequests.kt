@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 data class StrategyAnalyzeRequestUiDto(
     var strategyType: String? = null,
-    var strategyParameters: MutableList<StrategyParameterUiDto> = mutableListOf(),
+    var strategyParameters: MutableMap<String, Number?> = mutableMapOf(),
     var instrument: InstrumentRequestUiDto? = null,
     var candleInterval: CandleInterval? = null,
     var from: LocalDate? = null,
@@ -15,21 +15,25 @@ data class StrategyAnalyzeRequestUiDto(
 )
 
 data class StrategyParametersAnalyzeRequestUiDto(
-    var strategyType: String?,
-    var strategyParameters: MutableList<StrategyParameterUiDto> = mutableListOf(),
-    var mutableStrategyParameters: MutableList<StrategyParameterUiDto> = mutableListOf(),
-    var divisionFactor: BigDecimal?,
-    var variantsCount: Int?,
-    var resultFilter: StrategyAnalyzeResultFilterUiDto?,
-    var profitTypeSort: ProfitTypeSort?,
-    var instrument: InstrumentRequestUiDto?,
-    var candleInterval: CandleInterval?,
-    var from: LocalDate?,
-    var to: LocalDate?
+    var strategyType: String? = null,
+    var strategyParameters: MutableMap<String, StrategyParameterUiDto> = mutableMapOf(),
+    var divisionFactor: BigDecimal = BigDecimal(2),
+    var variantsCount: Int = 5,
+    var resultFilter: StrategyAnalyzeResultFilterUiDto = StrategyAnalyzeResultFilterUiDto(),
+    var profitTypeSort: ProfitTypeSort = ProfitTypeSort.NET,
+    var instrument: InstrumentRequestUiDto? = null,
+    var candleInterval: CandleInterval? = null,
+    var from: LocalDate? = null,
+    var to: LocalDate? = null
+)
+
+data class StrategyParameterUiDto(
+    var value: Number? = null,
+    var mutable: Boolean? = null
 )
 
 data class StrategyAnalyzeResultFilterUiDto(
-    var resultsLimit: Int?,
-    var minProfitLossPositionsRatio: BigDecimal?,
-    var tradesByDayCountFactor: BigDecimal?
+    var resultsLimit: Int = 15,
+    var minProfitLossPositionsRatio: BigDecimal = BigDecimal(1),
+    var tradesByDayCountFactor: BigDecimal = BigDecimal(1)
 )
