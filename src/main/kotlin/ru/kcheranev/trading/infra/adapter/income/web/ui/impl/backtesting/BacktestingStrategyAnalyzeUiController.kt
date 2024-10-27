@@ -37,13 +37,13 @@ class BacktestingStrategyAnalyzeUiController(
 
     @PostMapping("analyze")
     fun analyzeStrategy(
-        @ModelAttribute("analyzeStrategyRequest") strategyAnalyzeRequest: StrategyAnalyzeRequestUiDto,
+        @ModelAttribute("analyzeStrategyRequest") request: StrategyAnalyzeRequestUiDto,
         model: Model,
         bindingResult: BindingResult
     ): String {
         val analyzeResultDto =
             backtestingWebIncomeAdapterUiMapper.map(
-                strategyAnalyzeUseCase.analyzeStrategy(backtestingWebIncomeAdapterUiMapper.map(strategyAnalyzeRequest))
+                strategyAnalyzeUseCase.analyzeStrategy(backtestingWebIncomeAdapterUiMapper.map(request))
             )
         model.addAttribute("analyzeResult", analyzeResultDto)
         return "backtesting/analyze"
@@ -51,13 +51,13 @@ class BacktestingStrategyAnalyzeUiController(
 
     @PostMapping(value = ["analyze"], params = ["reloadStrategyParameters"])
     fun reloadStrategyParameters(
-        @ModelAttribute("analyzeStrategyRequest") strategyAnalyzeRequest: StrategyAnalyzeRequestUiDto,
+        @ModelAttribute("analyzeStrategyRequest") request: StrategyAnalyzeRequestUiDto,
         bindingResult: BindingResult
     ): String {
-        strategyAnalyzeRequest.strategyParameters.clear()
+        request.strategyParameters.clear()
         getStrategyParametersNamesUseCase.getStrategyParametersNames(
-            GetStrategyParametersNamesCommand(strategyAnalyzeRequest.strategyType!!)
-        ).forEach { strategyAnalyzeRequest.strategyParameters[it] = null }
+            GetStrategyParametersNamesCommand(request.strategyType!!)
+        ).forEach { request.strategyParameters[it] = null }
         return "backtesting/analyze"
     }
 

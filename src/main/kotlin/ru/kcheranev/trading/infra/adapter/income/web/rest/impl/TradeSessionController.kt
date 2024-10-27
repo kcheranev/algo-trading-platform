@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.kcheranev.trading.core.port.income.tradesession.CreateTradeSessionUseCase
+import ru.kcheranev.trading.core.port.income.tradesession.ResumeTradeSessionCommand
+import ru.kcheranev.trading.core.port.income.tradesession.ResumeTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.SearchTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.StopTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.StopTradeSessionUseCase
@@ -26,6 +28,7 @@ import java.util.UUID
 class TradeSessionController(
     private val createTradeSessionUseCase: CreateTradeSessionUseCase,
     private val stopTradeSessionUseCase: StopTradeSessionUseCase,
+    private val resumeTradeSessionUseCase: ResumeTradeSessionUseCase,
     private val tradeSessionSearchUseCase: SearchTradeSessionUseCase
 ) {
 
@@ -38,8 +41,13 @@ class TradeSessionController(
 
     @Operation(summary = "Stop trade session")
     @PostMapping("{id}/stop")
-    fun stop(@Parameter(description = "Trade session id") @PathVariable id: UUID) =
-        stopTradeSessionUseCase.stopTradeSession(StopTradeSessionCommand(TradeSessionId(id)))
+    fun stop(@Parameter(description = "Trade session id") @PathVariable("id") tradeSessionId: UUID) =
+        stopTradeSessionUseCase.stopTradeSession(StopTradeSessionCommand(TradeSessionId(tradeSessionId)))
+
+    @Operation(summary = "Resume trade session")
+    @PostMapping("{id}/resume")
+    fun resume(@Parameter(description = "Trade session id") @PathVariable("id") tradeSessionId: UUID) =
+        resumeTradeSessionUseCase.resumeTradeSession(ResumeTradeSessionCommand(TradeSessionId(tradeSessionId)))
 
     @Operation(summary = "Search trade sessions")
     @PostMapping("search")

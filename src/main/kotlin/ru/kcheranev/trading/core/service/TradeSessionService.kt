@@ -11,7 +11,7 @@ import ru.kcheranev.trading.core.port.income.tradesession.EnterTradeSessionComma
 import ru.kcheranev.trading.core.port.income.tradesession.EnterTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.ExitTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.ExitTradeSessionUseCase
-import ru.kcheranev.trading.core.port.income.tradesession.ResumeStrategyCommand
+import ru.kcheranev.trading.core.port.income.tradesession.ResumeTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.ResumeTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.SearchTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.SearchTradeSessionUseCase
@@ -179,7 +179,7 @@ class TradeSessionService(
     }
 
     @Transactional
-    override fun resumeTradeSession(command: ResumeStrategyCommand) {
+    override fun resumeTradeSession(command: ResumeTradeSessionCommand) {
         val tradeSession = tradeSessionPersistencePort.get(GetTradeSessionCommand(command.tradeSessionId))
         tradeSession.resume()
         tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))

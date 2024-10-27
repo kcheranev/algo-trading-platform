@@ -28,7 +28,7 @@ data class StopTradeSessionCommand(
     val tradeSessionId: TradeSessionId
 )
 
-data class ResumeStrategyCommand(
+data class ResumeTradeSessionCommand(
     val tradeSessionId: TradeSessionId
 )
 

@@ -26,13 +26,13 @@ class StrategyConfigurationUiController(
 
     @PostMapping
     fun create(
-        @ModelAttribute request: CreateStrategyConfigurationRequestUiDto,
+        @ModelAttribute("createStrategyConfigurationRequest") request: CreateStrategyConfigurationRequestUiDto,
         bindingResult: BindingResult
     ): String {
         createStrategyConfigurationUseCase.createStrategyConfiguration(
             strategyConfigurationWebIncomeAdapterUiMapper.map(request)
         )
-        return "redirect:ui/strategy-configurations"
+        return "redirect:/ui/strategy-configurations"
     }
 
     @GetMapping

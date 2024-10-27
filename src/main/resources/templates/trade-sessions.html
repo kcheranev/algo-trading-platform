@@ -8,7 +8,7 @@
     <div th:switch="${#lists.isEmpty(tradeSessions)}">
         <span th:case="true">There are no trade sessions</span>
         <div th:case="false">
-            <table class="table">
+            <table class="table align-middle">
                 <thead>
                 <tr>
                     <th>Id</th>
@@ -17,6 +17,7 @@
                     <th>Candle interval</th>
                     <th>Lots</th>
                     <th>Strategy type</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -27,6 +28,28 @@
                     <td th:text="${tradeSession.candleInterval}"></td>
                     <td th:text="${tradeSession.lotsQuantityInPosition}"></td>
                     <td th:text="${tradeSession.strategyType}"></td>
+                    <td>
+                        <form method="post">
+                            <button th:if="${tradeSession.availableToStop}"
+                                    th:formaction="@{/ui/trade-sessions/{id}/stop(id=${tradeSession.id})}"
+                                    type="submit" class="btn btn-danger">
+                                Stop
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-stop-fill" viewBox="0 0 16 16">
+                                    <path d="M5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5A1.5 1.5 0 0 1 5 3.5"/>
+                                </svg>
+                            </button>
+                            <button th:if="${tradeSession.availableToResume}"
+                                    th:formaction="@{/ui/trade-sessions/{id}/resume(id=${tradeSession.id})}"
+                                    type="submit" class="btn btn-success">
+                                Resume
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-play-fill" viewBox="0 0 16 16">
+                                    <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 </tbody>
             </table>

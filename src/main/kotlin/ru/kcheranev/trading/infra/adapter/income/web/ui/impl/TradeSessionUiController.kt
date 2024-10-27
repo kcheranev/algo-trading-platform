@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import ru.kcheranev.trading.core.port.income.tradesession.CreateTradeSessionUseCase
+import ru.kcheranev.trading.core.port.income.tradesession.ResumeTradeSessionCommand
+import ru.kcheranev.trading.core.port.income.tradesession.ResumeTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.SearchTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.SearchTradeSessionUseCase
 import ru.kcheranev.trading.core.port.income.tradesession.StopTradeSessionCommand
@@ -24,6 +26,7 @@ import java.util.UUID
 class TradeSessionUiController(
     private val createTradeSessionUseCase: CreateTradeSessionUseCase,
     private val stopTradeSessionUseCase: StopTradeSessionUseCase,
+    private val resumeTradeSessionUseCase: ResumeTradeSessionUseCase,
     private val searchTradeSessionUseCase: SearchTradeSessionUseCase
 ) {
 
@@ -33,13 +36,19 @@ class TradeSessionUiController(
         bindingResult: BindingResult
     ): String {
         createTradeSessionUseCase.createTradeSession(tradeSessionWebIncomeAdapterUiMapper.map(request))
-        return "redirect:ui/trade-sessions"
+        return "redirect:/ui/trade-sessions"
     }
 
     @PostMapping("{id}/stop")
-    fun stop(@PathVariable id: UUID, bindingResult: BindingResult): String {
-        stopTradeSessionUseCase.stopTradeSession(StopTradeSessionCommand(TradeSessionId(id)))
-        return "redirect:ui/trade-sessions"
+    fun stop(@PathVariable("id") tradeSessionId: UUID): String {
+        stopTradeSessionUseCase.stopTradeSession(StopTradeSessionCommand(TradeSessionId(tradeSessionId)))
+        return "redirect:/ui/trade-sessions"
+    }
+
+    @PostMapping("{id}/resume")
+    fun resume(@PathVariable("id") tradeSessionId: UUID): String {
+        resumeTradeSessionUseCase.resumeTradeSession(ResumeTradeSessionCommand(TradeSessionId(tradeSessionId)))
+        return "redirect:/ui/trade-sessions"
     }
 
     @GetMapping
@@ -52,7 +61,7 @@ class TradeSessionUiController(
     }
 
     @GetMapping("{id}")
-    fun findById(
+    fun getById(
         @PathVariable("id") tradeSessionId: UUID,
         model: Model,
         bindingResult: BindingResult

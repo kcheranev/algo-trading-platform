@@ -14,4 +14,11 @@ data class TradeSessionUiDto(
     val lotsQuantityInPosition: Int,
     val strategyType: String,
     val strategyParameters: Map<String, Number>
-)
+) {
+
+    val availableToStop = status != TradeSessionStatus.STOPPED
+
+    val availableToResume =
+        status in listOf(TradeSessionStatus.PENDING_ENTER, TradeSessionStatus.PENDING_EXIT, TradeSessionStatus.STOPPED)
+
+}
