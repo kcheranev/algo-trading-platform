@@ -5,6 +5,8 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import org.springframework.cache.CacheManager
+import org.springframework.cache.support.NoOpCache
 import ru.kcheranev.trading.common.date.DateSupplier
 import ru.kcheranev.trading.common.date.atEndOfDay
 import ru.kcheranev.trading.common.date.toMskInstant
@@ -44,6 +46,10 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
         val dateSupplier =
             mockk<DateSupplier> {
                 every { currentDateTime() } returns now
+            }
+        val cacheManager =
+            mockk<CacheManager> {
+                every { getCache(any()) } returns NoOpCache("cache-name")
             }
         val marketDataService =
             mockk<MarketDataService> {
@@ -85,7 +91,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                     )
                 )
             }
-        val adapter = HistoricCandleBrokerOutcomeAdapter(marketDataService, dateSupplier)
+        val adapter = HistoricCandleBrokerOutcomeAdapter(marketDataService, dateSupplier, cacheManager)
 
         //when
         val candles =
@@ -149,6 +155,10 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
             mockk<DateSupplier> {
                 every { currentDateTime() } returns now
             }
+        val cacheManager =
+            mockk<CacheManager> {
+                every { getCache(any()) } returns NoOpCache("cache-name")
+            }
         val marketDataService =
             mockk<MarketDataService> {
                 every {
@@ -198,7 +208,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                     )
                 )
             }
-        val adapter = HistoricCandleBrokerOutcomeAdapter(marketDataService, dateSupplier)
+        val adapter = HistoricCandleBrokerOutcomeAdapter(marketDataService, dateSupplier, cacheManager)
 
         //when
         val candles =

@@ -6,7 +6,7 @@ import org.ta4j.core.indicators.RSIIndicator
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator
 import org.ta4j.core.rules.CrossedDownIndicatorRule
 import org.ta4j.core.rules.CrossedUpIndicatorRule
-import ru.kcheranev.trading.core.StrategyParamValidationException
+import ru.kcheranev.trading.core.exception.StrategyParamValidationException
 import ru.kcheranev.trading.core.strategy.factory.RsiStrategyLongParameter.LENGTH
 import ru.kcheranev.trading.core.strategy.factory.RsiStrategyLongParameter.OVER_BOUGHT
 import ru.kcheranev.trading.core.strategy.factory.RsiStrategyLongParameter.OVER_SOLD

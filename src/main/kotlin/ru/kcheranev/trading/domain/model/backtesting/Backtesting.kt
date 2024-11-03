@@ -5,7 +5,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.ta4j.core.BaseBarSeriesBuilder
 import ru.kcheranev.trading.core.strategy.factory.StrategyFactory
-import ru.kcheranev.trading.domain.DomainException
+import ru.kcheranev.trading.domain.exception.BusinessException
 import ru.kcheranev.trading.domain.mapper.domainModelMapper
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
@@ -73,7 +73,6 @@ class Backtesting(
             }.awaitAll()
         }.asSequence()
             .filterNotNull()
-            .filter { it.analyzeResult.netValue > BigDecimal.ZERO }
             .filter {
                 it.analyzeResult.profitLossPositionsRatio >=
                         (minProfitLossPositionsRatio ?: DEFAULT_MIN_PROFIT_LOSS_POSITIONS_RATIO)
@@ -132,7 +131,7 @@ class Backtesting(
                 paramVariants.distinct()
             }
 
-            else -> throw DomainException("Unexpected parameter $paramValue value type")
+            else -> throw BusinessException("Unexpected parameter $paramValue value type")
         }
 
     private fun cartesianProduct(paramVariants: Map<String, List<Number>>): List<Map<String, Number>> =

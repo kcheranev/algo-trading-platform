@@ -1,6 +1,6 @@
 package ru.kcheranev.trading.core.port.outcome.broker
 
-import ru.kcheranev.trading.core.OutcomeCommandValidationException
+import ru.kcheranev.trading.core.exception.OutcomeCommandValidationException
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
 import java.time.LocalDate

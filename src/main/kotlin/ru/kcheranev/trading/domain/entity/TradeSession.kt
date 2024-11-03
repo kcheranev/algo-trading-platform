@@ -1,9 +1,7 @@
 package ru.kcheranev.trading.domain.entity
 
 import org.slf4j.LoggerFactory
-import ru.kcheranev.trading.domain.DomainException
 import ru.kcheranev.trading.domain.TradeSessionCreatedDomainEvent
-import ru.kcheranev.trading.domain.TradeSessionDomainException
 import ru.kcheranev.trading.domain.TradeSessionEnteredDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionExitedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionPendedForEntryDomainEvent
@@ -16,6 +14,7 @@ import ru.kcheranev.trading.domain.entity.TradeSessionStatus.PENDING_ENTER
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus.PENDING_EXIT
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus.STOPPED
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus.WAITING
+import ru.kcheranev.trading.domain.exception.TradeSessionDomainException
 import ru.kcheranev.trading.domain.mapper.domainModelMapper
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
@@ -49,7 +48,8 @@ data class TradeSession(
             )
         }
         val lastCandleDate =
-            strategy.lastCandleDate() ?: throw DomainException("Trade session $this has an empty candle series")
+            strategy.lastCandleDate()
+                ?: throw TradeSessionDomainException("Trade session $this has an empty candle series")
         if (lastCandleDate >= candle.endDateTime) {
             throw TradeSessionDomainException(
                 "Unable to process income candle: new candle date intersects trade session $this series dates"

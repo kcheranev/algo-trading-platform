@@ -20,7 +20,6 @@ import ru.kcheranev.trading.common.date.toMskZonedDateTime
 import ru.kcheranev.trading.core.config.TradingProperties
 import ru.kcheranev.trading.core.config.TradingScheduleInterval
 import ru.kcheranev.trading.domain.TradeSessionCreatedDomainEvent
-import ru.kcheranev.trading.domain.TradeSessionDomainException
 import ru.kcheranev.trading.domain.TradeSessionEnteredDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionExitedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionPendedForEntryDomainEvent
@@ -32,6 +31,7 @@ import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
+import ru.kcheranev.trading.domain.exception.TradeSessionDomainException
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument

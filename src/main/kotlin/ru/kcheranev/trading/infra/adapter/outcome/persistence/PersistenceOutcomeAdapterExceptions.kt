@@ -1,7 +1,5 @@
 package ru.kcheranev.trading.infra.adapter.outcome.persistence
 
-open class PersistenceOutcomeAdapterException(
-    message: String
-) : RuntimeException(message)
+import ru.kcheranev.trading.domain.exception.InfrastructureException
 
-class PersistenceNotFoundException(message: String) : PersistenceOutcomeAdapterException(message)
+class PersistenceNotFoundException(message: String) : InfrastructureException(message)

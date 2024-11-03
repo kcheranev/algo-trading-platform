@@ -11,7 +11,7 @@ import org.ta4j.core.indicators.helpers.ClosePriceIndicator
 import org.ta4j.core.indicators.statistics.StandardDeviationIndicator
 import org.ta4j.core.rules.CrossedDownIndicatorRule
 import org.ta4j.core.rules.UnderIndicatorRule
-import ru.kcheranev.trading.core.StrategyParamValidationException
+import ru.kcheranev.trading.core.exception.StrategyParamValidationException
 import ru.kcheranev.trading.core.strategy.factory.RsiBollingerLongStrategyParameter.BOLLINGER_LENGTH
 import ru.kcheranev.trading.core.strategy.factory.RsiBollingerLongStrategyParameter.OVER_BOUGHT
 import ru.kcheranev.trading.core.strategy.factory.RsiBollingerLongStrategyParameter.OVER_SOLD

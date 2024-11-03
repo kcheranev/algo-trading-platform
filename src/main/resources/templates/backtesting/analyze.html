@@ -152,8 +152,8 @@
                             </thead>
                             <tbody>
                             <tr th:each="trade : ${dayAnalyzeResult.value.trades}">
-                                <td th:text="${#temporals.format(trade.entry.date, 'HH:mm')}"></td>
-                                <td th:text="${trade.exit != null} ? ${#temporals.format(trade.exit.date, 'HH:mm')}: ''"></td>
+                                <td th:text="${#temporals.format(trade.entry.date, 'dd.MM HH:mm')}"></td>
+                                <td th:text="${trade.exit != null} ? ${#temporals.format(trade.exit.date, 'dd.MM HH:mm')}: ''"></td>
                                 <td th:text="${#numbers.formatDecimal(trade.netValue,1,4)}"
                                     th:class="${trade.netValue >= 0} ? 'text-success' : 'text-danger'"></td>
                                 <td th:text="${#numbers.formatDecimal(trade.grossValue,1,4)}"
@@ -173,29 +173,7 @@
     </th:block>
 </th:block>
 <th:block layout:fragment="script">
-    <script th:inline="javascript">
-        function changeStrategyTypeListener() {
-            return () => {
-                const form = document.querySelector("#analyzeForm");
-                const formData = new FormData(form);
-                formData.append("reloadStrategyParameters", "")
-                fetch("[(@{/ui/backtesting/analyze})]", {
-                    method: "POST",
-                    body: formData
-                }).then(response => {
-                    response.text()
-                        .then(responseText => {
-                            const htmlPage = new DOMParser().parseFromString(responseText, "text/html");
-                            document.querySelector("#strategyParameters")
-                                .replaceWith(htmlPage.querySelector("#strategyParameters"));
-                        });
-                });
-            }
-        }
-
-        document.querySelector("#strategyType")
-            .addEventListener("change", changeStrategyTypeListener());
-    </script>
+    <script type="text/javascript" th:src="@{/js/reload-strategy-parameters.js}"></script>
 </th:block>
 </body>
 </html>

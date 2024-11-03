@@ -5,6 +5,11 @@ spring:
     url: ${DATASOURCE_URL}
     username: postgres
     password: postgres
+  cache:
+    caffeine:
+      spec: maximumSize=5000
+    cacheNames:
+      - historicCandlesCache
   jackson:
     deserialization:
       use-big-decimal-for-floats: true

@@ -8,7 +8,7 @@ import org.ta4j.core.Trade.TradeType
 import org.ta4j.core.analysis.cost.LinearTransactionCostModel
 import org.ta4j.core.analysis.cost.ZeroCostModel
 import org.ta4j.core.backtest.BarSeriesManager
-import org.ta4j.core.criteria.EnterAndHoldReturnCriterion
+import org.ta4j.core.criteria.EnterAndHoldCriterion
 import org.ta4j.core.criteria.MaximumDrawdownCriterion
 import org.ta4j.core.criteria.NumberOfBarsCriterion
 import org.ta4j.core.criteria.NumberOfConsecutivePositionsCriterion
@@ -22,6 +22,7 @@ import org.ta4j.core.criteria.pnl.ProfitCriterion
 import org.ta4j.core.criteria.pnl.ProfitLossCriterion
 import org.ta4j.core.criteria.pnl.ProfitLossPercentageCriterion
 import org.ta4j.core.criteria.pnl.ProfitLossRatioCriterion
+import org.ta4j.core.criteria.pnl.ReturnCriterion
 import org.ta4j.core.num.DecimalNum
 import org.ta4j.core.num.Num
 import ru.kcheranev.trading.common.date.isWeekend
@@ -123,8 +124,8 @@ class TradeStrategy(
                 .calculate(series, tradingRecord).toInt(),
             averageLoss = AverageLossCriterion().calculate(series, tradingRecord).toBigDecimal(),
             averageProfit = AverageProfitCriterion().calculate(series, tradingRecord).toBigDecimal(),
-            enterAndHoldReturn = EnterAndHoldReturnCriterion()
-                .calculate(series, tradingRecord).toBigDecimal(),
+            enterAndHoldReturn = EnterAndHoldCriterion(ReturnCriterion()).calculate(series, tradingRecord)
+                .toBigDecimal(),
             maximumDrawdown = MaximumDrawdownCriterion().calculate(series, tradingRecord).toBigDecimal(),
             barsCount = NumberOfBarsCriterion().calculate(series, tradingRecord).toInt(),
             profitLoss = ProfitLossCriterion().calculate(series, tradingRecord).toBigDecimal(),

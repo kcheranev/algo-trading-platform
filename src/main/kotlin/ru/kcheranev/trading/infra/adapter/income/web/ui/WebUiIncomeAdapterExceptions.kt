@@ -1,7 +1,5 @@
 package ru.kcheranev.trading.infra.adapter.income.web.ui
 
-open class WebUiIncomeAdapterException(
-    message: String
-) : RuntimeException(message)
+import ru.kcheranev.trading.domain.exception.InfrastructureException
 
-class NotFoundException(message: String) : WebUiIncomeAdapterException(message)
+class NotFoundException(message: String) : InfrastructureException(message)

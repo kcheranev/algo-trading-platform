@@ -1,10 +1,7 @@
 package ru.kcheranev.trading.infra.adapter.income.broker
 
+import ru.kcheranev.trading.domain.exception.InfrastructureException
 import ru.tinkoff.piapi.contract.v1.SubscriptionInterval
 
-open class BrokerIncomeAdapterException(
-    message: String
-) : RuntimeException(message)
-
 class UnexpectedSubscriptionIntervalException(subscriptionInterval: SubscriptionInterval) :
-    BrokerIncomeAdapterException("Unexpected subscription interval $subscriptionInterval")
+    InfrastructureException("Unexpected subscription interval $subscriptionInterval")

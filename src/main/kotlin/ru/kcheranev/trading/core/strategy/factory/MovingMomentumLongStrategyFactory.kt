@@ -10,7 +10,7 @@ import org.ta4j.core.rules.CrossedDownIndicatorRule
 import org.ta4j.core.rules.CrossedUpIndicatorRule
 import org.ta4j.core.rules.OverIndicatorRule
 import org.ta4j.core.rules.UnderIndicatorRule
-import ru.kcheranev.trading.core.StrategyParamValidationException
+import ru.kcheranev.trading.core.exception.StrategyParamValidationException
 import ru.kcheranev.trading.core.strategy.factory.MovingMomentumLongStrategyParameter.EMA_MACD_BAR_COUNT
 import ru.kcheranev.trading.core.strategy.factory.MovingMomentumLongStrategyParameter.LONG_EMA_BAR_COUNT
 import ru.kcheranev.trading.core.strategy.factory.MovingMomentumLongStrategyParameter.LONG_MACD_BAR_COUNT

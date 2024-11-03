@@ -1,33 +1,47 @@
 package ru.kcheranev.trading.infra.adapter.outcome.broker.impl
 
+import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Component
 import ru.kcheranev.trading.common.date.DateSupplier
 import ru.kcheranev.trading.common.date.atEndOfDay
+import ru.kcheranev.trading.common.date.getOrPut
 import ru.kcheranev.trading.common.date.isWeekend
 import ru.kcheranev.trading.common.date.toMskInstant
 import ru.kcheranev.trading.core.port.outcome.broker.GetHistoricCandlesCommand
 import ru.kcheranev.trading.core.port.outcome.broker.GetHistoricCandlesForLongPeriodCommand
 import ru.kcheranev.trading.core.port.outcome.broker.GetLastHistoricCandlesCommand
 import ru.kcheranev.trading.core.port.outcome.broker.HistoricCandleBrokerPort
+import ru.kcheranev.trading.domain.exception.InfrastructureException
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.infra.adapter.outcome.broker.brokerOutcomeAdapterMapper
 import ru.tinkoff.piapi.core.MarketDataService
 
+private const val HISTORIC_CANDLES_CACHE = "historicCandlesCache"
+
 @Component
 class HistoricCandleBrokerOutcomeAdapter(
     private val marketDataService: MarketDataService,
-    private val dateSupplier: DateSupplier
+    private val dateSupplier: DateSupplier,
+    cacheManager: CacheManager
 ) : HistoricCandleBrokerPort {
 
+    private val historicCandlesCache =
+        cacheManager.getCache(HISTORIC_CANDLES_CACHE)
+            ?: throw InfrastructureException("There is no $HISTORIC_CANDLES_CACHE")
+
+    private fun GetHistoricCandlesCommand.digest() = "${instrument.id}_${candleInterval}_${from}_${to}"
+
     override fun getHistoricCandles(command: GetHistoricCandlesCommand) =
-        marketDataService.getCandlesSync(
-            command.instrument.id,
-            command.from.toMskInstant(),
-            command.to.toMskInstant(),
-            brokerOutcomeAdapterMapper.mapToBrokerCandleInterval(command.candleInterval)
-        ).filter { it.isComplete }
-            .map { brokerOutcomeAdapterMapper.map(it, command.candleInterval, command.instrument.id) }
-            .sortedBy { it.endDateTime }
+        historicCandlesCache.getOrPut(command.digest()) {
+            marketDataService.getCandlesSync(
+                command.instrument.id,
+                command.from.toMskInstant(),
+                command.to.toMskInstant(),
+                brokerOutcomeAdapterMapper.mapToBrokerCandleInterval(command.candleInterval)
+            ).filter { it.isComplete }
+                .map { brokerOutcomeAdapterMapper.map(it, command.candleInterval, command.instrument.id) }
+                .sortedBy { it.endDateTime }
+        }
 
     override fun getHistoricCandlesForLongPeriod(
         command: GetHistoricCandlesForLongPeriodCommand
