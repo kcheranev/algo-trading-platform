@@ -34,6 +34,6 @@ data class StrategyParameterUiDto(
 
 data class StrategyAnalyzeResultFilterUiDto(
     var resultsLimit: Int = 15,
-    var minProfitLossPositionsRatio: BigDecimal = BigDecimal(1),
+    var minProfitLossTradesRatio: BigDecimal = BigDecimal(1),
     var tradesByDayCountFactor: BigDecimal = BigDecimal(1)
 )

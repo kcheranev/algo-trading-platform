@@ -65,7 +65,7 @@ class BacktestingService(
             divisionFactor = command.divisionFactor,
             variantsCount = command.variantsCount,
             resultsLimit = command.resultFilter?.resultsLimit,
-            minProfitLossPositionsRatio = command.resultFilter?.minProfitLossPositionsRatio,
+            minProfitLossTradesRatio = command.resultFilter?.minProfitLossTradesRatio,
             tradesByDayCountFactor = command.resultFilter?.tradesByDayCountFactor,
             profitTypeSort = command.profitTypeSort
         )

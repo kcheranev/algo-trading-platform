@@ -4,6 +4,7 @@ import ru.kcheranev.trading.domain.model.TradeDirection
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.YearMonth
 
 data class StrategyParametersAnalyzeResponseDto(
     val analyzeResults: List<StrategyParametersAnalyzeResultDto>
@@ -15,7 +16,7 @@ data class StrategyAnalyzeResponseDto(
 
 data class StrategyParametersAnalyzeResultDto(
     val parameters: Map<String, Number>,
-    val result: StrategyAnalyzeResultDto
+    val analyzeResult: StrategyAnalyzeResultDto
 )
 
 data class StrategyAnalyzeResultDto(
@@ -25,11 +26,11 @@ data class StrategyAnalyzeResultDto(
     val grossProfit: BigDecimal,
     val netLoss: BigDecimal,
     val grossLoss: BigDecimal,
-    val profitPositionsCount: Int,
-    val losingPositionsCount: Int,
-    val positionsCount: Int,
-    val consecutiveProfitPositionsCount: Int,
-    val consecutiveLosingPositionsCount: Int,
+    val profitTradesCount: Int,
+    val losingTradesCount: Int,
+    val tradesCount: Int,
+    val consecutiveProfitTradesCount: Int,
+    val consecutiveLosingTradesCount: Int,
     val averageLoss: BigDecimal,
     val averageProfit: BigDecimal,
     val enterAndHoldReturn: BigDecimal,
@@ -38,8 +39,21 @@ data class StrategyAnalyzeResultDto(
     val profitLoss: BigDecimal,
     val profitLossPercentage: BigDecimal,
     val profitLossRatio: BigDecimal,
-    val profitLossPositionsRatio: BigDecimal,
-    val results: Map<LocalDate, DailyStrategyAnalyzeResultDto>
+    val profitLossTradesRatio: BigDecimal,
+    val strategyAnalyzeResultByMonth: Map<YearMonth, MonthlyStrategyAnalyzeResultDto>
+)
+
+data class MonthlyStrategyAnalyzeResultDto(
+    val netProfit: BigDecimal,
+    val grossProfit: BigDecimal,
+    val netLoss: BigDecimal,
+    val grossLoss: BigDecimal,
+    val grossValue: BigDecimal,
+    val netValue: BigDecimal,
+    val profitTradesCount: Int,
+    val losingTradesCount: Int,
+    val tradesCount: Int,
+    val strategyAnalyzeResultByDay: Map<LocalDate, DailyStrategyAnalyzeResultDto>
 )
 
 data class DailyStrategyAnalyzeResultDto(
@@ -49,9 +63,9 @@ data class DailyStrategyAnalyzeResultDto(
     val grossProfit: BigDecimal,
     val netLoss: BigDecimal,
     val grossLoss: BigDecimal,
-    val profitPositionsCount: Int,
-    val losingPositionsCount: Int,
-    val positionsCount: Int,
+    val profitTradesCount: Int,
+    val losingTradesCount: Int,
+    val tradesCount: Int,
     val trades: List<TradeDto>
 )
 

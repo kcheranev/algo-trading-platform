@@ -32,6 +32,6 @@ data class StrategyParametersAnalyzeCommand(
 
 data class StrategyAnalyzeResultFilter(
     val resultsLimit: Int?,
-    val minProfitLossPositionsRatio: BigDecimal?,
+    val minProfitLossTradesRatio: BigDecimal?,
     val tradesByDayCountFactor: BigDecimal?
 )

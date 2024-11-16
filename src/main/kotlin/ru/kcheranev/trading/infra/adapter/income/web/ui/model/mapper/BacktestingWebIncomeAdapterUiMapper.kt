@@ -51,13 +51,7 @@ abstract class BacktestingWebIncomeAdapterUiMapper {
             .mapValues { it.value.value!! }
             .let { StrategyParameters(it) }
 
-    @Mapping(target = "results", source = ".", qualifiedByName = ["mapResults"])
     abstract fun map(source: StrategyAnalyzeResult): StrategyAnalyzeResultUiDto
-
-    @Named("mapResults")
-    fun mapResults(source: StrategyAnalyzeResult) =
-        source.splitByDay()
-            .mapValues { map(it.value) }
 
     abstract fun map(source: DailyStrategyAnalyzeResult): DailyStrategyAnalyzeResultUiDto
 

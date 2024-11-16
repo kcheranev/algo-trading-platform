@@ -86,86 +86,133 @@
                 <td th:text="${#numbers.formatDecimal(analyzeResult.netValue,1,4)}"></td>
             </tr>
             <tr>
-                <td>Profit position count</td>
-                <td th:text="${analyzeResult.profitPositionsCount}"></td>
+                <td>Profit trades count</td>
+                <td th:text="${analyzeResult.profitTradesCount}"></td>
             </tr>
             <tr>
-                <td>Losing position count</td>
-                <td th:text="${analyzeResult.losingPositionsCount}"></td>
+                <td>Losing trades count</td>
+                <td th:text="${analyzeResult.losingTradesCount}"></td>
             </tr>
             </tbody>
         </table>
 
-        <div class="accordion" id="accordionPanelsStayOpenExample">
-            <div class="accordion-item" th:each="dayAnalyzeResult,dayAnalyzeResultStat : ${analyzeResult.results}">
+        <div class="accordion" id="accordionMonthAnalyzeResult">
+            <div class="accordion-item"
+                 th:each="monthAnalyzeResult,monthAnalyzeResultStat : ${analyzeResult.strategyAnalyzeResultByMonth}">
                 <h2 class="accordion-header">
-                    <button class="accordion-button  collapsed" type="button" data-bs-toggle="collapse"
-                            aria-expanded="false" data-bs-target="#panelsStayOpen-" aria-controls="panelsStayOpen-"
-                            th:attrappend="data-bs-target=${dayAnalyzeResultStat.index},aria-controls=${dayAnalyzeResultStat.index}">
-                        <span class="pe-2" th:text="${dayAnalyzeResult.key}"></span>
-                        <span th:class="'px-2 ' + (${dayAnalyzeResult.value.netValue >= 0} ? 'text-success' : 'text-danger')"
-                              th:text="|Net: ${#numbers.formatDecimal(dayAnalyzeResult.value.netValue,1,4)}|"></span>
-                        <span th:class="'px-2 ' + (${dayAnalyzeResult.value.grossValue >= 0} ? 'text-success' : 'text-danger')"
-                              th:text="|Gross: ${#numbers.formatDecimal(dayAnalyzeResult.value.grossValue,1,4)}|"></span>
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            aria-expanded="false" data-bs-target="#monthAnalyzeResult-"
+                            aria-controls="monthAnalyzeResult-"
+                            th:attrappend="data-bs-target=${monthAnalyzeResultStat.index},aria-controls=${monthAnalyzeResultStat.index}">
+                        <span class="pe-2" th:text="${monthAnalyzeResult.key}"></span>
+                        <span th:class="'px-2 ' + (${monthAnalyzeResult.value.netValue >= 0} ? 'text-success' : 'text-danger')"
+                              th:text="|Net: ${#numbers.formatDecimal(monthAnalyzeResult.value.netValue,1,4)}|"></span>
+                        <span th:class="'px-2 ' + (${monthAnalyzeResult.value.grossValue >= 0} ? 'text-success' : 'text-danger')"
+                              th:text="|Gross: ${#numbers.formatDecimal(monthAnalyzeResult.value.grossValue,1,4)}|"></span>
                         <span class="px-2"
-                              th:text="|Trades: ${#lists.size(dayAnalyzeResult.value.trades)}|"></span>
+                              th:text="|Trades: ${monthAnalyzeResult.value.tradesCount}|"></span>
                     </button>
                 </h2>
-                <div id="panelsStayOpen-" th:attrappend="id=${dayAnalyzeResultStat.index}"
+                <div id="monthAnalyzeResult-" th:attrappend="id=${monthAnalyzeResultStat.index}"
                      class="accordion-collapse collapse">
                     <div class="accordion-body">
                         <table class="table caption-top w-50">
-                            <caption>Daily results</caption>
+                            <caption>Month results</caption>
                             <tbody>
                             <tr>
                                 <td>Gross value</td>
-                                <td th:text="${#numbers.formatDecimal(dayAnalyzeResult.value.grossValue,1,4)}"></td>
+                                <td th:text="${#numbers.formatDecimal(monthAnalyzeResult.value.grossValue,1,4)}"></td>
                             </tr>
                             <tr>
                                 <td>Net value</td>
-                                <td th:text="${#numbers.formatDecimal(dayAnalyzeResult.value.netValue,1,4)}"></td>
+                                <td th:text="${#numbers.formatDecimal(monthAnalyzeResult.value.netValue,1,4)}"></td>
                             </tr>
                             <tr>
-                                <td>Profit position count</td>
-                                <td th:text="${dayAnalyzeResult.value.profitPositionsCount}"></td>
+                                <td>Profit trades count</td>
+                                <td th:text="${monthAnalyzeResult.value.profitTradesCount}"></td>
                             </tr>
                             <tr>
-                                <td>Losing position count</td>
-                                <td th:text="${dayAnalyzeResult.value.losingPositionsCount}"></td>
+                                <td>Losing trades count</td>
+                                <td th:text="${monthAnalyzeResult.value.losingTradesCount}"></td>
                             </tr>
                             </tbody>
                         </table>
-                        <table class="table caption-top">
-                            <caption>Trades</caption>
-                            <thead>
-                            <tr>
-                                <th>Entry time</th>
-                                <th>Exit time</th>
-                                <th>Net value</th>
-                                <th>Gross value</th>
-                                <th>Direction</th>
-                                <th>Entry net price</th>
-                                <th>Exit net price</th>
-                                <th>Entry gross price</th>
-                                <th>Exit gross price</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="trade : ${dayAnalyzeResult.value.trades}">
-                                <td th:text="${#temporals.format(trade.entry.date, 'dd.MM HH:mm')}"></td>
-                                <td th:text="${trade.exit != null} ? ${#temporals.format(trade.exit.date, 'dd.MM HH:mm')}: ''"></td>
-                                <td th:text="${#numbers.formatDecimal(trade.netValue,1,4)}"
-                                    th:class="${trade.netValue >= 0} ? 'text-success' : 'text-danger'"></td>
-                                <td th:text="${#numbers.formatDecimal(trade.grossValue,1,4)}"
-                                    th:class="${trade.grossValue >= 0} ? 'text-success' : 'text-danger'"></td>
-                                <td th:text="${trade.entry.direction.name() == 'BUY'}? 'LONG' : 'SHORT'"></td>
-                                <td th:text="${#numbers.formatDecimal(trade.entry.netPrice,1,4)}"></td>
-                                <td th:text="${trade.exit != null} ? ${#numbers.formatDecimal(trade.exit.netPrice,1,4)}: ''"></td>
-                                <td th:text="${#numbers.formatDecimal(trade.entry.grossPrice,1,4)}"></td>
-                                <td th:text="${trade.exit != null} ? ${#numbers.formatDecimal(trade.exit.grossPrice,1,4)}: ''"></td>
-                            </tr>
-                            </tbody>
-                        </table>
+                        <div class="accordion" id="accordionDayAnalyzeResult">
+                            <div class="accordion-item"
+                                 th:each="dayAnalyzeResult,dayAnalyzeResultStat : ${monthAnalyzeResult.value.strategyAnalyzeResultByDay}">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                            aria-expanded="false" data-bs-target="#dayAnalyzeResult-"
+                                            aria-controls="dayAnalyzeResult-"
+                                            th:attrappend="data-bs-target=${dayAnalyzeResultStat.index},aria-controls=${dayAnalyzeResultStat.index}">
+                                        <span class="pe-2" th:text="${dayAnalyzeResult.key}"></span>
+                                        <span th:class="'px-2 ' + (${dayAnalyzeResult.value.netValue >= 0} ? 'text-success' : 'text-danger')"
+                                              th:text="|Net: ${#numbers.formatDecimal(dayAnalyzeResult.value.netValue,1,4)}|"></span>
+                                        <span th:class="'px-2 ' + (${dayAnalyzeResult.value.grossValue >= 0} ? 'text-success' : 'text-danger')"
+                                              th:text="|Gross: ${#numbers.formatDecimal(dayAnalyzeResult.value.grossValue,1,4)}|"></span>
+                                        <span class="px-2"
+                                              th:text="|Trades: ${dayAnalyzeResult.value.tradesCount}|"></span>
+                                    </button>
+                                </h2>
+                                <div id="dayAnalyzeResult-" th:attrappend="id=${dayAnalyzeResultStat.index}"
+                                     class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <table class="table caption-top w-50">
+                                            <caption>Day results</caption>
+                                            <tbody>
+                                            <tr>
+                                                <td>Gross value</td>
+                                                <td th:text="${#numbers.formatDecimal(dayAnalyzeResult.value.grossValue,1,4)}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Net value</td>
+                                                <td th:text="${#numbers.formatDecimal(dayAnalyzeResult.value.netValue,1,4)}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Profit trades count</td>
+                                                <td th:text="${dayAnalyzeResult.value.profitTradesCount}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Losing trades count</td>
+                                                <td th:text="${dayAnalyzeResult.value.losingTradesCount}"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="table caption-top">
+                                            <caption>Trades</caption>
+                                            <thead>
+                                            <tr>
+                                                <th>Entry time</th>
+                                                <th>Exit time</th>
+                                                <th>Net value</th>
+                                                <th>Gross value</th>
+                                                <th>Direction</th>
+                                                <th>Entry net price</th>
+                                                <th>Exit net price</th>
+                                                <th>Entry gross price</th>
+                                                <th>Exit gross price</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="trade : ${dayAnalyzeResult.value.trades}">
+                                                <td th:text="${#temporals.format(trade.entry.date, 'dd.MM HH:mm')}"></td>
+                                                <td th:text="${trade.exit != null} ? ${#temporals.format(trade.exit.date, 'dd.MM HH:mm')}: ''"></td>
+                                                <td th:text="${#numbers.formatDecimal(trade.netValue,1,4)}"
+                                                    th:class="${trade.netValue >= 0} ? 'text-success' : 'text-danger'"></td>
+                                                <td th:text="${#numbers.formatDecimal(trade.grossValue,1,4)}"
+                                                    th:class="${trade.grossValue >= 0} ? 'text-success' : 'text-danger'"></td>
+                                                <td th:text="${trade.entry.direction.name() == 'BUY'}? 'LONG' : 'SHORT'"></td>
+                                                <td th:text="${#numbers.formatDecimal(trade.entry.netPrice,1,4)}"></td>
+                                                <td th:text="${trade.exit != null} ? ${#numbers.formatDecimal(trade.exit.netPrice,1,4)}: ''"></td>
+                                                <td th:text="${#numbers.formatDecimal(trade.entry.grossPrice,1,4)}"></td>
+                                                <td th:text="${trade.exit != null} ? ${#numbers.formatDecimal(trade.exit.grossPrice,1,4)}: ''"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

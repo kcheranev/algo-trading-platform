@@ -18,7 +18,7 @@ import ru.kcheranev.trading.domain.model.TradeStrategy
 import kotlin.math.max
 
 @Component
-class RsiBollingerStopGainLossLongStrategyFactory : ShortStrategyFactory() {
+class RsiBollingerStopGainLossLongStrategyFactory : LongStrategyFactory() {
 
     override fun initStrategy(parameters: StrategyParameters, series: CustomizedBarSeries): TradeStrategy {
         val overSold = parameters.getAsInt(RsiBollingerStopGainLossStrategyParameter.OVER_SOLD)

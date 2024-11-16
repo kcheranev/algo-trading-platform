@@ -32,6 +32,6 @@ data class StrategyParametersAnalyzeRequestDto(
 
 data class StrategyAnalyzeResultFilterDto(
     @Schema(description = "Results limit") val resultsLimit: Int?,
-    @Schema(description = "Minimal profit loss position ratio") val minProfitLossPositionsRatio: BigDecimal?,
+    @Schema(description = "Minimal profit loss trades ratio") val minProfitLossTradesRatio: BigDecimal?,
     @Schema(description = "Trades by day count factor") val tradesByDayCountFactor: BigDecimal?
 )

@@ -18,7 +18,7 @@ const val BACKTESTING_RESULT_SCALE = 5
 
 private const val DEFAULT_BACKTESTING_RESULTS_LIMIT = 15
 
-private val DEFAULT_MIN_PROFIT_LOSS_POSITIONS_RATIO = BigDecimal(1)
+private val DEFAULT_MIN_PROFIT_LOSS_TRADES_RATIO = BigDecimal(1)
 
 private val DEFAULT_TRADES_BY_DAY_COUNT_FACTOR = BigDecimal(1)
 
@@ -56,7 +56,7 @@ class Backtesting(
         divisionFactor: BigDecimal,
         variantsCount: Int,
         resultsLimit: Int?,
-        minProfitLossPositionsRatio: BigDecimal?,
+        minProfitLossTradesRatio: BigDecimal?,
         tradesByDayCountFactor: BigDecimal?,
         profitTypeSort: ProfitTypeSort?
     ): List<StrategyParametersAnalyzeResult> {
@@ -74,11 +74,11 @@ class Backtesting(
         }.asSequence()
             .filterNotNull()
             .filter {
-                it.analyzeResult.profitLossPositionsRatio >=
-                        (minProfitLossPositionsRatio ?: DEFAULT_MIN_PROFIT_LOSS_POSITIONS_RATIO)
+                it.analyzeResult.profitLossTradesRatio >=
+                        (minProfitLossTradesRatio ?: DEFAULT_MIN_PROFIT_LOSS_TRADES_RATIO)
             }
             .filter {
-                it.analyzeResult.trades.size >=
+                it.analyzeResult.tradesCount >=
                         BigDecimal(daysCount)
                             .multiply(tradesByDayCountFactor ?: DEFAULT_TRADES_BY_DAY_COUNT_FACTOR)
                             .toInt()

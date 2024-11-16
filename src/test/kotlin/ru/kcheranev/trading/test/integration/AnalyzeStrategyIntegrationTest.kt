@@ -19,6 +19,7 @@ import ru.kcheranev.trading.test.stub.grpc.MarketDataBrokerGrpcStub
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.YearMonth
 
 @IntegrationTest
 class AnalyzeStrategyIntegrationTest(
@@ -54,21 +55,34 @@ class AnalyzeStrategyIntegrationTest(
         strategyAnalyzeResponse.statusCode shouldBe HttpStatus.OK
         val strategyAnalyzeResult = strategyAnalyzeResponse.body?.analyzeResult
         strategyAnalyzeResult.shouldNotBeNull()
-        strategyAnalyzeResult.results shouldHaveSize 1
-        strategyAnalyzeResult.results.keys.first() shouldBe LocalDate.parse("2024-01-30")
+        strategyAnalyzeResult.strategyAnalyzeResultByMonth shouldHaveSize 1
+        strategyAnalyzeResult.strategyAnalyzeResultByMonth.keys.first() shouldBe YearMonth.parse("2024-01")
         strategyAnalyzeResult.grossValue shouldBe BigDecimal("2.000000000")
         strategyAnalyzeResult.netValue shouldBe BigDecimal("1.83680000000000")
-        strategyAnalyzeResult.profitPositionsCount shouldBe 1
-        strategyAnalyzeResult.losingPositionsCount shouldBe 1
-        strategyAnalyzeResult.profitLossPositionsRatio shouldBe BigDecimal("1.00000")
-        with(strategyAnalyzeResult.results.values.first()) {
-            positionsCount shouldBe 3
+        strategyAnalyzeResult.profitTradesCount shouldBe 1
+        strategyAnalyzeResult.losingTradesCount shouldBe 1
+        strategyAnalyzeResult.profitLossTradesRatio shouldBe BigDecimal("1.00000")
+        val monthlyStrategyAnalyzeResult =
+            strategyAnalyzeResult.strategyAnalyzeResultByMonth[YearMonth.parse("2024-01")]
+        monthlyStrategyAnalyzeResult.shouldNotBeNull()
+        monthlyStrategyAnalyzeResult.strategyAnalyzeResultByDay shouldHaveSize 1
+        monthlyStrategyAnalyzeResult.netProfit shouldBe BigDecimal("8.91560000000000")
+        monthlyStrategyAnalyzeResult.grossProfit shouldBe BigDecimal("9.000000000")
+        monthlyStrategyAnalyzeResult.netLoss shouldBe BigDecimal("-7.07880000000000")
+        monthlyStrategyAnalyzeResult.grossLoss shouldBe BigDecimal("-7.000000000")
+        monthlyStrategyAnalyzeResult.netValue shouldBe BigDecimal("1.83680000000000")
+        monthlyStrategyAnalyzeResult.grossValue shouldBe BigDecimal("2.000000000")
+        monthlyStrategyAnalyzeResult.profitTradesCount shouldBe 1
+        monthlyStrategyAnalyzeResult.losingTradesCount shouldBe 1
+        monthlyStrategyAnalyzeResult.tradesCount shouldBe 3
+        with(monthlyStrategyAnalyzeResult.strategyAnalyzeResultByDay.values.first()) {
+            tradesCount shouldBe 3
             netProfit shouldBe BigDecimal("8.91560000000000")
             grossProfit shouldBe BigDecimal("9.000000000")
             netLoss shouldBe BigDecimal("-7.07880000000000")
             grossLoss shouldBe BigDecimal("-7.000000000")
-            losingPositionsCount shouldBe 1
-            profitPositionsCount shouldBe 1
+            losingTradesCount shouldBe 1
+            profitTradesCount shouldBe 1
             trades shouldHaveSize 3
             netValue shouldBe BigDecimal("1.83680000000000")
             grossValue shouldBe BigDecimal("2.000000000")

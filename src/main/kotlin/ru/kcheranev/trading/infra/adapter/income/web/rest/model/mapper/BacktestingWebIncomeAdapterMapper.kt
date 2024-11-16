@@ -1,8 +1,6 @@
 package ru.kcheranev.trading.infra.adapter.income.web.rest.model.mapper
 
 import org.mapstruct.Mapper
-import org.mapstruct.Mapping
-import org.mapstruct.Named
 import org.mapstruct.factory.Mappers
 import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeCommand
 import ru.kcheranev.trading.core.port.income.backtesting.StrategyParametersAnalyzeCommand
@@ -23,13 +21,7 @@ abstract class BacktestingWebIncomeAdapterMapper {
 
     abstract fun map(source: StrategyParametersAnalyzeRequestDto): StrategyParametersAnalyzeCommand
 
-    @Mapping(target = "results", source = ".", qualifiedByName = ["mapResults"])
     abstract fun map(source: StrategyAnalyzeResult): StrategyAnalyzeResultDto
-
-    @Named("mapResults")
-    fun mapResults(source: StrategyAnalyzeResult) =
-        source.splitByDay()
-            .mapValues { map(it.value) }
 
     abstract fun map(source: DailyStrategyAnalyzeResult): DailyStrategyAnalyzeResultDto
 

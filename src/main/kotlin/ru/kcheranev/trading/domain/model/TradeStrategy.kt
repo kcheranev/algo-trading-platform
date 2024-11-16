@@ -110,17 +110,17 @@ class TradeStrategy(
         if (tradingRecord.currentPosition.entry != null && tradingRecord.currentPosition.exit == null) {
             trades.add(Trade(mapPositionTrade(tradingRecord.currentPosition.entry), null))
         }
-        return StrategyAnalyzeResult(
+        return StrategyAnalyzeResult.from(
             netProfit = ProfitCriterion().calculate(series, tradingRecord).toBigDecimal(),
             grossProfit = ProfitCriterion(true).calculate(series, tradingRecord).toBigDecimal(),
             netLoss = LossCriterion().calculate(series, tradingRecord).toBigDecimal(),
             grossLoss = LossCriterion(true).calculate(series, tradingRecord).toBigDecimal(),
-            profitPositionsCount = NumberOfWinningPositionsCriterion().calculate(series, tradingRecord).toInt(),
-            losingPositionsCount = NumberOfLosingPositionsCriterion().calculate(series, tradingRecord).toInt(),
-            positionsCount = NumberOfPositionsCriterion().calculate(series, tradingRecord).toInt(),
-            consecutiveProfitPositionsCount = NumberOfConsecutivePositionsCriterion(AnalysisCriterion.PositionFilter.PROFIT)
+            profitTradesCount = NumberOfWinningPositionsCriterion().calculate(series, tradingRecord).toInt(),
+            losingTradesCount = NumberOfLosingPositionsCriterion().calculate(series, tradingRecord).toInt(),
+            tradesCount = NumberOfPositionsCriterion().calculate(series, tradingRecord).toInt(),
+            consecutiveProfitTradesCount = NumberOfConsecutivePositionsCriterion(AnalysisCriterion.PositionFilter.PROFIT)
                 .calculate(series, tradingRecord).toInt(),
-            consecutiveLosingPositionsCount = NumberOfConsecutivePositionsCriterion(AnalysisCriterion.PositionFilter.LOSS)
+            consecutiveLosingTradesCount = NumberOfConsecutivePositionsCriterion(AnalysisCriterion.PositionFilter.LOSS)
                 .calculate(series, tradingRecord).toInt(),
             averageLoss = AverageLossCriterion().calculate(series, tradingRecord).toBigDecimal(),
             averageProfit = AverageProfitCriterion().calculate(series, tradingRecord).toBigDecimal(),

@@ -3,7 +3,7 @@ function changeStrategyTypeListener() {
         const form = document.querySelector("#analyzeForm");
         const formData = new FormData(form);
         formData.append("reloadStrategyParameters", "")
-        fetch("/ui/backtesting/analyze", {
+        fetch(form.action, {
             method: "POST",
             body: formData
         }).then(response => {
