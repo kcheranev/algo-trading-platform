@@ -11,7 +11,7 @@ import java.util.UUID
 @Table(name = "trade_order")
 data class TradeOrderEntity(
     @Id
-    var id: UUID,
+    val id: UUID,
     @Column("ticker")
     val ticker: String,
     @Column("instrument_id")

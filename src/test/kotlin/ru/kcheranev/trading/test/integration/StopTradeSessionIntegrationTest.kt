@@ -60,7 +60,8 @@ class StopTradeSessionIntegrationTest(
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
-                lotsQuantityInPosition = 0,
+                positionLotsQuantity = 0,
+                positionAveragePrice = BigDecimal.ZERO,
                 strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )

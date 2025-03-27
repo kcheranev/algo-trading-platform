@@ -1,11 +1,10 @@
 package ru.kcheranev.trading.core.port.outcome.persistence.tradeorder
 
 import ru.kcheranev.trading.domain.entity.TradeOrder
-import ru.kcheranev.trading.domain.entity.TradeOrderId
 
 interface TradeOrderPersistencePort {
 
-    fun insert(command: InsertTradeOrderCommand): TradeOrderId
+    fun insert(command: InsertTradeOrderCommand)
 
     fun get(command: GetTradeOrderCommand): TradeOrder
 

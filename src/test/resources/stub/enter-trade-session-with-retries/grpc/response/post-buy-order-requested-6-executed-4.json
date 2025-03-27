@@ -4,13 +4,13 @@
   "lotsRequested": "6",
   "lotsExecuted": "4",
   "initialOrderPrice": {
-    "units": "80"
+    "units": "138"
   },
   "executedOrderPrice": {
-    "units": "21"
+    "units": "23"
   },
   "totalOrderAmount": {
-    "units": "85"
+    "units": "92"
   },
   "initialCommission": {
     "units": "1"

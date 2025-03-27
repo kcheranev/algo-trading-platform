@@ -1,11 +1,10 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
 
 plugins {
-    id("org.springframework.boot") version "3.1.5"
-    id("io.spring.dependency-management") version "1.1.3"
-    kotlin("jvm") version "1.8.22"
-    kotlin("kapt") version "1.8.22"
-    kotlin("plugin.spring") version "1.8.22"
+    id("org.springframework.boot")
+    kotlin("jvm")
+    kotlin("kapt")
+    kotlin("plugin.spring")
 }
 
 group = "ru.kcheranev"
@@ -16,15 +15,22 @@ val tinkoffApiVersion by extra("1.5")
 val ta4jVersion by extra("0.17")
 val mapstructVersion by extra("1.5.5.Final")
 val springdocOpenapiStarterWebmvcUiVersion by extra("2.2.0")
-val kotestVersion by extra("5.8.0")
-val kotestExtensionsSpringVersion by extra("1.1.3")
-val mockkVersion by extra("1.13.8")
-val wiremockVersion by extra("3.3.1")
-val wiremockGrpcExtensionVersion by extra("0.4.0")
-val testcontainersPostgresqlVersion by extra("1.19.3")
+val kotestVersion by extra("5.9.1")
+val kotestExtensionsSpringVersion by extra("1.3.0")
+val mockkVersion by extra("1.13.17")
+val wiremockVersion by extra("3.12.1")
+val wiremockGrpcExtensionVersion by extra("0.10.0")
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xjsr305=strict")
+    }
 }
 
 repositories {
@@ -32,6 +38,8 @@ repositories {
 }
 
 dependencies {
+    implementation(platform(BOM_COORDINATES))
+
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -59,19 +67,12 @@ dependencies {
     testImplementation("io.kotest:kotest-framework-datatest:$kotestVersion")
     testImplementation("io.kotest.extensions:kotest-extensions-spring:$kotestExtensionsSpringVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
-    testImplementation("org.wiremock:wiremock:$wiremockVersion")
-    testImplementation("org.wiremock:wiremock-grpc-extension:$wiremockGrpcExtensionVersion")
-    testImplementation("org.testcontainers:postgresql:$testcontainersPostgresqlVersion")
+    testImplementation("org.wiremock:wiremock-standalone:$wiremockVersion")
+    testImplementation("org.wiremock:wiremock-grpc-extension-standalone:$wiremockGrpcExtensionVersion")
+    testImplementation("org.testcontainers:postgresql")
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = freeCompilerArgs + "-Xjsr305=strict"
-        jvmTarget = "17"
-    }
-}
-
-tasks.withType<Test> {
+tasks.test {
     useJUnitPlatform()
     jvmArgs("--add-opens=java.base/java.util=ALL-UNNAMED", "--add-opens=java.base/java.lang=ALL-UNNAMED")
 }

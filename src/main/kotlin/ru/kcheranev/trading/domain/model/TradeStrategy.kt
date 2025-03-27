@@ -29,6 +29,7 @@ import ru.kcheranev.trading.common.date.isWeekend
 import ru.kcheranev.trading.common.date.max
 import ru.kcheranev.trading.common.date.min
 import ru.kcheranev.trading.core.config.TradingProperties.Companion.tradingProperties
+import ru.kcheranev.trading.core.strategy.rule.isSatisfiedByType
 import ru.kcheranev.trading.domain.model.backtesting.Order
 import ru.kcheranev.trading.domain.model.backtesting.StrategyAnalyzeResult
 import ru.kcheranev.trading.domain.model.backtesting.Trade
@@ -50,6 +51,11 @@ class TradeStrategy(
     fun shouldEnter() = shouldEnter(series.endIndex)
 
     fun shouldExit() = shouldExit(series.endIndex)
+
+    fun shouldExit(currentPosition: Position?): Boolean {
+        val index = series.endIndex
+        return !isUnstableAt(index) && exitRule.isSatisfiedByType(index, currentPosition)
+    }
 
     fun lastCandleDate(): LocalDateTime? =
         if (series.isEmpty) {

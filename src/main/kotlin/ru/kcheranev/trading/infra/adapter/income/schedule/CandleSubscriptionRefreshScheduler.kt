@@ -11,7 +11,7 @@ class CandleSubscriptionRefreshScheduler(
     private val refreshCandleSubscriptionsUseCase: RefreshCandleSubscriptionsUseCase
 ) {
 
-    @Scheduled(fixedDelayString = "\${application.schedule.candleSubscriptionRefreshDelay}")
+    @Scheduled(fixedDelayString = "\${application.schedule.candle-subscription-refresh-delay}")
     fun refreshCandleSubscriptions() {
         refreshCandleSubscriptionsUseCase.refreshCandleSubscriptions()
     }

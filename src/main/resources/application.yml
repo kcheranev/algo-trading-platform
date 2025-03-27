@@ -8,7 +8,7 @@ spring:
   cache:
     caffeine:
       spec: maximumSize=5000
-    cacheNames:
+    cache-names:
       - historicCandlesCache
   jackson:
     deserialization:
@@ -16,10 +16,10 @@ spring:
 
 application:
   trading:
-    defaultCommission: 0.0004
-    availableDelayedCandlesCount: 3
-    placeOrderRetryCount: 3
-    tradingSchedule:
+    default-commission: 0.0004
+    available-delayed-candles-count: 3
+    place-order-retry-count: 3
+    trading-schedule:
       - from: "10:00:00"
         to: "18:40:00"
       - from: "19:05:00"
@@ -27,12 +27,12 @@ application:
   infra:
     broker:
       token: ${BROKER_TOKEN}
-      appName: ${spring.application.name}
-      tradingAccountName: trading_account
+      app-name: ${spring.application.name}
+      trading-account-name: trading_account
     notification.telegram:
       token: ${TELEGRAM_TOKEN}
-      chatId: ${TELEGRAM_CHAT_ID}
-      apiUrl: https://api.telegram.org/bot${application.infra.notification.telegram.token}
+      chat-id: ${TELEGRAM_CHAT_ID}
+      api-url: https://api.telegram.org/bot${application.infra.notification.telegram.token}
   schedule:
     enabled: true
-    candleSubscriptionRefreshDelay: PT15S
+    candle-subscription-refresh-delay: PT15S

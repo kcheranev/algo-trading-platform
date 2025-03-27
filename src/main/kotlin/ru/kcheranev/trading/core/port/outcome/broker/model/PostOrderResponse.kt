@@ -8,6 +8,7 @@ data class PostOrderResponse(
     val lotsRequested: Int,
     val lotsExecuted: Int,
     val totalPrice: BigDecimal,
+    val executedPrice: BigDecimal,
     val executedCommission: BigDecimal
 ) {
 

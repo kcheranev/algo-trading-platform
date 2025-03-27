@@ -16,7 +16,6 @@ import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.TradeSess
 import ru.kcheranev.trading.core.port.service.TradeStrategyServicePort
 import ru.kcheranev.trading.core.port.service.command.InitTradeStrategyCommand
 import ru.kcheranev.trading.domain.entity.TradeSession
-import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.domain.model.StrategyParameters
@@ -37,29 +36,23 @@ class TradeSessionPersistenceOutcomeAdapter(
 ) : TradeSessionPersistencePort {
 
     @Transactional(propagation = MANDATORY)
-    override fun insert(command: InsertTradeSessionCommand): TradeSessionId {
+    override fun insert(command: InsertTradeSessionCommand) {
         val tradeSession = command.tradeSession
-        val savedTradeSessionEntity =
-            jdbcTemplate.insert(persistenceOutcomeAdapterMapper.map(tradeSession))
+        jdbcTemplate.insert(persistenceOutcomeAdapterMapper.map(tradeSession))
         tradeSession.events.forEach { eventPublisher.publishEvent(it) }
         tradeSession.clearEvents()
-        val tradeSessionId = savedTradeSessionEntity.id
-        tradeStrategyCache.put(tradeSessionId, tradeSession.strategy)
-        return TradeSessionId(tradeSessionId)
+        tradeStrategyCache.put(command.tradeSession.id.value, tradeSession.strategy)
     }
 
     @Transactional(propagation = MANDATORY)
-    override fun save(command: SaveTradeSessionCommand): TradeSessionId {
+    override fun save(command: SaveTradeSessionCommand) {
         val tradeSession = command.tradeSession
-        val savedTradeSessionEntity =
-            tradeSessionRepository.save(persistenceOutcomeAdapterMapper.map(tradeSession))
+        tradeSessionRepository.save(persistenceOutcomeAdapterMapper.map(tradeSession))
         tradeSession.events.forEach { eventPublisher.publishEvent(it) }
         tradeSession.clearEvents()
-        val tradeSessionId = savedTradeSessionEntity.id
         if (tradeSession.status == TradeSessionStatus.STOPPED) {
-            tradeStrategyCache.remove(tradeSessionId)
+            tradeStrategyCache.remove(command.tradeSession.id.value)
         }
-        return TradeSessionId(tradeSessionId)
     }
 
     override fun get(command: GetTradeSessionCommand): TradeSession {
@@ -75,7 +68,7 @@ class TradeSessionPersistenceOutcomeAdapter(
 
     override fun search(command: SearchTradeSessionCommand) =
         tradeSessionRepository.search(command)
-            .map { persistenceOutcomeAdapterMapper.map(it) }
+            .map(persistenceOutcomeAdapterMapper::map)
 
     override fun getReadyForOrderTradeSessions() =
         tradeSessionRepository.getReadyForOrderTradeSessions()

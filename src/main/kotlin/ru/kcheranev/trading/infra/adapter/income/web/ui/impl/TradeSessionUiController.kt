@@ -55,7 +55,7 @@ class TradeSessionUiController(
     fun findAll(model: Model): String {
         val tradeSessionDtoList =
             searchTradeSessionUseCase.search(SearchTradeSessionCommand())
-                .map { tradeSessionWebIncomeAdapterUiMapper.map(it) }
+                .map(tradeSessionWebIncomeAdapterUiMapper::map)
         model.addAttribute("tradeSessions", tradeSessionDtoList)
         return "trade-sessions"
     }

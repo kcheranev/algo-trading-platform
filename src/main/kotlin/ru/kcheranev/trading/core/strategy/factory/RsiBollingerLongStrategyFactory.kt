@@ -54,7 +54,7 @@ class RsiBollingerLongStrategyFactory : LongStrategyFactory() {
 
     override fun strategyName() = "RSI_BOLLINGER"
 
-    override fun strategyParameterNames() = RsiBollingerLongStrategyParameter.values().map { it.alias() }
+    override fun strategyParameterNames() = RsiBollingerLongStrategyParameter.entries.map { it.alias() }
 
 }
 

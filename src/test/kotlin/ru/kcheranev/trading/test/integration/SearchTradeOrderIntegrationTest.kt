@@ -49,7 +49,8 @@ class SearchTradeOrderIntegrationTest(
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
-                lotsQuantityInPosition = 0,
+                positionLotsQuantity = 0,
+                positionAveragePrice = BigDecimal.ZERO,
                 strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
@@ -63,7 +64,8 @@ class SearchTradeOrderIntegrationTest(
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
-                lotsQuantityInPosition = 0,
+                positionLotsQuantity = 0,
+                positionAveragePrice = BigDecimal.ZERO,
                 strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
@@ -363,6 +365,7 @@ class SearchTradeOrderIntegrationTest(
                 page = Page(2, 1),
                 sort = Sort(TradeOrderSort.TOTAL_PRICE, SortDirection.DESC)
             )
+
         //when
         val response = testRestTemplate.postForEntity(
             "/trade-orders/search",
@@ -377,8 +380,8 @@ class SearchTradeOrderIntegrationTest(
         }
         val tradeOrdersResult = response.body!!.tradeOrders
         tradeOrdersResult.size shouldBe 2
-        tradeOrdersResult[0].totalPrice = BigDecimal(140)
-        tradeOrdersResult[1].totalPrice = BigDecimal(130)
+        tradeOrdersResult[0].totalPrice shouldBe BigDecimal(140)
+        tradeOrdersResult[1].totalPrice shouldBe BigDecimal(130)
     }
 
     "should return empty result when there are no trade orders found" {

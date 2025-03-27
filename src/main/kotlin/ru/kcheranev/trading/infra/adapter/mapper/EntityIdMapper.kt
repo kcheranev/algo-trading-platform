@@ -1,6 +1,7 @@
 package ru.kcheranev.trading.infra.adapter.mapper
 
 import org.mapstruct.Mapper
+import ru.kcheranev.trading.domain.entity.InstrumentId
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.domain.entity.TradeOrderId
 import ru.kcheranev.trading.domain.entity.TradeSessionId
@@ -20,5 +21,9 @@ abstract class EntityIdMapper {
     fun mapUuidToTradeOrderId(source: UUID?) = source?.let { TradeOrderId(it) }
 
     fun mapTradeOrderIdToUuid(source: TradeOrderId?) = source?.value
+
+    fun mapUuidToInstrumentId(source: UUID?) = source?.let { InstrumentId(it) }
+
+    fun mapInstrumentIdToUuid(source: InstrumentId?) = source?.value
 
 }

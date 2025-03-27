@@ -37,7 +37,7 @@ class RsiLongStrategyFactory : LongStrategyFactory() {
 
     override fun strategyName() = "RSI"
 
-    override fun strategyParameterNames() = RsiStrategyLongParameter.values().map { it.alias() }
+    override fun strategyParameterNames() = RsiStrategyLongParameter.entries.map { it.alias() }
 
 }
 

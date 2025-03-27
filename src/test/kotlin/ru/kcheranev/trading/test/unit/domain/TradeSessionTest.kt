@@ -26,6 +26,7 @@ import ru.kcheranev.trading.domain.TradeSessionPendedForEntryDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionPendedForExitDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionResumedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionStoppedDomainEvent
+import ru.kcheranev.trading.domain.entity.CurrentPosition
 import ru.kcheranev.trading.domain.entity.StrategyConfiguration
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.domain.entity.TradeSession
@@ -35,6 +36,7 @@ import ru.kcheranev.trading.domain.exception.TradeSessionDomainException
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
+import ru.kcheranev.trading.domain.model.Position
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.TradeStrategy
 import java.math.BigDecimal
@@ -124,7 +126,7 @@ class TradeSessionTest : FreeSpec({
         val tradeStrategy =
             spyk(TradeStrategy(barSeries, false, mockk<Strategy>())) {
                 every { shouldEnter(any()) } returns false
-                every { shouldExit(any()) } returns false
+                every { shouldExit(any(Position::class)) } returns false
             }
         val candle =
             Candle(
@@ -240,7 +242,7 @@ class TradeSessionTest : FreeSpec({
         val tradeStrategy =
             spyk(TradeStrategy(barSeries, false, mockk<Strategy>())) {
                 every { shouldEnter(any()) } returns true
-                every { shouldExit(any()) } returns true
+                every { shouldExit(any(Position::class)) } returns true
             }
         val tradeSessionId = UUID.randomUUID()
         val tradeSession =
@@ -251,7 +253,7 @@ class TradeSessionTest : FreeSpec({
                 status = TradeSessionStatus.IN_POSITION,
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
-                lotsQuantityInPosition = 5,
+                currentPosition = CurrentPosition(lotsQuantity = 5, averagePrice = BigDecimal("42")),
                 strategy = tradeStrategy,
                 strategyType = "DUMMY",
                 strategyParameters = StrategyParameters(mapOf("paramName" to 1))
@@ -301,11 +303,12 @@ class TradeSessionTest : FreeSpec({
             )
 
         //when
-        tradeSession.enter(5)
+        tradeSession.enter(5, BigDecimal("42"))
 
         //then
         tradeSession.status shouldBe TradeSessionStatus.IN_POSITION
-        tradeSession.lotsQuantityInPosition shouldBe 5
+        tradeSession.currentPosition.lotsQuantity shouldBe 5
+        tradeSession.currentPosition.averagePrice shouldBe BigDecimal("42")
         val domainEvents = tradeSession.events
         domainEvents shouldHaveSize 1
         val enteredEvent = domainEvents.first()
@@ -337,7 +340,8 @@ class TradeSessionTest : FreeSpec({
 
         //then
         tradeSession.status shouldBe TradeSessionStatus.WAITING
-        tradeSession.lotsQuantityInPosition shouldBe 0
+        tradeSession.currentPosition.lotsQuantity shouldBe 0
+        tradeSession.currentPosition.averagePrice shouldBe BigDecimal.ZERO
         val domainEvents = tradeSession.events
         domainEvents shouldHaveSize 1
         val exitedEvent = domainEvents.first()
@@ -351,15 +355,16 @@ class TradeSessionTest : FreeSpec({
         data class TestParameters(
             val currentStatus: TradeSessionStatus,
             val targetStatus: TradeSessionStatus,
-            val lotsQuantityInPosition: Int
+            val currentPositionLotsQuantity: Int,
+            val currentPositionAveragePrice: BigDecimal
         )
         withData(
-            nameFn = { "current = ${it.currentStatus}, target = ${it.targetStatus}, is in position = ${it.lotsQuantityInPosition > 0}" },
-            TestParameters(TradeSessionStatus.PENDING_ENTER, TradeSessionStatus.WAITING, 0),
-            TestParameters(TradeSessionStatus.PENDING_EXIT, TradeSessionStatus.IN_POSITION, 10),
-            TestParameters(TradeSessionStatus.STOPPED, TradeSessionStatus.IN_POSITION, 10),
-            TestParameters(TradeSessionStatus.STOPPED, TradeSessionStatus.WAITING, 0)
-        ) { (currentStatus, targetStatus, lotsQuantityInPosition) ->
+            nameFn = { "current = ${it.currentStatus}, target = ${it.targetStatus}, is in position = ${it.currentPositionLotsQuantity > 0}" },
+            TestParameters(TradeSessionStatus.PENDING_ENTER, TradeSessionStatus.WAITING, 0, BigDecimal.ZERO),
+            TestParameters(TradeSessionStatus.PENDING_EXIT, TradeSessionStatus.IN_POSITION, 10, BigDecimal("42")),
+            TestParameters(TradeSessionStatus.STOPPED, TradeSessionStatus.IN_POSITION, 10, BigDecimal("42")),
+            TestParameters(TradeSessionStatus.STOPPED, TradeSessionStatus.WAITING, 0, BigDecimal.ZERO)
+        ) { (currentStatus, targetStatus, currentPositionLotsQuantity, currentPositionAveragePrice) ->
             //given
             val tradeStrategy = mockk<TradeStrategy>()
             val tradeSessionId = UUID.randomUUID()
@@ -371,7 +376,10 @@ class TradeSessionTest : FreeSpec({
                     status = currentStatus,
                     candleInterval = CandleInterval.ONE_MIN,
                     lotsQuantity = 10,
-                    lotsQuantityInPosition = lotsQuantityInPosition,
+                    currentPosition = CurrentPosition(
+                        lotsQuantity = currentPositionLotsQuantity,
+                        averagePrice = currentPositionAveragePrice
+                    ),
                     strategy = tradeStrategy,
                     strategyType = "DUMMY",
                     strategyParameters = StrategyParameters(mapOf("paramName" to 1))

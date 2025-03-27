@@ -34,7 +34,7 @@ class BacktestingController(
     fun analyzeStrategyParameters(@RequestBody request: StrategyParametersAnalyzeRequestDto) =
         StrategyParametersAnalyzeResponseDto(
             strategyAnalyzeUseCase.analyzeStrategyParameters(backtestingWebIncomeAdapterMapper.map(request))
-                .map { backtestingWebIncomeAdapterMapper.map(it) }
+                .map(backtestingWebIncomeAdapterMapper::map)
         )
 
 }

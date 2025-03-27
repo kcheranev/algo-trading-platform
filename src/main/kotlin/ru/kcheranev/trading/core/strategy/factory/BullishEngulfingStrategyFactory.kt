@@ -5,8 +5,8 @@ import org.ta4j.core.BaseStrategy
 import org.ta4j.core.indicators.candles.BullishEngulfingIndicator
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator
 import org.ta4j.core.rules.BooleanIndicatorRule
-import org.ta4j.core.rules.StopGainRule
-import org.ta4j.core.rules.StopLossRule
+import ru.kcheranev.trading.core.strategy.rule.StopGainRule
+import ru.kcheranev.trading.core.strategy.rule.StopLossRule
 import ru.kcheranev.trading.domain.model.CustomizedBarSeries
 import ru.kcheranev.trading.domain.model.StrategyParameter
 import ru.kcheranev.trading.domain.model.StrategyParameters
@@ -29,7 +29,7 @@ class BullishEngulfingStrategyFactory : LongStrategyFactory() {
 
     override fun strategyName() = "BULLISH_ENGULFING"
 
-    override fun strategyParameterNames() = BullishEngulfingStrategyLongParameter.values().map { it.alias() }
+    override fun strategyParameterNames() = BullishEngulfingStrategyLongParameter.entries.map { it.alias() }
 
 }
 

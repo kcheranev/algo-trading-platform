@@ -23,7 +23,8 @@ class TradeSessionEntityRowMapper(
             status = TradeSessionStatus.valueOf(rs.getString("status")),
             candleInterval = CandleInterval.valueOf(rs.getString("candle_interval")),
             lotsQuantity = rs.getInt("lots_quantity"),
-            lotsQuantityInPosition = rs.getInt("lots_quantity_in_position"),
+            positionLotsQuantity = rs.getInt("position_lots_quantity"),
+            positionAveragePrice = rs.getBigDecimal("position_average_price"),
             strategyType = rs.getString("strategy_type"),
             strategyParameters = mapToJsonbReadConverter.convert(
                 rs.getObject(

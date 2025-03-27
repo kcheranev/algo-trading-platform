@@ -33,7 +33,7 @@ class Backtesting(
         CustomizedBarSeries(
             BaseBarSeriesBuilder()
                 .withName("Trade session: ticker=$ticker, candleInterval=$candleInterval")
-                .withBars(candles.map { domainModelMapper.map(it) })
+                .withBars(candles.map(domainModelMapper::map))
                 .build(),
             candleInterval
         )

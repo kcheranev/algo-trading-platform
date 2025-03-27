@@ -39,7 +39,7 @@ class StrategyConfigurationUiController(
     fun findAll(model: Model): String {
         val strategyConfigurationDtoList =
             searchStrategyConfigurationUseCase.search(SearchStrategyConfigurationCommand())
-                .map { strategyConfigurationWebIncomeAdapterUiMapper.map(it) }
+                .map(strategyConfigurationWebIncomeAdapterUiMapper::map)
         model.addAttribute("strategyConfigurations", strategyConfigurationDtoList)
         return "strategy-configurations"
     }

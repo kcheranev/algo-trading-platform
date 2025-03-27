@@ -54,7 +54,7 @@ class TradeSessionController(
     fun search(@RequestBody request: SearchTradeSessionRequestDto) =
         TradeSessionSearchResponseDto(
             tradeSessionSearchUseCase.search(tradeSessionWebIncomeAdapterMapper.map(request))
-                .map { tradeSessionWebIncomeAdapterMapper.map(it) }
+                .map(tradeSessionWebIncomeAdapterMapper::map)
         )
 
 }

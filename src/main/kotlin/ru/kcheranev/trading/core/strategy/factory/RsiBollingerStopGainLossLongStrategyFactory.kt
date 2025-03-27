@@ -43,7 +43,7 @@ class RsiBollingerStopGainLossLongStrategyFactory : LongStrategyFactory() {
 
     override fun strategyName() = "RSI_BOLLINGER_STOP_GAIN_LOSS"
 
-    override fun strategyParameterNames() = RsiBollingerStopGainLossStrategyParameter.values().map { it.alias() }
+    override fun strategyParameterNames() = RsiBollingerStopGainLossStrategyParameter.entries.map { it.alias() }
 
 }
 

@@ -17,7 +17,7 @@ class SubscriptionUiController(
     fun findAllCandleSubscriptions(model: Model): String {
         val candleSubscriptionDtoList =
             searchCandleSubscriptionUseCase.findAllCandleSubscriptions()
-                .map { subscriptionWebIncomeAdapterUiMapper.map(it) }
+                .map(subscriptionWebIncomeAdapterUiMapper::map)
         model.addAttribute("candleSubscriptions", candleSubscriptionDtoList)
         return "subscriptions"
     }

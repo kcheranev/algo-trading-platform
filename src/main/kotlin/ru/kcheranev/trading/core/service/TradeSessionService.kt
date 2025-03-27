@@ -75,7 +75,8 @@ class TradeSessionService(
                 lotsQuantity = command.lotsQuantity,
                 tradeStrategy = tradeStrategy
             )
-        return tradeSessionPersistencePort.insert(InsertTradeSessionCommand(tradeSession))
+        tradeSessionPersistencePort.insert(InsertTradeSessionCommand(tradeSession))
+        return tradeSession.id
     }
 
     @Transactional
@@ -110,7 +111,7 @@ class TradeSessionService(
                 return@postOrderWithRetry postOrderResponse
             }
         if (postOrderResultAccumulator.haveOrders()) {
-            tradeSession.enter(postOrderResultAccumulator.lotsExecuted)
+            tradeSession.enter(postOrderResultAccumulator.lotsExecuted, postOrderResultAccumulator.averagePrice)
         } else {
             tradeSession.resume()
         }
@@ -121,7 +122,7 @@ class TradeSessionService(
     override fun exitTradeSession(command: ExitTradeSessionCommand) {
         val tradeSession = tradeSessionPersistencePort.get(GetTradeSessionCommand(command.tradeSessionId))
         val postOrderResultAccumulator =
-            postOrderWithRetry(tradeSession.lotsQuantityInPosition) { remainLotsQuantity ->
+            postOrderWithRetry(tradeSession.currentPosition.lotsQuantity) { remainLotsQuantity ->
                 val postOrderResponse =
                     if (tradeSession.isMargin()) {
                         orderServiceBrokerPort.postBestPriceBuyOrder(

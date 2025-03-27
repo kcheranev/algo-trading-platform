@@ -4,10 +4,11 @@
   "lotsRequested": "4",
   "lotsExecuted": "4",
   "initialOrderPrice": {
-    "units": "424"
+    "units": "434"
   },
   "executedOrderPrice": {
-    "units": "427"
+    "units": "108",
+    "nano": "500000000"
   },
   "totalOrderAmount": {
     "units": "434"

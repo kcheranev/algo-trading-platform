@@ -5,7 +5,8 @@ CREATE TABLE strategy_configuration
     type            character varying NOT NULL,
     candle_interval character varying NOT NULL,
     parameters      jsonb             NOT NULL,
-    CONSTRAINT strategy_configuration_pkey PRIMARY KEY (id)
+    CONSTRAINT strategy_configuration_pkey PRIMARY KEY (id),
+    CONSTRAINT strategy_configuration_name_unq UNIQUE (name)
 );
 
 CREATE TABLE trade_session
@@ -16,7 +17,8 @@ CREATE TABLE trade_session
     status                    character varying NOT NULL,
     candle_interval           character varying NOT NULL,
     lots_quantity             integer           NOT NULL,
-    lots_quantity_in_position integer           NOT NULL,
+    position_lots_quantity    integer           NOT NULL,
+    position_average_price    numeric           NOT NULL,
     strategy_type             character varying NOT NULL,
     strategy_parameters       jsonb             NOT NULL,
     CONSTRAINT trade_session_pkey PRIMARY KEY (id)
@@ -42,8 +44,12 @@ CREATE TABLE trade_order
 
 CREATE TABLE instrument
 (
-    id            uuid              NOT NULL,
-    ticker        character varying NOT NULL,
-    instrument_id character varying NOT NULL,
-    CONSTRAINT instrument_pkey PRIMARY KEY (id)
+    id                   uuid              NOT NULL,
+    ticker               character varying NOT NULL,
+    name                 character varying NOT NULL,
+    broker_instrument_id character varying NOT NULL,
+    CONSTRAINT instrument_pkey PRIMARY KEY (id),
+    CONSTRAINT instrument_ticker_unq UNIQUE (ticker),
+    CONSTRAINT instrument_name_unq UNIQUE (name),
+    CONSTRAINT instrument_instrument_id_unq UNIQUE (broker_instrument_id)
 )

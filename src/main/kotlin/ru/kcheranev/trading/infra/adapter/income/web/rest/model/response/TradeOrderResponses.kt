@@ -6,17 +6,17 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 data class TradeOrderDto(
-    var id: UUID,
-    var ticker: String,
-    var instrumentId: String,
-    var date: LocalDateTime,
-    var lotsQuantity: Int,
-    var totalPrice: BigDecimal,
-    var executedCommission: BigDecimal,
-    var direction: TradeDirection,
-    var tradeSessionId: UUID
+    val id: UUID,
+    val ticker: String,
+    val instrumentId: String,
+    val date: LocalDateTime,
+    val lotsQuantity: Int,
+    val totalPrice: BigDecimal,
+    val executedCommission: BigDecimal,
+    val direction: TradeDirection,
+    val tradeSessionId: UUID
 )
 
 data class TradeOrderSearchResponseDto(
-    var tradeOrders: List<TradeOrderDto>
+    val tradeOrders: List<TradeOrderDto>
 )

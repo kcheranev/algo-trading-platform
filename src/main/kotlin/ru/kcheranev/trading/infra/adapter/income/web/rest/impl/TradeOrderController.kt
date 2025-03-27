@@ -23,7 +23,7 @@ class TradeOrderController(
     fun search(@RequestBody request: SearchTradeOrderRequestDto) =
         TradeOrderSearchResponseDto(
             tradeOrderSearchUseCase.search(tradeOrderWebIncomeAdapterMapper.map(request))
-                .map { tradeOrderWebIncomeAdapterMapper.map(it) }
+                .map(tradeOrderWebIncomeAdapterMapper::map)
         )
 
 }

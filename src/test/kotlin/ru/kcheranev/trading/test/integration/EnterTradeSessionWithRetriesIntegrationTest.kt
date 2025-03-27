@@ -19,6 +19,7 @@ import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
+import ru.kcheranev.trading.domain.model.Position
 import ru.kcheranev.trading.domain.model.TradeStrategy
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
@@ -63,7 +64,8 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
-                lotsQuantityInPosition = 0,
+                positionLotsQuantity = 0,
+                positionAveragePrice = BigDecimal.ZERO,
                 strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
@@ -86,7 +88,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
         val tradeStrategy =
             spyk(TradeStrategy(barSeries, false, mockk<Strategy>())) {
                 every { shouldEnter(any()) } returns true
-                every { shouldExit(any()) } returns false
+                every { shouldExit(any(Position::class)) } returns false
             }
         tradeStrategyCache.put(tradeSessionId, tradeStrategy)
         marketDataSubscriptionInitializer.addSubscription(
@@ -129,7 +131,8 @@ class EnterTradeSessionWithRetriesIntegrationTest(
 
         val tradeSession = jdbcTemplate.findById(tradeSessionId, TradeSessionEntity::class.java)
         tradeSession.status shouldBe TradeSessionStatus.IN_POSITION
-        tradeSession.lotsQuantityInPosition shouldBe 10
+        tradeSession.positionLotsQuantity shouldBe 10
+        tradeSession.positionAveragePrice shouldBe BigDecimal("22.6000")
 
         val tradeOrders = jdbcTemplate.findAll(TradeOrderEntity::class.java)
         tradeOrders shouldHaveSize 3
@@ -150,7 +153,8 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
-                lotsQuantityInPosition = 0,
+                positionLotsQuantity = 0,
+                positionAveragePrice = BigDecimal.ZERO,
                 strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
@@ -173,7 +177,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
         val tradeStrategy =
             spyk(TradeStrategy(barSeries, false, mockk<Strategy>())) {
                 every { shouldEnter(any()) } returns true
-                every { shouldExit(any()) } returns false
+                every { shouldExit(any(Position::class)) } returns false
             }
         tradeStrategyCache.put(tradeSessionId, tradeStrategy)
         marketDataSubscriptionInitializer.addSubscription(
@@ -216,7 +220,8 @@ class EnterTradeSessionWithRetriesIntegrationTest(
 
         val tradeSession = jdbcTemplate.findById(tradeSessionId, TradeSessionEntity::class.java)
         tradeSession.status shouldBe TradeSessionStatus.IN_POSITION
-        tradeSession.lotsQuantityInPosition shouldBe 9
+        tradeSession.positionLotsQuantity shouldBe 9
+        tradeSession.positionAveragePrice shouldBe BigDecimal("21.8889")
 
         val tradeOrders = jdbcTemplate.findAll(TradeOrderEntity::class.java)
         tradeOrders shouldHaveSize 3
@@ -237,7 +242,8 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
-                lotsQuantityInPosition = 0,
+                positionLotsQuantity = 0,
+                positionAveragePrice = BigDecimal.ZERO,
                 strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
@@ -260,7 +266,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
         val tradeStrategy =
             spyk(TradeStrategy(barSeries, false, mockk<Strategy>())) {
                 every { shouldEnter(any()) } returns true
-                every { shouldExit(any()) } returns false
+                every { shouldExit(any(Position::class)) } returns false
             }
         tradeStrategyCache.put(tradeSessionId, tradeStrategy)
         marketDataSubscriptionInitializer.addSubscription(
@@ -293,7 +299,8 @@ class EnterTradeSessionWithRetriesIntegrationTest(
 
         val tradeSession = jdbcTemplate.findById(tradeSessionId, TradeSessionEntity::class.java)
         tradeSession.status shouldBe TradeSessionStatus.WAITING
-        tradeSession.lotsQuantityInPosition shouldBe 0
+        tradeSession.positionLotsQuantity shouldBe 0
+        tradeSession.positionAveragePrice shouldBe BigDecimal.ZERO
 
         val tradeOrders = jdbcTemplate.findAll(TradeOrderEntity::class.java)
         tradeOrders.shouldBeEmpty()

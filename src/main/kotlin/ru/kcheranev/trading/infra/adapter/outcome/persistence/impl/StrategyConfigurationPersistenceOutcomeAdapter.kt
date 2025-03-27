@@ -10,7 +10,6 @@ import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.
 import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.SaveStrategyConfigurationCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.SearchStrategyConfigurationCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.StrategyConfigurationPersistencePort
-import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.PersistenceNotFoundException
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.persistenceOutcomeAdapterMapper
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.StrategyConfigurationRepository
@@ -23,31 +22,19 @@ class StrategyConfigurationPersistenceOutcomeAdapter(
 ) : StrategyConfigurationPersistencePort {
 
     @Transactional(propagation = Propagation.MANDATORY)
-    override fun insert(command: InsertStrategyConfigurationCommand): StrategyConfigurationId {
+    override fun insert(command: InsertStrategyConfigurationCommand) {
         val strategyConfiguration = command.strategyConfiguration
-        val strategyConfigurationId =
-            StrategyConfigurationId(
-                jdbcTemplate.insert(
-                    persistenceOutcomeAdapterMapper.map(strategyConfiguration)
-                ).id
-            )
+        jdbcTemplate.insert(persistenceOutcomeAdapterMapper.map(strategyConfiguration))
         strategyConfiguration.events.forEach { eventPublisher.publishEvent(it) }
         strategyConfiguration.clearEvents()
-        return strategyConfigurationId
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
-    override fun save(command: SaveStrategyConfigurationCommand): StrategyConfigurationId {
+    override fun save(command: SaveStrategyConfigurationCommand) {
         val strategyConfiguration = command.strategyConfiguration
-        val strategyConfigurationId =
-            StrategyConfigurationId(
-                strategyConfigurationRepository.save(
-                    persistenceOutcomeAdapterMapper.map(strategyConfiguration)
-                ).id
-            )
+        strategyConfigurationRepository.save(persistenceOutcomeAdapterMapper.map(strategyConfiguration))
         strategyConfiguration.events.forEach { eventPublisher.publishEvent(it) }
         strategyConfiguration.clearEvents()
-        return strategyConfigurationId
     }
 
     override fun get(command: GetStrategyConfigurationCommand) =
@@ -55,10 +42,10 @@ class StrategyConfigurationPersistenceOutcomeAdapter(
             .orElseThrow {
                 PersistenceNotFoundException("Strategy configuration entity with id ${command.strategyConfigurationId.value} is not exists")
             }
-            .let { persistenceOutcomeAdapterMapper.map(it) }
+            .let(persistenceOutcomeAdapterMapper::map)
 
     override fun search(command: SearchStrategyConfigurationCommand) =
         strategyConfigurationRepository.search(command)
-            .map { persistenceOutcomeAdapterMapper.map(it) }
+            .map(persistenceOutcomeAdapterMapper::map)
 
 }

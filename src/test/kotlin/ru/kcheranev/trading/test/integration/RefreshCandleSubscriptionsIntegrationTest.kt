@@ -21,6 +21,7 @@ import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.test.IntegrationTest
 import ru.kcheranev.trading.test.stub.grpc.MarketDataBrokerGrpcStub
 import ru.kcheranev.trading.test.util.MarketDataSubscriptionInitializer
+import java.math.BigDecimal
 import java.util.UUID
 
 @IntegrationTest
@@ -58,7 +59,8 @@ class RefreshCandleSubscriptionsIntegrationTest(
                 status = TradeSessionStatus.IN_POSITION,
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
-                lotsQuantityInPosition = 10,
+                positionLotsQuantity = 10,
+                positionAveragePrice = BigDecimal("100"),
                 strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
@@ -99,7 +101,8 @@ class RefreshCandleSubscriptionsIntegrationTest(
                 status = TradeSessionStatus.IN_POSITION,
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
-                lotsQuantityInPosition = 10,
+                positionLotsQuantity = 10,
+                positionAveragePrice = BigDecimal("100"),
                 strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
@@ -113,7 +116,8 @@ class RefreshCandleSubscriptionsIntegrationTest(
                 status = TradeSessionStatus.IN_POSITION,
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
-                lotsQuantityInPosition = 10,
+                positionLotsQuantity = 5,
+                positionAveragePrice = BigDecimal("50"),
                 strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )

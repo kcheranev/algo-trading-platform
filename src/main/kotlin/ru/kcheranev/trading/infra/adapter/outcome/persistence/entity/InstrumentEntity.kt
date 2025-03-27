@@ -8,9 +8,11 @@ import java.util.UUID
 @Table(name = "instrument")
 data class InstrumentEntity(
     @Id
-    var id: UUID,
+    val id: UUID,
+    @Column("name")
+    val name: String,
     @Column("ticker")
     val ticker: String,
-    @Column("instrument_id")
-    val instrumentId: String
+    @Column("broker_instrument_id")
+    val brokerInstrumentId: String
 )

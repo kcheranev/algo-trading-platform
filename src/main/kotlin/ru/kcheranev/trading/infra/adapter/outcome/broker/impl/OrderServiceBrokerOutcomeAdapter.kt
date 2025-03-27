@@ -32,7 +32,7 @@ class OrderServiceBrokerOutcomeAdapter(
                     userServiceBrokerOutcomeAdapter.getTradingAccountId(),
                     OrderType.ORDER_TYPE_BESTPRICE,
                     UUID.randomUUID().toString()
-                ).let { brokerOutcomeAdapterMapper.map(it) }
+                ).let(brokerOutcomeAdapterMapper::map)
             notificationPort.sendNotification(
                 SendNotificationCommand(
                     """
@@ -41,6 +41,7 @@ class OrderServiceBrokerOutcomeAdapter(
                         status=${postOrderResponse.status}
                         lotsRequested=${postOrderResponse.lotsRequested}
                         lotsExecuted=${postOrderResponse.lotsExecuted}
+                        executedPrice=${postOrderResponse.executedPrice}
                         totalPrice=${postOrderResponse.totalPrice}
                         executedCommission=${postOrderResponse.executedCommission}
                     """.trimIndent()
@@ -68,7 +69,7 @@ class OrderServiceBrokerOutcomeAdapter(
                     userServiceBrokerOutcomeAdapter.getTradingAccountId(),
                     OrderType.ORDER_TYPE_BESTPRICE,
                     UUID.randomUUID().toString()
-                ).let { brokerOutcomeAdapterMapper.map(it) }
+                ).let(brokerOutcomeAdapterMapper::map)
             notificationPort.sendNotification(
                 SendNotificationCommand(
                     """
@@ -77,6 +78,7 @@ class OrderServiceBrokerOutcomeAdapter(
                         status=${postOrderResponse.status}
                         lotsRequested=${postOrderResponse.lotsRequested}
                         lotsExecuted=${postOrderResponse.lotsExecuted}
+                        executedPrice=${postOrderResponse.executedPrice}
                         totalPrice=${postOrderResponse.totalPrice}
                         executedCommission=${postOrderResponse.executedCommission}
                     """.trimIndent()

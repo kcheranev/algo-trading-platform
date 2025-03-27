@@ -19,8 +19,10 @@ import ru.kcheranev.trading.domain.mapper.domainModelMapper
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
+import ru.kcheranev.trading.domain.model.Position
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.TradeStrategy
+import java.math.BigDecimal
 import java.util.UUID
 
 data class TradeSession(
@@ -30,7 +32,7 @@ data class TradeSession(
     var status: TradeSessionStatus = WAITING,
     val candleInterval: CandleInterval,
     val lotsQuantity: Int,
-    var lotsQuantityInPosition: Int = 0,
+    val currentPosition: CurrentPosition = CurrentPosition(),
     var strategy: TradeStrategy,
     val strategyType: String,
     val strategyParameters: StrategyParameters
@@ -71,8 +73,15 @@ data class TradeSession(
     private fun shouldEnter() =
         status.transitionAvailable(PENDING_ENTER) && strategy.shouldEnter()
 
-    private fun shouldExit() =
-        status.transitionAvailable(PENDING_EXIT) && strategy.shouldExit()
+    private fun shouldExit(): Boolean {
+        val position =
+            Position(
+                lotsQuantity = currentPosition.lotsQuantity,
+                averagePrice = currentPosition.averagePrice,
+                margin = isMargin()
+            )
+        return status.transitionAvailable(PENDING_EXIT) && strategy.shouldExit(position)
+    }
 
     private fun pendingEnter() {
         checkTransition(PENDING_ENTER)
@@ -91,19 +100,19 @@ data class TradeSession(
                 tradeSessionId = id,
                 instrument = instrument,
                 candleInterval = candleInterval,
-                lotsQuantityInPosition = lotsQuantityInPosition
+                lotsQuantityInPosition = currentPosition.lotsQuantity
             )
         )
         log.info("Trade session $this is pended for exit")
     }
 
-    fun enter(lotsExecuted: Int) {
+    fun enter(lotsExecuted: Int, averagePrice: BigDecimal) {
         checkTransition(IN_POSITION)
         status = IN_POSITION
         if (lotsQuantity != lotsExecuted) {
             log.warn("$lotsExecuted executed lots while entering trade session $this is not equal to expected $lotsQuantity")
         }
-        lotsQuantityInPosition = lotsExecuted
+        currentPosition.enter(lotsExecuted, averagePrice)
         registerEvent(TradeSessionEnteredDomainEvent(id, instrument, candleInterval))
         log.info("Trade session $this has been entered")
     }
@@ -111,10 +120,10 @@ data class TradeSession(
     fun exit(lotsExecuted: Int) {
         checkTransition(WAITING)
         status = WAITING
-        if (lotsQuantityInPosition != lotsExecuted) {
-            log.warn("$lotsExecuted executed lots while exiting trade session $this is not equal to expected $lotsQuantityInPosition")
+        if (currentPosition.lotsQuantity != lotsExecuted) {
+            log.warn("$lotsExecuted executed lots while exiting trade session $this is not equal to expected $${currentPosition.lotsQuantity}")
         }
-        lotsQuantityInPosition = 0
+        currentPosition.exit()
         registerEvent(TradeSessionExitedDomainEvent(id, instrument, candleInterval))
         log.info("Trade session $this has been exited")
     }
@@ -133,7 +142,7 @@ data class TradeSession(
         log.info("Trade session $this has been resumed, previous status $previousStatus, current status $status")
     }
 
-    private fun isEntered() = lotsQuantityInPosition != 0
+    private fun isEntered() = currentPosition.lotsQuantity != 0
 
     fun stop() {
         checkTransition(STOPPED)
@@ -170,7 +179,6 @@ data class TradeSession(
                     status = WAITING,
                     candleInterval = strategyConfiguration.candleInterval,
                     lotsQuantity = lotsQuantity,
-                    lotsQuantityInPosition = 0,
                     strategy = tradeStrategy,
                     strategyType = strategyConfiguration.type,
                     strategyParameters = strategyConfiguration.parameters
@@ -198,6 +206,23 @@ data class TradeSessionId(
 
         fun init() = TradeSessionId(UUID.randomUUID())
 
+    }
+
+}
+
+data class CurrentPosition(
+    var lotsQuantity: Int = 0,
+    var averagePrice: BigDecimal = BigDecimal.ZERO
+) {
+
+    fun enter(lotsQuantity: Int, averagePrice: BigDecimal) {
+        this.lotsQuantity = lotsQuantity
+        this.averagePrice = averagePrice
+    }
+
+    fun exit() {
+        lotsQuantity = 0
+        averagePrice = BigDecimal.ZERO
     }
 
 }

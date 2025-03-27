@@ -4,10 +4,10 @@
   "lotsRequested": "4",
   "lotsExecuted": "4",
   "initialOrderPrice": {
-    "units": "396"
+    "units": "404"
   },
   "executedOrderPrice": {
-    "units": "397"
+    "units": "101"
   },
   "totalOrderAmount": {
     "units": "404"

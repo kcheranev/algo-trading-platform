@@ -17,6 +17,7 @@ import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessio
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeStrategyCache
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.test.IntegrationTest
+import java.math.BigDecimal
 import java.util.UUID
 
 @IntegrationTest
@@ -39,7 +40,8 @@ class SearchTradeSessionIntegrationTest(
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
-                lotsQuantityInPosition = 0,
+                positionLotsQuantity = 0,
+                positionAveragePrice = BigDecimal.ZERO,
                 strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )
@@ -54,7 +56,8 @@ class SearchTradeSessionIntegrationTest(
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
                 lotsQuantity = 10,
-                lotsQuantityInPosition = 0,
+                positionLotsQuantity = 0,
+                positionAveragePrice = BigDecimal.ZERO,
                 strategyType = "DUMMY_LONG",
                 strategyParameters = MapWrapper(mapOf("paramName" to 1))
             )

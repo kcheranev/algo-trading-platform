@@ -34,7 +34,7 @@ class StrategyConfigurationController(
         StrategyConfigurationSearchResponseDto(
             strategyConfigurationSearchUseCase.search(
                 strategyConfigurationWebIncomeAdapterMapper.map(request)
-            ).map { strategyConfigurationWebIncomeAdapterMapper.map(it) }
+            ).map(strategyConfigurationWebIncomeAdapterMapper::map)
         )
 
 }

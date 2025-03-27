@@ -22,6 +22,7 @@ abstract class BrokerOutcomeAdapterMapper {
                 lotsRequested = lotsRequested.toInt(),
                 lotsExecuted = lotsExecuted.toInt(),
                 totalPrice = commonBrokerMapper.map(totalOrderAmount),
+                executedPrice = commonBrokerMapper.map(executedOrderPrice),
                 executedCommission = commonBrokerMapper.map(executedCommission)
             )
         }

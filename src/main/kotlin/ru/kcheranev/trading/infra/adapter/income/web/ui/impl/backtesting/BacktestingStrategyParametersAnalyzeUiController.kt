@@ -49,7 +49,7 @@ class BacktestingStrategyParametersAnalyzeUiController(
         val analyzeResultsDto =
             strategyAnalyzeUseCase.analyzeStrategyParameters(
                 backtestingWebIncomeAdapterUiMapper.map(request)
-            ).map { backtestingWebIncomeAdapterUiMapper.map(it) }
+            ).map(backtestingWebIncomeAdapterUiMapper::map)
         model.addAttribute("analyzeResults", analyzeResultsDto)
         return "backtesting/parameters-analyze"
     }

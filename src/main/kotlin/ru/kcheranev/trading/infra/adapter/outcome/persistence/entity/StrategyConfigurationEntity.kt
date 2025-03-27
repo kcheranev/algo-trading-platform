@@ -10,7 +10,7 @@ import java.util.UUID
 @Table("strategy_configuration")
 data class StrategyConfigurationEntity(
     @Id
-    var id: UUID,
+    val id: UUID,
     @Column("name")
     val name: String,
     @Column("type")
