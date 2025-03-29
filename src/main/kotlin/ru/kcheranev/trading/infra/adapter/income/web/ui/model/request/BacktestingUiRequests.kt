@@ -8,7 +8,7 @@ import java.time.LocalDate
 data class StrategyAnalyzeRequestUiDto(
     var strategyType: String? = null,
     var strategyParameters: MutableMap<String, Number?> = mutableMapOf(),
-    var instrument: InstrumentRequestUiDto? = null,
+    var brokerInstrumentId: String? = null,
     var candleInterval: CandleInterval? = null,
     var from: LocalDate? = null,
     var to: LocalDate? = null
@@ -21,7 +21,7 @@ data class StrategyParametersAnalyzeRequestUiDto(
     var variantsCount: Int = 5,
     var resultFilter: StrategyAnalyzeResultFilterUiDto = StrategyAnalyzeResultFilterUiDto(),
     var profitTypeSort: ProfitTypeSort = ProfitTypeSort.NET,
-    var instrument: InstrumentRequestUiDto? = null,
+    var brokerInstrumentId: String? = null,
     var candleInterval: CandleInterval? = null,
     var from: LocalDate? = null,
     var to: LocalDate? = null

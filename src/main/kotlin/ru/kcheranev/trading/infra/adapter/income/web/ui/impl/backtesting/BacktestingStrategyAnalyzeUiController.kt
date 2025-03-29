@@ -8,11 +8,15 @@ import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeUseCase
+import ru.kcheranev.trading.core.port.income.instrument.FindAllInstrumentsUseCase
 import ru.kcheranev.trading.core.port.income.strategy.GetStrategyParametersNamesCommand
 import ru.kcheranev.trading.core.port.income.strategy.GetStrategyParametersNamesUseCase
 import ru.kcheranev.trading.core.port.income.strategy.GetStrategyTypesUseCase
 import ru.kcheranev.trading.domain.model.CandleInterval
+import ru.kcheranev.trading.domain.model.Instrument
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.common.InstrumentUiDto
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.mapper.backtestingWebIncomeAdapterUiMapper
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.mapper.commonModelUiMapper
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyAnalyzeRequestUiDto
 
 @Controller
@@ -20,7 +24,8 @@ import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyAn
 class BacktestingStrategyAnalyzeUiController(
     private val strategyAnalyzeUseCase: StrategyAnalyzeUseCase,
     private val getStrategyTypesUseCase: GetStrategyTypesUseCase,
-    private val getStrategyParametersNamesUseCase: GetStrategyParametersNamesUseCase
+    private val getStrategyParametersNamesUseCase: GetStrategyParametersNamesUseCase,
+    private val findAllInstrumentsUseCase: FindAllInstrumentsUseCase
 ) {
 
     @ModelAttribute("strategyTypes")
@@ -28,6 +33,9 @@ class BacktestingStrategyAnalyzeUiController(
 
     @ModelAttribute("candleIntervals")
     fun candleIntervals() = CandleInterval.entries.map(CandleInterval::name)
+
+    @ModelAttribute("instruments")
+    fun instruments() = findAllInstrumentsUseCase.findAll().map(commonModelUiMapper::map)
 
     @GetMapping("analyze")
     fun analyzeStrategy(model: Model): String {
@@ -41,9 +49,16 @@ class BacktestingStrategyAnalyzeUiController(
         model: Model,
         bindingResult: BindingResult
     ): String {
+        @Suppress("UNCHECKED_CAST")
+        val ticker =
+            (model.getAttribute("instruments") as List<InstrumentUiDto>)
+                .first { it.brokerInstrumentId == request.brokerInstrumentId }
+                .let(InstrumentUiDto::ticker)
         val analyzeResultDto =
             backtestingWebIncomeAdapterUiMapper.map(
-                strategyAnalyzeUseCase.analyzeStrategy(backtestingWebIncomeAdapterUiMapper.map(request))
+                strategyAnalyzeUseCase.analyzeStrategy(
+                    backtestingWebIncomeAdapterUiMapper.map(request, Instrument(request.brokerInstrumentId!!, ticker))
+                )
             )
         model.addAttribute("analyzeResult", analyzeResultDto)
         return "backtesting/analyze"

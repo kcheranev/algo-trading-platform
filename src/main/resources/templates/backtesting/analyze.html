@@ -33,13 +33,17 @@
                     </select>
                 </div>
                 <div class="col-6">
-                    <label for="instrumentId" class="form-label">Instrument id</label>
-                    <input id="instrumentId" type="text" class="form-control" th:field="*{instrument.id}">
+                    <label for="instrument" class="form-label">Instrument</label>
+                    <select id="instrument" class="form-select" th:field="*{brokerInstrumentId}">
+                        <option value="" selected hidden>Select an instrument</option>
+                        <option th:each="instrument : ${instruments}"
+                                th:value="${instrument.brokerInstrumentId}"
+                                th:text="${instrument.name}">
+                            Candle interval
+                        </option>
+                    </select>
                 </div>
-                <div class="col-6">
-                    <label for="instrumentTicker" class="form-label">Ticker</label>
-                    <input id="instrumentTicker" type="text" class="form-control" th:field="*{instrument.ticker}">
-                </div>
+                <div class="w-100"></div>
                 <div class="col-6">
                     <label for="fromDate" class="form-label">Date from</label>
                     <input id="fromDate" type="date" name="from" class="form-control" th:value="*{from}">

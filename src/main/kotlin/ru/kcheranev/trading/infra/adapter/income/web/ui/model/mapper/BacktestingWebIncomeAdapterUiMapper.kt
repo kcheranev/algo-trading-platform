@@ -6,6 +6,7 @@ import org.mapstruct.Named
 import org.mapstruct.factory.Mappers
 import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeCommand
 import ru.kcheranev.trading.core.port.income.backtesting.StrategyParametersAnalyzeCommand
+import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.backtesting.DailyStrategyAnalyzeResult
 import ru.kcheranev.trading.domain.model.backtesting.StrategyAnalyzeResult
@@ -22,34 +23,37 @@ import ru.kcheranev.trading.infra.adapter.mapper.EntityIdMapper
 abstract class BacktestingWebIncomeAdapterUiMapper {
 
     @Mapping(target = "strategyParameters", qualifiedByName = ["mapStrategyParameters"])
-    abstract fun map(source: StrategyAnalyzeRequestUiDto): StrategyAnalyzeCommand
+    abstract fun map(request: StrategyAnalyzeRequestUiDto, instrument: Instrument): StrategyAnalyzeCommand
 
     @Named("mapStrategyParameters")
     fun mapStrategyParameters(source: Map<String, Number>) = StrategyParameters(source)
 
     @Mapping(
         target = "strategyParameters",
-        source = "strategyParameters",
+        source = "request.strategyParameters",
         qualifiedByName = ["mapNoMutableStrategyParameters"]
     )
     @Mapping(
         target = "mutableStrategyParameters",
-        source = "strategyParameters",
+        source = "request.strategyParameters",
         qualifiedByName = ["mapMutableStrategyParameters"]
     )
-    abstract fun map(source: StrategyParametersAnalyzeRequestUiDto): StrategyParametersAnalyzeCommand
+    abstract fun map(
+        request: StrategyParametersAnalyzeRequestUiDto,
+        instrument: Instrument
+    ): StrategyParametersAnalyzeCommand
 
     @Named("mapNoMutableStrategyParameters")
     fun mapNoMutableStrategyParameters(source: MutableMap<String, StrategyParameterUiDto>) =
         source.filter { it.value.mutable == false }
             .mapValues { it.value.value!! }
-            .let { StrategyParameters(it) }
+            .let(::StrategyParameters)
 
     @Named("mapMutableStrategyParameters")
     fun mapMutableStrategyParameters(source: MutableMap<String, StrategyParameterUiDto>) =
         source.filter { it.value.mutable == true }
             .mapValues { it.value.value!! }
-            .let { StrategyParameters(it) }
+            .let(::StrategyParameters)
 
     abstract fun map(source: StrategyAnalyzeResult): StrategyAnalyzeResultUiDto
 

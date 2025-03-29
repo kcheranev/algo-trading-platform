@@ -13,7 +13,7 @@ version = "1.0.0"
 val thymeleafExtrasJava8timeVersion by extra("3.0.4.RELEASE")
 val tinkoffApiVersion by extra("1.5")
 val ta4jVersion by extra("0.17")
-val mapstructVersion by extra("1.5.5.Final")
+val mapstructVersion by extra("1.6.3")
 val springdocOpenapiStarterWebmvcUiVersion by extra("2.2.0")
 val kotestVersion by extra("5.9.1")
 val kotestExtensionsSpringVersion by extra("1.3.0")

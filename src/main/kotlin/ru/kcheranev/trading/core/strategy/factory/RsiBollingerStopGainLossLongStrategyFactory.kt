@@ -8,9 +8,9 @@ import org.ta4j.core.indicators.bollinger.BollingerBandsLowerIndicator
 import org.ta4j.core.indicators.bollinger.BollingerBandsMiddleIndicator
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator
 import org.ta4j.core.indicators.statistics.StandardDeviationIndicator
-import org.ta4j.core.rules.StopGainRule
-import org.ta4j.core.rules.StopLossRule
 import org.ta4j.core.rules.UnderIndicatorRule
+import ru.kcheranev.trading.core.strategy.rule.StopGainRule
+import ru.kcheranev.trading.core.strategy.rule.StopLossRule
 import ru.kcheranev.trading.domain.model.CustomizedBarSeries
 import ru.kcheranev.trading.domain.model.StrategyParameter
 import ru.kcheranev.trading.domain.model.StrategyParameters
