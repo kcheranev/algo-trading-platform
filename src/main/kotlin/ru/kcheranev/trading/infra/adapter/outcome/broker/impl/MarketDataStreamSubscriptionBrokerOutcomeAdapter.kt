@@ -44,7 +44,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
                 marketDataStreamService.newStream(
                     candleSubscription.id,
                     CandleSubscriptionBrokerIncomeAdapter(processCandleUseCase)
-                ) { log.error(it.toString()) }
+                ) { ex -> log.error(ex.toString()) }
                     .subscribeCandlesWithWaitingClose(
                         listOf(instrument.id),
                         brokerOutcomeAdapterMapper.mapToSubscriptionInterval(candleInterval)

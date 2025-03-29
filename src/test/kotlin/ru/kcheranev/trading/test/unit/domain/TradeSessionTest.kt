@@ -39,6 +39,7 @@ import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.domain.model.Position
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.TradeStrategy
+import ru.kcheranev.trading.test.extension.MockDateSupplierExtension
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.LocalDateTime
@@ -46,6 +47,8 @@ import java.time.LocalTime
 import java.util.UUID
 
 class TradeSessionTest : FreeSpec({
+
+    extensions(MockDateSupplierExtension())
 
     beforeSpec {
         mockkObject(TradingProperties.Companion)

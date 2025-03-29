@@ -20,6 +20,8 @@ application:
     available-delayed-candles-count: 3
     place-order-retry-count: 3
     trading-schedule:
+      - from: "07:00:00"
+        to: "09:50:00"
       - from: "10:00:00"
         to: "18:40:00"
       - from: "19:05:00"

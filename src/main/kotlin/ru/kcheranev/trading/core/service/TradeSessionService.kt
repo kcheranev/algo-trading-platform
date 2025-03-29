@@ -2,7 +2,6 @@ package ru.kcheranev.trading.core.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import ru.kcheranev.trading.common.date.DateSupplier
 import ru.kcheranev.trading.core.config.TradingProperties.Companion.tradingProperties
 import ru.kcheranev.trading.core.model.order.PostOrderResultAccumulator
 import ru.kcheranev.trading.core.port.income.tradesession.CreateTradeSessionCommand
@@ -43,8 +42,7 @@ class TradeSessionService(
     private val strategyConfigurationPersistencePort: StrategyConfigurationPersistencePort,
     private val tradeSessionPersistencePort: TradeSessionPersistencePort,
     private val orderServiceBrokerPort: OrderServiceBrokerPort,
-    private val tradeOrderPersistencePort: TradeOrderPersistencePort,
-    private val dateSupplier: DateSupplier
+    private val tradeOrderPersistencePort: TradeOrderPersistencePort
 ) : SearchTradeSessionUseCase,
     CreateTradeSessionUseCase,
     EnterTradeSessionUseCase,
@@ -103,8 +101,7 @@ class TradeSessionService(
                             totalPrice = postOrderResponse.totalPrice,
                             executedCommission = postOrderResponse.executedCommission,
                             direction = if (tradeSession.isMargin()) TradeDirection.SELL else TradeDirection.BUY,
-                            tradeSessionId = tradeSession.id,
-                            dateSupplier = dateSupplier
+                            tradeSessionId = tradeSession.id
                         )
                     tradeOrderPersistencePort.insert(InsertTradeOrderCommand(tradeOrder))
                 }
@@ -142,8 +139,7 @@ class TradeSessionService(
                             totalPrice = postOrderResponse.totalPrice,
                             executedCommission = postOrderResponse.executedCommission,
                             direction = if (tradeSession.isMargin()) TradeDirection.BUY else TradeDirection.SELL,
-                            tradeSessionId = tradeSession.id,
-                            dateSupplier = dateSupplier
+                            tradeSessionId = tradeSession.id
                         )
                     tradeOrderPersistencePort.insert(InsertTradeOrderCommand(tradeOrder))
                 }

@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
+import ru.kcheranev.trading.common.date.DateSupplier
 import ru.kcheranev.trading.core.config.TradingProperties
 import ru.kcheranev.trading.core.config.TradingScheduleInterval
 import ru.kcheranev.trading.domain.model.CandleInterval
@@ -45,23 +46,13 @@ class TradeStrategyTest : FreeSpec({
         withData(
             nameFn = { "last candle date = ${it.lastCandleDateTime}, actual date = ${it.targetDate}, candle interval = ${it.candleInterval}, is fresh = ${it.fresh}" },
             TestParameters("2024-10-02T10:15:00", "2024-10-02T10:30:00", CandleInterval.ONE_MIN, false),
-            TestParameters("2024-10-02T18:35:00", "2024-10-02T19:05:00", CandleInterval.ONE_MIN, true),
-            TestParameters("2024-10-02T18:35:00", "2024-10-02T19:10:00", CandleInterval.ONE_MIN, false),
-            TestParameters("2024-10-02T18:35:00", "2024-10-03T10:15:00", CandleInterval.ONE_MIN, false),
-            TestParameters("2024-10-02T18:35:00", "2024-10-04T10:15:00", CandleInterval.ONE_MIN, false),
-            TestParameters("2024-10-04T18:35:00", "2024-10-07T10:15:00", CandleInterval.ONE_MIN, false),
-            TestParameters("2024-10-02T10:15:00", "2024-10-02T10:30:00", CandleInterval.FIVE_MIN, true),
-            TestParameters("2024-10-02T10:15:00", "2024-10-02T10:34:00", CandleInterval.FIVE_MIN, true),
-            TestParameters("2024-10-02T18:35:00", "2024-10-02T19:05:00", CandleInterval.FIVE_MIN, true),
-            TestParameters("2024-10-02T18:35:00", "2024-10-02T19:10:00", CandleInterval.FIVE_MIN, true),
-            TestParameters("2024-10-02T18:35:00", "2024-10-03T10:15:00", CandleInterval.FIVE_MIN, false),
-            TestParameters("2024-10-02T18:35:00", "2024-10-04T10:15:00", CandleInterval.FIVE_MIN, false),
-            TestParameters("2024-10-04T18:35:00", "2024-10-07T10:15:00", CandleInterval.FIVE_MIN, false)
-        ) { (lastCandleDateTime, targetDate, candleInterval, isFreshCandleSeries) ->
+            TestParameters("2024-10-02T10:15:00", "2024-10-02T10:18:00", CandleInterval.ONE_MIN, true),
+            TestParameters("2024-10-02T10:15:00", "2024-10-02T10:20:00", CandleInterval.ONE_MIN, true),
+            TestParameters("2024-10-01T23:45:00", "2024-10-02T10:00:00", CandleInterval.ONE_MIN, false)
+        ) { (lastCandleDateTime, now, candleInterval, isFreshCandleSeries) ->
             //given
-            mockk<TradeStrategy> {
-                every { lastCandleDate() } returns LocalDateTime.parse(lastCandleDateTime)
-            }
+            mockkObject(DateSupplier)
+            every { DateSupplier.currentDateTime() } returns LocalDateTime.parse(now)
             val tradeStrategy =
                 TradeStrategy(
                     series = mockk {
@@ -73,10 +64,13 @@ class TradeStrategyTest : FreeSpec({
                 )
 
             //when
-            val result = tradeStrategy.isFreshCandleSeries(LocalDateTime.parse(targetDate), candleInterval)
+            val result = tradeStrategy.isFreshCandleSeries(candleInterval)
 
             //then
             result shouldBe isFreshCandleSeries
+
+            //cleanup
+            unmockkObject(DateSupplier)
         }
     }
 

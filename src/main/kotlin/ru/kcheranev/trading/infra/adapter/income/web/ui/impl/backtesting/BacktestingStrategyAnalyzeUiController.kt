@@ -27,7 +27,7 @@ class BacktestingStrategyAnalyzeUiController(
     fun strategyTypes() = getStrategyTypesUseCase.getStrategyTypes()
 
     @ModelAttribute("candleIntervals")
-    fun candleIntervals() = CandleInterval.values().map { it.name }
+    fun candleIntervals() = CandleInterval.entries.map(CandleInterval::name)
 
     @GetMapping("analyze")
     fun analyzeStrategy(model: Model): String {

@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "ru.kcheranev"
-version = "0.0.1-SNAPSHOT"
+version = "1.0.0"
 
 val thymeleafExtrasJava8timeVersion by extra("3.0.4.RELEASE")
 val tinkoffApiVersion by extra("1.5")

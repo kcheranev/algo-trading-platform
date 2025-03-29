@@ -39,7 +39,6 @@ class ReinitializeStrategyAfterDelayIntegrationTest(
     private val tradeStrategyCache: TradeStrategyCache,
     private val marketDataSubscriptionInitializer: MarketDataSubscriptionInitializer,
     private val telegramNotificationHttpStub: TelegramNotificationHttpStub,
-    private val dateSupplier: DateSupplier,
     private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
 
@@ -91,7 +90,7 @@ class ReinitializeStrategyAfterDelayIntegrationTest(
             Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
             CandleInterval.ONE_MIN
         )
-        every { dateSupplier.currentDateTime() } returns LocalDateTime.parse("2024-01-30T10:22:00")
+        every { DateSupplier.currentDateTime() } returns LocalDateTime.parse("2024-01-30T10:22:00")
         marketDataBrokerGrpcStub.stubForGetCandles("get-candles.json")
         telegramNotificationHttpStub.stubForSendNotification()
         val candle =

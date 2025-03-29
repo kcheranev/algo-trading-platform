@@ -67,7 +67,7 @@ class RefreshCandleSubscriptionsIntegrationTest(
         )
         val tradeStrategy =
             mockk<TradeStrategy> {
-                every { isFreshCandleSeries(any(), any()) } returns true
+                every { isFreshCandleSeries(any()) } returns true
             }
         tradeStrategyCache.put(tradeStrategyId, tradeStrategy)
 
@@ -124,7 +124,7 @@ class RefreshCandleSubscriptionsIntegrationTest(
         )
         val tradeStrategy =
             mockk<TradeStrategy> {
-                every { isFreshCandleSeries(any(), any()) } returns true
+                every { isFreshCandleSeries(any()) } returns true
             }
         tradeStrategyCache.put(tradeStrategyId1, tradeStrategy)
         tradeStrategyCache.put(tradeStrategyId2, tradeStrategy)

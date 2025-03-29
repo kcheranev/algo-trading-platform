@@ -65,7 +65,7 @@ class MovingMomentumLongStrategyFactory : LongStrategyFactory() {
 
     override fun strategyName() = "MOVING_MOMENTUM"
 
-    override fun strategyParameterNames() = MovingMomentumLongStrategyParameter.values().map { it.alias() }
+    override fun strategyParameterNames() = MovingMomentumLongStrategyParameter.entries.map { it.alias() }
 }
 
 private enum class MovingMomentumLongStrategyParameter(private val alias: String) : StrategyParameter {

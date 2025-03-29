@@ -15,8 +15,8 @@
                     <th>Ticker</th>
                     <th>Status</th>
                     <th>Candle interval</th>
-                    <th>Lots quantity in position</th>
-                    <th>Average position price</th>
+                    <th>Lots quantity</th>
+                    <th>Average price</th>
                     <th>Strategy type</th>
                     <th></th>
                 </tr>
@@ -28,8 +28,7 @@
                     <td th:text="${tradeSession.status}"></td>
                     <td th:text="${tradeSession.candleInterval}"></td>
                     <td th:text="${tradeSession.currentPosition.lotsQuantity}"></td>
-                    <td th:text="${tradeSession.currentPosition.averagePrice}"></td>
-                    <td th:text="${tradeSession.lotsQuantityInPosition}"></td>
+                    <td th:text="${#numbers.formatDecimal(tradeSession.currentPosition.averagePrice,1,4)}"></td>
                     <td th:text="${tradeSession.strategyType}"></td>
                     <td>
                         <form method="post">

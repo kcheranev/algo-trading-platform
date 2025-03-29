@@ -3,10 +3,10 @@ package ru.kcheranev.trading.common.date
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-interface DateSupplier {
+object DateSupplier {
 
-    fun currentDateTime(): LocalDateTime
+    fun currentDateTime(): LocalDateTime = LocalDateTime.now()
 
-    fun currentDate(): LocalDate
+    fun currentDate(): LocalDate = LocalDate.now()
 
 }

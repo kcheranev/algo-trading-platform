@@ -21,7 +21,6 @@ private const val HISTORIC_CANDLES_CACHE = "historicCandlesCache"
 @Component
 class HistoricCandleBrokerOutcomeAdapter(
     private val marketDataService: MarketDataService,
-    private val dateSupplier: DateSupplier,
     cacheManager: CacheManager
 ) : HistoricCandleBrokerPort {
 
@@ -70,7 +69,7 @@ class HistoricCandleBrokerOutcomeAdapter(
     }
 
     override fun getLastHistoricCandles(command: GetLastHistoricCandlesCommand): List<Candle> {
-        val now = dateSupplier.currentDateTime()
+        val now = DateSupplier.currentDateTime()
         var currentDay = now.toLocalDate()
         var candles =
             getHistoricCandles(

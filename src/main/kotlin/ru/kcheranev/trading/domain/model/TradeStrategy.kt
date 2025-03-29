@@ -25,9 +25,7 @@ import org.ta4j.core.criteria.pnl.ProfitLossRatioCriterion
 import org.ta4j.core.criteria.pnl.ReturnCriterion
 import org.ta4j.core.num.DecimalNum
 import org.ta4j.core.num.Num
-import ru.kcheranev.trading.common.date.isWeekend
-import ru.kcheranev.trading.common.date.max
-import ru.kcheranev.trading.common.date.min
+import ru.kcheranev.trading.common.date.DateSupplier
 import ru.kcheranev.trading.core.config.TradingProperties.Companion.tradingProperties
 import ru.kcheranev.trading.core.strategy.rule.isSatisfiedByType
 import ru.kcheranev.trading.domain.model.backtesting.Order
@@ -36,7 +34,6 @@ import ru.kcheranev.trading.domain.model.backtesting.Trade
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.LocalDateTime
-import java.time.LocalTime
 
 class TradeStrategy(
     private val series: BarSeries,
@@ -66,40 +63,10 @@ class TradeStrategy(
                 .toLocalDateTime()
         }
 
-    fun isFreshCandleSeries(targetDate: LocalDateTime, candleInterval: CandleInterval): Boolean {
+    fun isFreshCandleSeries(candleInterval: CandleInterval): Boolean {
         val lastCandleDate = lastCandleDate() ?: return false
-        if (Duration.between(lastCandleDate, targetDate)
-                .dividedBy(candleInterval.duration) <= tradingProperties.availableDelayedCandlesCount
-        ) {
-            return true
-        }
-        var currentDay = lastCandleDate.toLocalDate()
-        var skippedCandlesCount = 0
-        while (currentDay <= targetDate.toLocalDate()) {
-            if (currentDay.isWeekend()) {
-                currentDay = currentDay.plusDays(1)
-                continue
-            }
-            val startTime =
-                if (currentDay == lastCandleDate.toLocalDate()) {
-                    lastCandleDate.toLocalTime()
-                } else {
-                    LocalTime.MIN
-                }
-            val endTime =
-                if (currentDay == targetDate.toLocalDate()) {
-                    targetDate.toLocalTime()
-                } else {
-                    LocalTime.MAX
-                }
-            tradingProperties.tradingSchedule
-                .filter { it.afterOrContains(startTime) }
-                .filter { it.beforeOrContains(endTime) }
-                .map { Duration.between(max(it.from, startTime), min(it.to, endTime)) }
-                .forEach { skippedCandlesCount += it.dividedBy(candleInterval.duration).toInt() }
-            currentDay = currentDay.plusDays(1)
-        }
-        return skippedCandlesCount <= tradingProperties.availableDelayedCandlesCount
+        return Duration.between(lastCandleDate, DateSupplier.currentDateTime())
+            .dividedBy(candleInterval.duration) <= tradingProperties.availableDelayedCandlesCount
     }
 
     fun analyze(commission: BigDecimal): StrategyAnalyzeResult {

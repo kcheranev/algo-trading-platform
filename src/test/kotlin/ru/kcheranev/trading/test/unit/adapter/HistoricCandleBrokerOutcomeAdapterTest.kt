@@ -15,6 +15,7 @@ import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.infra.adapter.outcome.broker.impl.HistoricCandleBrokerOutcomeAdapter
+import ru.kcheranev.trading.test.extension.MockDateSupplierExtension
 import ru.tinkoff.piapi.contract.v1.HistoricCandle
 import ru.tinkoff.piapi.core.MarketDataService
 import ru.tinkoff.piapi.core.utils.MapperUtils.bigDecimalToQuotation
@@ -23,6 +24,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
+
+    extensions(MockDateSupplierExtension())
 
     fun buildCandle(
         high: BigDecimal,
@@ -43,10 +46,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
     "should get last historic candles in one day" {
         //given
         val now = LocalDateTime.parse("2024-01-30T07:17:00")
-        val dateSupplier =
-            mockk<DateSupplier> {
-                every { currentDateTime() } returns now
-            }
+        every { DateSupplier.currentDateTime() } returns now
         val cacheManager =
             mockk<CacheManager> {
                 every { getCache(any()) } returns NoOpCache("cache-name")
@@ -91,7 +91,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                     )
                 )
             }
-        val adapter = HistoricCandleBrokerOutcomeAdapter(marketDataService, dateSupplier, cacheManager)
+        val adapter = HistoricCandleBrokerOutcomeAdapter(marketDataService, cacheManager)
 
         //when
         val candles =
@@ -151,10 +151,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
     "should get last historic candles in two day" {
         //given
         val now = LocalDateTime.parse("2024-10-07T07:17:00")
-        val dateSupplier =
-            mockk<DateSupplier> {
-                every { currentDateTime() } returns now
-            }
+        every { DateSupplier.currentDateTime() } returns now
         val cacheManager =
             mockk<CacheManager> {
                 every { getCache(any()) } returns NoOpCache("cache-name")
@@ -208,7 +205,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                     )
                 )
             }
-        val adapter = HistoricCandleBrokerOutcomeAdapter(marketDataService, dateSupplier, cacheManager)
+        val adapter = HistoricCandleBrokerOutcomeAdapter(marketDataService, cacheManager)
 
         //when
         val candles =

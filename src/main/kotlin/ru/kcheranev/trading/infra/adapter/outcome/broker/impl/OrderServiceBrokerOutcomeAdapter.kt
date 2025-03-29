@@ -1,6 +1,7 @@
 package ru.kcheranev.trading.infra.adapter.outcome.broker.impl
 
 import org.springframework.stereotype.Component
+import ru.kcheranev.trading.common.date.format
 import ru.kcheranev.trading.core.port.outcome.broker.OrderServiceBrokerPort
 import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceBuyOrderCommand
 import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceSellOrderCommand
@@ -36,14 +37,14 @@ class OrderServiceBrokerOutcomeAdapter(
             notificationPort.sendNotification(
                 SendNotificationCommand(
                     """
-                        Post best price buy order for the ${command.instrument.ticker}
-                        orderId=${postOrderResponse.orderId}
+                        Buy order executed
+                        ticker=${command.instrument.ticker}
                         status=${postOrderResponse.status}
                         lotsRequested=${postOrderResponse.lotsRequested}
                         lotsExecuted=${postOrderResponse.lotsExecuted}
-                        executedPrice=${postOrderResponse.executedPrice}
-                        totalPrice=${postOrderResponse.totalPrice}
-                        executedCommission=${postOrderResponse.executedCommission}
+                        executedPrice=${postOrderResponse.executedPrice.format()}
+                        totalPrice=${postOrderResponse.totalPrice.format()}
+                        executedCommission=${postOrderResponse.executedCommission.format()}
                     """.trimIndent()
                 )
             )
@@ -51,7 +52,7 @@ class OrderServiceBrokerOutcomeAdapter(
         } catch (ex: Exception) {
             notificationPort.sendNotification(
                 SendNotificationCommand(
-                    "An error has been occurred while post best price buy order: ticker=${command.instrument.ticker}"
+                    "An error has been occurred while sending best price buy order: ticker=${command.instrument.ticker}"
                 )
             )
             throw ex
@@ -73,14 +74,14 @@ class OrderServiceBrokerOutcomeAdapter(
             notificationPort.sendNotification(
                 SendNotificationCommand(
                     """
-                        Post best price sell order for the ${command.instrument.ticker}
-                        orderId=${postOrderResponse.orderId}
+                        Sell order executed
+                        ticker=${command.instrument.ticker}
                         status=${postOrderResponse.status}
                         lotsRequested=${postOrderResponse.lotsRequested}
                         lotsExecuted=${postOrderResponse.lotsExecuted}
-                        executedPrice=${postOrderResponse.executedPrice}
-                        totalPrice=${postOrderResponse.totalPrice}
-                        executedCommission=${postOrderResponse.executedCommission}
+                        executedPrice=${postOrderResponse.executedPrice.format()}
+                        totalPrice=${postOrderResponse.totalPrice.format()}
+                        executedCommission=${postOrderResponse.executedCommission.format()}
                     """.trimIndent()
                 )
             )
@@ -88,7 +89,7 @@ class OrderServiceBrokerOutcomeAdapter(
         } catch (ex: Exception) {
             notificationPort.sendNotification(
                 SendNotificationCommand(
-                    "An error has been occurred while post best price sell order: ticker=${command.instrument.ticker}"
+                    "An error has been occurred while sending best price sell order: ticker=${command.instrument.ticker}"
                 )
             )
             throw ex

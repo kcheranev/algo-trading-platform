@@ -1,11 +1,11 @@
 package ru.kcheranev.trading.infra.adapter.outcome.persistence.impl
 
+import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation.MANDATORY
 import org.springframework.transaction.annotation.Transactional
-import ru.kcheranev.trading.common.date.DateSupplier
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.GetReadyToOrderTradeSessionsCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.GetTradeSessionCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.InsertTradeSessionCommand
@@ -31,9 +31,10 @@ class TradeSessionPersistenceOutcomeAdapter(
     private val tradeSessionRepository: TradeSessionRepository,
     private val tradeStrategyCache: TradeStrategyCache,
     private val tradeStrategyServicePort: TradeStrategyServicePort,
-    private val eventPublisher: ApplicationEventPublisher,
-    private val dateSupplier: DateSupplier
+    private val eventPublisher: ApplicationEventPublisher
 ) : TradeSessionPersistencePort {
+
+    private val log = LoggerFactory.getLogger(javaClass)
 
     @Transactional(propagation = MANDATORY)
     override fun insert(command: InsertTradeSessionCommand) {
@@ -83,8 +84,12 @@ class TradeSessionPersistenceOutcomeAdapter(
 
     private fun getOrCreateTradeStrategy(tradeSessionEntity: TradeSessionEntity): TradeStrategy =
         tradeStrategyCache.get(tradeSessionEntity.id)
-            ?.takeIf { it.isFreshCandleSeries(dateSupplier.currentDateTime(), tradeSessionEntity.candleInterval) }
+            ?.takeIf { it.isFreshCandleSeries(tradeSessionEntity.candleInterval) }
             ?: run {
+                log.info(
+                    "Candle series for the subscription ticker=${tradeSessionEntity.ticker}, " +
+                            "candleInterval=${tradeSessionEntity.candleInterval} has been expired. Reinitializing..."
+                )
                 val tradeStrategy =
                     tradeStrategyServicePort.initTradeStrategy(
                         InitTradeStrategyCommand(

@@ -1,6 +1,7 @@
 package ru.kcheranev.trading.domain.entity
 
 import org.slf4j.LoggerFactory
+import ru.kcheranev.trading.common.date.isTradingTime
 import ru.kcheranev.trading.domain.TradeSessionCreatedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionEnteredDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionExitedDomainEvent
@@ -71,17 +72,18 @@ data class TradeSession(
     }
 
     private fun shouldEnter() =
-        status.transitionAvailable(PENDING_ENTER) && strategy.shouldEnter()
+        isTradingTime() && status.transitionAvailable(PENDING_ENTER) && strategy.shouldEnter()
 
-    private fun shouldExit(): Boolean {
-        val position =
-            Position(
-                lotsQuantity = currentPosition.lotsQuantity,
-                averagePrice = currentPosition.averagePrice,
-                margin = isMargin()
-            )
-        return status.transitionAvailable(PENDING_EXIT) && strategy.shouldExit(position)
-    }
+    private fun shouldExit() =
+        isTradingTime() &&
+                status.transitionAvailable(PENDING_EXIT) &&
+                strategy.shouldExit(
+                    Position(
+                        lotsQuantity = currentPosition.lotsQuantity,
+                        averagePrice = currentPosition.averagePrice,
+                        margin = isMargin()
+                    )
+                )
 
     private fun pendingEnter() {
         checkTransition(PENDING_ENTER)

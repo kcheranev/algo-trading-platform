@@ -11,6 +11,7 @@ import ru.kcheranev.trading.test.extension.CleanDatabaseExtension
 import ru.kcheranev.trading.test.extension.ClearAllMocksExtension
 import ru.kcheranev.trading.test.extension.ClearCacheExtension
 import ru.kcheranev.trading.test.extension.ClearTradeStrategyCacheCacheExtension
+import ru.kcheranev.trading.test.extension.MockDateSupplierExtension
 import ru.kcheranev.trading.test.extension.ResetCandleSubscriptionCacheExtension
 import ru.kcheranev.trading.test.extension.ResetMarketDataStreamExtension
 import ru.kcheranev.trading.test.extension.ResetWireMockExtension
@@ -42,6 +43,9 @@ class ExtensionTestConfiguration {
 
     @Bean
     fun clearCacheExtension(cacheManager: CacheManager) = ClearCacheExtension(cacheManager)
+
+    @Bean
+    fun mockDateSupplierExtension() = MockDateSupplierExtension()
 
     @Bean
     fun springExtension() = SpringExtension

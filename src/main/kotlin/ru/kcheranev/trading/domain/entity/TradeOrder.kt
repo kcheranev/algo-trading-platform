@@ -28,12 +28,11 @@ data class TradeOrder(
             executedCommission: BigDecimal,
             direction: TradeDirection,
             tradeSessionId: TradeSessionId,
-            dateSupplier: DateSupplier
         ) = TradeOrder(
             id = TradeOrderId.init(),
             ticker = ticker,
             instrumentId = instrumentId,
-            date = dateSupplier.currentDateTime(),
+            date = DateSupplier.currentDateTime(),
             lotsQuantity = lotsQuantity,
             totalPrice = totalPrice,
             executedCommission = executedCommission,

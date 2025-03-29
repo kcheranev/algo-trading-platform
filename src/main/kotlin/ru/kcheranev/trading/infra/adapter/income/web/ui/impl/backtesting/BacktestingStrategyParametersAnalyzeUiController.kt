@@ -29,10 +29,10 @@ class BacktestingStrategyParametersAnalyzeUiController(
     fun strategyTypes() = getStrategyTypesUseCase.getStrategyTypes()
 
     @ModelAttribute("profitTypesSort")
-    fun profitTypesSort() = ProfitTypeSort.values().map { it.name }
+    fun profitTypesSort() = ProfitTypeSort.entries.map { it.name }
 
     @ModelAttribute("candleIntervals")
-    fun candleIntervals() = CandleInterval.values().map { it.name }
+    fun candleIntervals() = CandleInterval.entries.map { it.name }
 
     @GetMapping("parameters-analyze")
     fun analyzeStrategyParameters(model: Model): String {
