@@ -8,12 +8,12 @@ import ru.kcheranev.trading.domain.TradeSessionPendedForExitDomainEvent
 
 @Component
 class TradeSessionPendedForExitDomainEventProcessor(
-    private val exitTradeSessionUseCase: ExitTradeSessionUseCase,
+    private val exitTradeSessionUseCase: ExitTradeSessionUseCase
 ) {
 
     @TransactionalEventListener
     fun processTradeSessionPendedForExitDomainEvent(event: TradeSessionPendedForExitDomainEvent) {
-        exitTradeSessionUseCase.exitTradeSession(ExitTradeSessionCommand(event.tradeSessionId))
+        exitTradeSessionUseCase.exitTradeSession(ExitTradeSessionCommand(event.tradeSession.id))
     }
 
 }

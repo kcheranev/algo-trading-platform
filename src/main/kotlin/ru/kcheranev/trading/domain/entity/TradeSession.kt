@@ -2,6 +2,7 @@ package ru.kcheranev.trading.domain.entity
 
 import org.slf4j.LoggerFactory
 import ru.kcheranev.trading.common.date.isTradingTime
+import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategy
 import ru.kcheranev.trading.domain.TradeSessionCreatedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionEnteredDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionExitedDomainEvent
@@ -32,7 +33,7 @@ data class TradeSession(
     val instrumentId: String,
     var status: TradeSessionStatus = WAITING,
     val candleInterval: CandleInterval,
-    val lotsQuantity: Int,
+    val orderLotsQuantityStrategy: OrderLotsQuantityStrategy,
     val currentPosition: CurrentPosition = CurrentPosition(),
     var strategy: TradeStrategy,
     val strategyType: String,
@@ -43,23 +44,25 @@ data class TradeSession(
 
     val instrument = Instrument(instrumentId, ticker)
 
+    val about =
+        "[id=${id.value}, ticker=$ticker, strategyType=$strategyType, candleInterval=$candleInterval, status=$status]"
+
     fun processIncomeCandle(candle: Candle) {
         val isReadyForOrder = status == WAITING || status == IN_POSITION
         if (!isReadyForOrder) {
             throw TradeSessionDomainException(
-                "Unable to process income candle for the trade session $this"
+                "Unable to process income candle for the trade session $about"
             )
         }
-        val lastCandleDate =
-            strategy.lastCandleDate()
-                ?: throw TradeSessionDomainException("Trade session $this has an empty candle series")
+        val lastCandleDate = strategy.lastCandleDate()
+            ?: throw TradeSessionDomainException("Trade session $about has an empty candle series")
         if (lastCandleDate >= candle.endDateTime) {
             throw TradeSessionDomainException(
-                "Unable to process income candle: new candle date intersects trade session $this series dates"
+                "Unable to process income candle: new candle date intersects trade session $about series dates"
             )
         }
         strategy.addBar(domainModelMapper.map(candle))
-        registerEvent(TradeStrategySeriesCandleAddedDomainEvent(id))
+        registerEvent(TradeStrategySeriesCandleAddedDomainEvent(this))
         executeStrategy()
     }
 
@@ -89,80 +92,78 @@ data class TradeSession(
         checkTransition(PENDING_ENTER)
         status = PENDING_ENTER
         registerEvent(
-            TradeSessionPendedForEntryDomainEvent(id, instrument, candleInterval, lotsQuantity)
+            TradeSessionPendedForEntryDomainEvent(this)
         )
-        log.info("Trade session $this is pended for entry")
+        log.info("Trade session $about is pended for entry")
     }
 
     private fun pendingExit() {
         checkTransition(PENDING_EXIT)
         status = PENDING_EXIT
         registerEvent(
-            TradeSessionPendedForExitDomainEvent(
-                tradeSessionId = id,
-                instrument = instrument,
-                candleInterval = candleInterval,
-                lotsQuantityInPosition = currentPosition.lotsQuantity
-            )
+            TradeSessionPendedForExitDomainEvent(this)
         )
-        log.info("Trade session $this is pended for exit")
+        log.info("Trade session $about is pended for exit")
     }
 
-    fun enter(lotsExecuted: Int, averagePrice: BigDecimal) {
+    fun enter(lotsRequested: Int, lotsExecuted: Int, averagePrice: BigDecimal) {
         checkTransition(IN_POSITION)
         status = IN_POSITION
-        if (lotsQuantity != lotsExecuted) {
-            log.warn("$lotsExecuted executed lots while entering trade session $this is not equal to expected $lotsQuantity")
+        if (lotsRequested != lotsExecuted) {
+            log.warn("$lotsExecuted executed lots while entering trade session $about is not equal to expected $lotsRequested")
         }
         currentPosition.enter(lotsExecuted, averagePrice)
-        registerEvent(TradeSessionEnteredDomainEvent(id, instrument, candleInterval))
-        log.info("Trade session $this has been entered")
+        registerEvent(TradeSessionEnteredDomainEvent(this, lotsRequested))
+        log.info("Trade session $about has been entered")
     }
 
     fun exit(lotsExecuted: Int) {
         checkTransition(WAITING)
         status = WAITING
-        if (currentPosition.lotsQuantity != lotsExecuted) {
-            log.warn("$lotsExecuted executed lots while exiting trade session $this is not equal to expected $${currentPosition.lotsQuantity}")
+        val lotsRequested = currentPosition.lotsQuantity
+        if (lotsRequested != lotsExecuted) {
+            log.warn("$lotsExecuted executed lots while exiting trade session $about is not equal to expected $${currentPosition.lotsQuantity}")
         }
         currentPosition.exit()
-        registerEvent(TradeSessionExitedDomainEvent(id, instrument, candleInterval))
-        log.info("Trade session $this has been exited")
+        registerEvent(TradeSessionExitedDomainEvent(this, lotsRequested, lotsExecuted))
+        log.info("Trade session $about has been exited")
     }
 
     fun resume() {
         val previousStatus = status
-        if (isEntered()) {
+        if (havePosition()) {
             checkTransition(IN_POSITION)
             status = IN_POSITION
-            registerEvent(TradeSessionResumedDomainEvent(id, instrument, candleInterval))
+            registerEvent(TradeSessionResumedDomainEvent(this))
         } else {
             checkTransition(WAITING)
             status = WAITING
-            registerEvent(TradeSessionResumedDomainEvent(id, instrument, candleInterval))
+            registerEvent(TradeSessionResumedDomainEvent(this))
         }
-        log.info("Trade session $this has been resumed, previous status $previousStatus, current status $status")
+        log.info("Trade session $about has been resumed, previous status $previousStatus, current status $status")
     }
 
-    private fun isEntered() = currentPosition.lotsQuantity != 0
+    private fun havePosition() = currentPosition.lotsQuantity != 0
+
+    fun calculateOrderLotsQuantity() = orderLotsQuantityStrategy.getLotsQuantity(this)
 
     fun stop() {
         checkTransition(STOPPED)
         status = STOPPED
-        registerEvent(TradeSessionStoppedDomainEvent(id, instrument, candleInterval))
-        log.info("Trade session $this has been stopped")
+        registerEvent(TradeSessionStoppedDomainEvent(this))
+        log.info("Trade session $about has been stopped")
     }
 
     fun isMargin() = strategy.margin
 
+    fun lastCandleClosePrice() = strategy.lastCandleClose()
+        ?: throw TradeSessionDomainException("Trade session $about has an empty candle series")
+
     private fun checkTransition(toStatus: TradeSessionStatus) {
         if (!status.transitionAvailable(toStatus)) {
-            throw TradeSessionDomainException("Unexpected trade session $this status transition from $status to $toStatus")
+            throw TradeSessionDomainException("Unexpected trade session $about status transition from $status to $toStatus")
         }
     }
-
-    override fun toString() =
-        "[id=${id.value}, ticker=$ticker, instrumentId=$instrumentId, status=$status, candleInterval=$candleInterval]"
 
     companion object {
 
@@ -170,7 +171,7 @@ data class TradeSession(
             strategyConfiguration: StrategyConfiguration,
             ticker: String,
             instrumentId: String,
-            lotsQuantity: Int,
+            orderLotsQuantityStrategy: OrderLotsQuantityStrategy,
             tradeStrategy: TradeStrategy,
         ): TradeSession {
             val tradeSession =
@@ -180,17 +181,12 @@ data class TradeSession(
                     instrumentId = instrumentId,
                     status = WAITING,
                     candleInterval = strategyConfiguration.candleInterval,
-                    lotsQuantity = lotsQuantity,
+                    orderLotsQuantityStrategy = orderLotsQuantityStrategy,
                     strategy = tradeStrategy,
                     strategyType = strategyConfiguration.type,
                     strategyParameters = strategyConfiguration.parameters
                 )
-            tradeSession.registerEvent(
-                TradeSessionCreatedDomainEvent(
-                    Instrument(instrumentId, ticker),
-                    strategyConfiguration.candleInterval
-                )
-            )
+            tradeSession.registerEvent(TradeSessionCreatedDomainEvent(tradeSession))
             return tradeSession
         }
 

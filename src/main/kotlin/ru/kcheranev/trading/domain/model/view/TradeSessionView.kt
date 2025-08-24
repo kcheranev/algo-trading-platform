@@ -1,5 +1,6 @@
 package ru.kcheranev.trading.domain.model.view
 
+import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategyType
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
@@ -12,7 +13,7 @@ data class TradeSessionView(
     val instrumentId: String,
     val status: TradeSessionStatus,
     val candleInterval: CandleInterval,
-    val lotsQuantity: Int,
+    val orderLotsQuantityStrategyType: OrderLotsQuantityStrategyType,
     val currentPosition: CurrentPositionView,
     val strategyType: String,
     val strategyParameters: StrategyParameters

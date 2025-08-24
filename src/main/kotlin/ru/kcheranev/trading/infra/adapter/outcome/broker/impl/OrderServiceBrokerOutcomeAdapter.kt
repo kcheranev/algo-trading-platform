@@ -1,7 +1,14 @@
 package ru.kcheranev.trading.infra.adapter.outcome.broker.impl
 
+import arrow.core.Either
+import arrow.core.Either.Companion.catch
+import arrow.core.raise.either
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import ru.kcheranev.trading.common.date.format
+import ru.kcheranev.trading.common.format
+import ru.kcheranev.trading.core.error.BestPriceBuyOrderExecutionError
+import ru.kcheranev.trading.core.error.BestPriceSellOrderExecutionError
+import ru.kcheranev.trading.core.error.BrokerIntegrationError
 import ru.kcheranev.trading.core.port.outcome.broker.OrderServiceBrokerPort
 import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceBuyOrderCommand
 import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceSellOrderCommand
@@ -22,22 +29,33 @@ class OrderServiceBrokerOutcomeAdapter(
     private val notificationPort: NotificationPort
 ) : OrderServiceBrokerPort {
 
-    override fun postBestPriceBuyOrder(command: PostBestPriceBuyOrderCommand): PostOrderResponse {
-        try {
-            val postOrderResponse =
+    private val log = LoggerFactory.getLogger(javaClass)
+
+    override fun postBestPriceBuyOrder(command: PostBestPriceBuyOrderCommand): Either<BrokerIntegrationError, PostOrderResponse> =
+        either {
+            catch {
                 loggingOrdersServiceDecorator.postOrderSync(
                     command.instrument.id,
                     command.quantity.toLong(),
                     Quotation.getDefaultInstance(),
                     OrderDirection.ORDER_DIRECTION_BUY,
-                    userServiceBrokerOutcomeAdapter.getTradingAccountId(),
+                    userServiceBrokerOutcomeAdapter.getTradingAccountId().bind(),
                     OrderType.ORDER_TYPE_BESTPRICE,
                     UUID.randomUUID().toString()
-                ).let(brokerOutcomeAdapterMapper::map)
-            notificationPort.sendNotification(
-                SendNotificationCommand(
-                    """
-                        Buy order executed
+                )
+            }.onLeft { ex ->
+                val errorMessage =
+                    "An error has been occurred while sending best price buy order: ticker=${command.instrument.ticker}"
+                log.error(errorMessage, ex)
+                notificationPort.sendNotification(SendNotificationCommand(errorMessage))
+            }.mapLeft { BestPriceBuyOrderExecutionError }
+                .bind()
+        }.map(brokerOutcomeAdapterMapper::map)
+            .onRight { postOrderResponse ->
+                notificationPort.sendNotification(
+                    SendNotificationCommand(
+                        """
+                        Buy order executed:
                         ticker=${command.instrument.ticker}
                         status=${postOrderResponse.status}
                         lotsRequested=${postOrderResponse.lotsRequested}
@@ -46,35 +64,35 @@ class OrderServiceBrokerOutcomeAdapter(
                         totalPrice=${postOrderResponse.totalPrice.format()}
                         executedCommission=${postOrderResponse.executedCommission.format()}
                     """.trimIndent()
+                    )
                 )
-            )
-            return postOrderResponse
-        } catch (ex: Exception) {
-            notificationPort.sendNotification(
-                SendNotificationCommand(
-                    "An error has been occurred while sending best price buy order: ticker=${command.instrument.ticker}"
-                )
-            )
-            throw ex
-        }
-    }
+            }
 
-    override fun postBestPriceSellOrder(command: PostBestPriceSellOrderCommand): PostOrderResponse {
-        try {
-            val postOrderResponse =
+    override fun postBestPriceSellOrder(command: PostBestPriceSellOrderCommand): Either<BrokerIntegrationError, PostOrderResponse> =
+        either {
+            catch {
                 loggingOrdersServiceDecorator.postOrderSync(
                     command.instrument.id,
                     command.quantity.toLong(),
                     Quotation.getDefaultInstance(),
                     OrderDirection.ORDER_DIRECTION_SELL,
-                    userServiceBrokerOutcomeAdapter.getTradingAccountId(),
+                    userServiceBrokerOutcomeAdapter.getTradingAccountId().bind(),
                     OrderType.ORDER_TYPE_BESTPRICE,
                     UUID.randomUUID().toString()
-                ).let(brokerOutcomeAdapterMapper::map)
-            notificationPort.sendNotification(
-                SendNotificationCommand(
-                    """
-                        Sell order executed
+                )
+            }.onLeft { ex ->
+                val errorMessage =
+                    "An error has been occurred while sending best price sell order: ticker=${command.instrument.ticker}"
+                log.error(errorMessage, ex)
+                notificationPort.sendNotification(SendNotificationCommand(errorMessage))
+            }.mapLeft { BestPriceSellOrderExecutionError }
+                .bind()
+        }.map(brokerOutcomeAdapterMapper::map)
+            .onRight { postOrderResponse ->
+                notificationPort.sendNotification(
+                    SendNotificationCommand(
+                        """
+                        Sell order executed:
                         ticker=${command.instrument.ticker}
                         status=${postOrderResponse.status}
                         lotsRequested=${postOrderResponse.lotsRequested}
@@ -83,17 +101,8 @@ class OrderServiceBrokerOutcomeAdapter(
                         totalPrice=${postOrderResponse.totalPrice.format()}
                         executedCommission=${postOrderResponse.executedCommission.format()}
                     """.trimIndent()
+                    )
                 )
-            )
-            return postOrderResponse
-        } catch (ex: Exception) {
-            notificationPort.sendNotification(
-                SendNotificationCommand(
-                    "An error has been occurred while sending best price sell order: ticker=${command.instrument.ticker}"
-                )
-            )
-            throw ex
-        }
-    }
+            }
 
 }

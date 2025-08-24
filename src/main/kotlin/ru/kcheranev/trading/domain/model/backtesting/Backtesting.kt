@@ -4,11 +4,12 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.ta4j.core.BaseBarSeriesBuilder
+import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeResultFilter
+import ru.kcheranev.trading.core.port.income.backtesting.StrategyParametersMutation
 import ru.kcheranev.trading.core.strategy.factory.StrategyFactory
 import ru.kcheranev.trading.domain.exception.BusinessException
 import ru.kcheranev.trading.domain.mapper.domainModelMapper
 import ru.kcheranev.trading.domain.model.Candle
-import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.CustomizedBarSeries
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import java.math.BigDecimal
@@ -18,13 +19,8 @@ const val BACKTESTING_RESULT_SCALE = 5
 
 private const val DEFAULT_BACKTESTING_RESULTS_LIMIT = 15
 
-private val DEFAULT_MIN_PROFIT_LOSS_TRADES_RATIO = BigDecimal(1)
-
-private val DEFAULT_TRADES_BY_DAY_COUNT_FACTOR = BigDecimal(1)
-
 class Backtesting(
-    val ticker: String,
-    val candleInterval: CandleInterval,
+    val name: String,
     val commission: BigDecimal,
     candles: List<Candle>
 ) {
@@ -32,10 +28,9 @@ class Backtesting(
     private val series: CustomizedBarSeries =
         CustomizedBarSeries(
             BaseBarSeriesBuilder()
-                .withName("Trade session: ticker=$ticker, candleInterval=$candleInterval")
+                .withName("Trade session: $name")
                 .withBars(candles.map(domainModelMapper::map))
-                .build(),
-            candleInterval
+                .build()
         )
 
     private val daysCount =
@@ -53,34 +48,30 @@ class Backtesting(
         strategyFactory: StrategyFactory,
         parameters: StrategyParameters,
         mutableParameters: StrategyParameters,
-        divisionFactor: BigDecimal,
-        variantsCount: Int,
-        resultsLimit: Int?,
-        minProfitLossTradesRatio: BigDecimal?,
-        tradesByDayCountFactor: BigDecimal?,
+        parametersMutation: StrategyParametersMutation,
+        resultFilter: StrategyAnalyzeResultFilter?,
         profitTypeSort: ProfitTypeSort?
     ): List<StrategyParametersAnalyzeResult> {
         val mutableParametersVariants =
             mutableParameters.mapValues { (_, paramValue) ->
-                buildParameterVariants(paramValue, divisionFactor, variantsCount)
+                buildParameterVariants(paramValue, parametersMutation.divisionFactor, parametersMutation.variantsCount)
             }
         val mutableParametersCartesianProduct = cartesianProduct(mutableParametersVariants)
         return runBlocking {
             mutableParametersCartesianProduct.map { paramVariant ->
-                async {
-                    analyzeParametersVariant(strategyFactory, paramVariant + parameters)
-                }
+                async { analyzeParametersVariant(strategyFactory, paramVariant + parameters) }
             }.awaitAll()
         }.asSequence()
             .filterNotNull()
-            .filter {
-                it.analyzeResult.profitLossTradesRatio >=
-                        (minProfitLossTradesRatio ?: DEFAULT_MIN_PROFIT_LOSS_TRADES_RATIO)
+            .filter { parametersAnalyzeResult ->
+                resultFilter?.minProfitLossTradesRatio == null ||
+                        parametersAnalyzeResult.analyzeResult.profitLossTradesRatio >= resultFilter.minProfitLossTradesRatio
             }
-            .filter {
-                it.analyzeResult.tradesCount >=
+            .filter { parametersAnalyzeResult ->
+                resultFilter?.tradesByDayCountFactor == null ||
+                        parametersAnalyzeResult.analyzeResult.tradesCount >=
                         BigDecimal(daysCount)
-                            .multiply(tradesByDayCountFactor ?: DEFAULT_TRADES_BY_DAY_COUNT_FACTOR)
+                            .multiply(resultFilter.tradesByDayCountFactor)
                             .toInt()
             }
             .sortedByDescending {
@@ -90,7 +81,7 @@ class Backtesting(
                     null -> it.analyzeResult.netValue
                 }
             }
-            .take(resultsLimit ?: DEFAULT_BACKTESTING_RESULTS_LIMIT)
+            .take(resultFilter?.resultsLimit ?: DEFAULT_BACKTESTING_RESULTS_LIMIT)
             .toList()
     }
 
@@ -152,8 +143,7 @@ class Backtesting(
                 analyzeStrategy(strategyFactory, StrategyParameters(parameters)),
                 parameters
             )
-        } catch (e: Exception) {
-            //ignore
+        } catch (_: Exception) {
             null
         }
 

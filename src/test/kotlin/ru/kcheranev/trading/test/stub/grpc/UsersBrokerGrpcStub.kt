@@ -25,4 +25,11 @@ class UsersBrokerGrpcStub(testName: String) : AbstractGrpcStub(testName) {
         )
     }
 
+    fun stubForGetAccountsFailed() {
+        usersService.stubFor(
+            WireMockGrpc.method("GetAccounts")
+                .willReturn(WireMockGrpc.Status.INTERNAL, "Error")
+        )
+    }
+
 }

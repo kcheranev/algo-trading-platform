@@ -4,9 +4,9 @@ import org.springframework.jdbc.core.JdbcTemplate
 import ru.kcheranev.trading.core.port.model.sort.TradeOrderSort
 import ru.kcheranev.trading.core.port.outcome.persistence.tradeorder.SearchTradeOrderCommand
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.addAndCondition
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.ComparstionCondition
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.EqualsCondition
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.query.ComparstionCondition
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.query.EqualsCondition
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.query.addAndCondition
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.rowmapper.TradeOrderEntityRowMapper
 
 private const val DEFAULT_OFFSET = 0
@@ -22,34 +22,38 @@ class CustomizedTradeOrderRepositoryImpl(
         val queryBuilder = StringBuilder()
         queryBuilder.append("SELECT * FROM trade_order")
         val conditionsBuilder = StringBuilder()
+        val parameters = mutableListOf<Any>()
         if (command.id != null) {
-            conditionsBuilder.addAndCondition(EqualsCondition("id", command.id.value))
+            conditionsBuilder.addAndCondition(EqualsCondition("id"))
+            parameters.add(command.id.value)
         }
         if (command.ticker != null) {
-            conditionsBuilder.addAndCondition(EqualsCondition("ticker", command.ticker))
+            conditionsBuilder.addAndCondition(EqualsCondition("ticker"))
+            parameters.add(command.ticker)
         }
         if (command.instrumentId != null) {
-            conditionsBuilder.addAndCondition(EqualsCondition("instrument_id", command.instrumentId))
+            conditionsBuilder.addAndCondition(EqualsCondition("instrument_id"))
+            parameters.add(command.instrumentId)
         }
         if (command.date != null) {
-            conditionsBuilder.addAndCondition(ComparstionCondition("date", command.date))
+            conditionsBuilder.addAndCondition(ComparstionCondition("date", command.date.comparsion))
+            parameters.add(command.date.value)
         }
         if (command.lotsQuantity != null) {
-            conditionsBuilder.addAndCondition(ComparstionCondition("lots_quantity", command.lotsQuantity))
+            conditionsBuilder.addAndCondition(ComparstionCondition("lots_quantity", command.lotsQuantity.comparsion))
+            parameters.add(command.lotsQuantity.value)
         }
         if (command.totalPrice != null) {
-            conditionsBuilder.addAndCondition(ComparstionCondition("total_price", command.totalPrice))
+            conditionsBuilder.addAndCondition(ComparstionCondition("total_price", command.totalPrice.comparsion))
+            parameters.add(command.totalPrice.value)
         }
         if (command.direction != null) {
-            conditionsBuilder.addAndCondition(EqualsCondition("direction", command.direction))
+            conditionsBuilder.addAndCondition(EqualsCondition("direction"))
+            parameters.add(command.direction.name)
         }
         if (command.tradeSessionId != null) {
-            conditionsBuilder.addAndCondition(
-                EqualsCondition(
-                    "trade_session_id",
-                    command.tradeSessionId.value
-                )
-            )
+            conditionsBuilder.addAndCondition(EqualsCondition("trade_session_id"))
+            parameters.add(command.tradeSessionId.value)
         }
         if (conditionsBuilder.isNotEmpty()) {
             queryBuilder.append(" WHERE $conditionsBuilder")
@@ -69,7 +73,7 @@ class CustomizedTradeOrderRepositoryImpl(
         } else {
             queryBuilder.append(" LIMIT $DEFAULT_LIMIT OFFSET $DEFAULT_OFFSET")
         }
-        return jdbcTemplate.query(queryBuilder.toString(), tradeOrderEntityRowMapper)
+        return jdbcTemplate.query(queryBuilder.toString(), tradeOrderEntityRowMapper, *parameters.toTypedArray())
     }
 
 }

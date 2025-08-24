@@ -1,7 +1,10 @@
 package ru.kcheranev.trading.infra.adapter.outcome.notification
 
+import arrow.core.Either
+import arrow.core.Either.Companion.catch
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
+import ru.kcheranev.trading.core.error.NotificationError
 import ru.kcheranev.trading.core.port.outcome.notification.NotificationPort
 import ru.kcheranev.trading.core.port.outcome.notification.SendNotificationCommand
 import ru.kcheranev.trading.infra.config.properties.TelegramNotificationProperties
@@ -16,11 +19,13 @@ class TelegramNotificationOutcomeAdapter(
 
     private val chatId = telegramNotificationProperties.chatId
 
-    override fun sendNotification(command: SendNotificationCommand) {
-        restTemplate.postForLocation(
-            "$apiUrl/sendMessage?chat_id=${chatId}&text=${command.text}",
-            Unit
-        )
-    }
+    override fun sendNotification(command: SendNotificationCommand): Either<NotificationError, Unit> =
+        catch {
+            restTemplate.postForLocation(
+                "$apiUrl/sendMessage?chat_id=${chatId}&text=${command.text}",
+                Unit
+            )
+            return@catch
+        }.mapLeft { NotificationError }
 
 }

@@ -1,6 +1,7 @@
 package ru.kcheranev.trading.infra.adapter.income.web.rest.model.mapper
 
 import org.mapstruct.Mapper
+import org.mapstruct.Mapping
 import org.mapstruct.factory.Mappers
 import ru.kcheranev.trading.core.port.income.tradesession.CreateTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.SearchTradeSessionCommand
@@ -18,6 +19,7 @@ interface TradeSessionWebIncomeAdapterMapper {
 
     fun map(source: SearchTradeSessionRequestDto): SearchTradeSessionCommand
 
+    @Mapping(source = "orderLotsQuantityStrategy.type", target = "orderLotsQuantityStrategyType")
     fun map(source: TradeSession): TradeSessionDto
 
     fun map(source: TradeSessionView): TradeSessionDto

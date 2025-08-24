@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<body>
+<th:block layout:fragment="content">
+    <h4 class="mb-4">Instruments</h4>
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addInstrumentModal">
+        Create
+    </button>
+    <div class="modal fade" id="addInstrumentModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="createInstrumentForm" action="#" th:action="@{/ui/instruments}"
+                      th:object="${createInstrumentRequest}" method="post">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Instrument creation</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="instrumentName" class="form-label">Name</label>
+                            <input id="instrumentName" type="text" class="form-control" name="name" th:value="*{name}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="instrumentTicker" class="form-label">Ticker</label>
+                            <input id="instrumentTicker" type="text" class="form-control" name="ticker"
+                                   th:value="*{ticker}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="brokerInstrumentId" class="form-label">Broker instrument id</label>
+                            <input id="brokerInstrumentId" type="text" class="form-control" name="brokerInstrumentId"
+                                   th:value="*{brokerInstrumentId}">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <th:block th:switch="${#lists.isEmpty(instruments)}">
+        <span th:case="true">There are no instruments</span>
+        <div th:case="false">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Ticker</th>
+                    <th>Broker id</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="instrument : ${instruments}">
+                    <td th:text="${instrument.id}"></td>
+                    <td th:text="${instrument.name}"></td>
+                    <td th:text="${instrument.ticker}"></td>
+                    <td th:text="${instrument.brokerInstrumentId}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </th:block>
+</th:block>
+</body>
+</html>

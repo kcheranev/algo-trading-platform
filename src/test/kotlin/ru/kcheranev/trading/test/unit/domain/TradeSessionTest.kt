@@ -7,6 +7,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.throwable.shouldHaveMessage
+import io.kotest.matchers.types.shouldBeSameInstanceAs
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.mockk.every
 import io.mockk.mockk
@@ -19,6 +20,8 @@ import org.ta4j.core.Strategy
 import ru.kcheranev.trading.common.date.toMskZonedDateTime
 import ru.kcheranev.trading.core.config.TradingProperties
 import ru.kcheranev.trading.core.config.TradingScheduleInterval
+import ru.kcheranev.trading.core.strategy.lotsquantity.HardcodedOrderLotsQuantityStrategy
+import ru.kcheranev.trading.core.strategy.lotsquantity.LOTS_QUANTITY_STRATEGY_PARAMETER_NAME
 import ru.kcheranev.trading.domain.TradeSessionCreatedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionEnteredDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionExitedDomainEvent
@@ -35,7 +38,6 @@ import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.exception.TradeSessionDomainException
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.domain.model.Position
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.TradeStrategy
@@ -77,7 +79,7 @@ class TradeSessionTest : FreeSpec({
                 name = "dummy",
                 type = "strategy-type",
                 candleInterval = CandleInterval.ONE_MIN,
-                parameters = StrategyParameters(mapOf("key" to 1))
+                parameters = StrategyParameters(mapOf("key" to 1, LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 10))
             )
         val tradeStrategy = mockk<TradeStrategy>()
 
@@ -87,7 +89,7 @@ class TradeSessionTest : FreeSpec({
                 strategyConfiguration = strategyConfiguration,
                 ticker = "SBER",
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
-                lotsQuantity = 10,
+                orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
                 tradeStrategy = tradeStrategy
             )
 
@@ -97,16 +99,20 @@ class TradeSessionTest : FreeSpec({
         tradeSession.instrumentId shouldBe "e6123145-9665-43e0-8413-cd61b8aa9b1"
         tradeSession.status shouldBe TradeSessionStatus.WAITING
         tradeSession.candleInterval shouldBe CandleInterval.ONE_MIN
-        tradeSession.lotsQuantity shouldBe 10
+        tradeSession.orderLotsQuantityStrategy.shouldBeTypeOf<HardcodedOrderLotsQuantityStrategy>()
         tradeSession.strategy shouldBe tradeStrategy
         tradeSession.strategyType shouldBe "strategy-type"
-        tradeSession.strategyParameters shouldBe StrategyParameters(mapOf("key" to 1))
+        tradeSession.strategyParameters shouldBe StrategyParameters(
+            mapOf(
+                "key" to 1,
+                LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 10
+            )
+        )
 
         tradeSession.events.size shouldBe 1
         val domainEvent = tradeSession.events.first()
         domainEvent.shouldBeTypeOf<TradeSessionCreatedDomainEvent>()
-        domainEvent.instrument shouldBe Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
-        domainEvent.candleInterval shouldBe CandleInterval.ONE_MIN
+        domainEvent.tradeSession shouldBeSameInstanceAs tradeSession
     }
 
     "should add candle to series" {
@@ -149,10 +155,15 @@ class TradeSessionTest : FreeSpec({
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
-                lotsQuantity = 10,
+                orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
                 strategy = tradeStrategy,
                 strategyType = "DUMMY",
-                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
+                strategyParameters = StrategyParameters(
+                    mapOf(
+                        "paramName" to 1,
+                        LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 10
+                    )
+                )
             )
 
         //when
@@ -193,10 +204,15 @@ class TradeSessionTest : FreeSpec({
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
-                lotsQuantity = 10,
+                orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
                 strategy = tradeStrategy,
                 strategyType = "DUMMY",
-                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
+                strategyParameters = StrategyParameters(
+                    mapOf(
+                        "paramName" to 1,
+                        LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 10
+                    )
+                )
             )
         val candle =
             Candle(
@@ -219,10 +235,7 @@ class TradeSessionTest : FreeSpec({
         domainEvents shouldHaveSize 2
         val pendingEnterEvent = domainEvents[1]
         pendingEnterEvent.shouldBeTypeOf<TradeSessionPendedForEntryDomainEvent>()
-        pendingEnterEvent.tradeSessionId shouldBe TradeSessionId(tradeSessionId)
-        pendingEnterEvent.instrument shouldBe Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
-        pendingEnterEvent.candleInterval shouldBe CandleInterval.ONE_MIN
-        pendingEnterEvent.lotsQuantity shouldBe 10
+        pendingEnterEvent.tradeSession shouldBeSameInstanceAs tradeSession
     }
 
     "should pending exit trade session" {
@@ -255,11 +268,16 @@ class TradeSessionTest : FreeSpec({
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.IN_POSITION,
                 candleInterval = CandleInterval.ONE_MIN,
-                lotsQuantity = 10,
+                orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
                 currentPosition = CurrentPosition(lotsQuantity = 5, averagePrice = BigDecimal("42")),
                 strategy = tradeStrategy,
                 strategyType = "DUMMY",
-                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
+                strategyParameters = StrategyParameters(
+                    mapOf(
+                        "paramName" to 1,
+                        LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 10
+                    )
+                )
             )
         val candle =
             Candle(
@@ -282,10 +300,7 @@ class TradeSessionTest : FreeSpec({
         domainEvents shouldHaveSize 2
         val pendingExitEvent = domainEvents[1]
         pendingExitEvent.shouldBeTypeOf<TradeSessionPendedForExitDomainEvent>()
-        pendingExitEvent.tradeSessionId shouldBe TradeSessionId(tradeSessionId)
-        pendingExitEvent.instrument shouldBe Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
-        pendingExitEvent.candleInterval shouldBe CandleInterval.ONE_MIN
-        pendingExitEvent.lotsQuantityInPosition shouldBe 5
+        pendingExitEvent.tradeSession shouldBeSameInstanceAs tradeSession
     }
 
     "should enter trade session" {
@@ -299,26 +314,30 @@ class TradeSessionTest : FreeSpec({
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.PENDING_ENTER,
                 candleInterval = CandleInterval.ONE_MIN,
-                lotsQuantity = 10,
+                orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
                 strategy = tradeStrategy,
                 strategyType = "DUMMY",
-                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
+                strategyParameters = StrategyParameters(
+                    mapOf(
+                        "paramName" to 1,
+                        LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 10
+                    )
+                )
             )
 
         //when
-        tradeSession.enter(5, BigDecimal("42"))
+        tradeSession.enter(10, 10, BigDecimal("42"))
 
         //then
         tradeSession.status shouldBe TradeSessionStatus.IN_POSITION
-        tradeSession.currentPosition.lotsQuantity shouldBe 5
+        tradeSession.currentPosition.lotsQuantity shouldBe 10
         tradeSession.currentPosition.averagePrice shouldBe BigDecimal("42")
         val domainEvents = tradeSession.events
         domainEvents shouldHaveSize 1
         val enteredEvent = domainEvents.first()
         enteredEvent.shouldBeTypeOf<TradeSessionEnteredDomainEvent>()
-        enteredEvent.tradeSessionId shouldBe TradeSessionId(tradeSessionId)
-        enteredEvent.instrument shouldBe Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
-        enteredEvent.candleInterval shouldBe CandleInterval.ONE_MIN
+        enteredEvent.tradeSession shouldBeSameInstanceAs tradeSession
+        enteredEvent.lotsRequested shouldBe 10
     }
 
     "should exit trade session" {
@@ -332,10 +351,16 @@ class TradeSessionTest : FreeSpec({
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.PENDING_EXIT,
                 candleInterval = CandleInterval.ONE_MIN,
-                lotsQuantity = 10,
+                orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
+                currentPosition = CurrentPosition(5, BigDecimal(100)),
                 strategy = tradeStrategy,
                 strategyType = "DUMMY",
-                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
+                strategyParameters = StrategyParameters(
+                    mapOf(
+                        "paramName" to 1,
+                        LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 10
+                    )
+                )
             )
 
         //when
@@ -349,9 +374,9 @@ class TradeSessionTest : FreeSpec({
         domainEvents shouldHaveSize 1
         val exitedEvent = domainEvents.first()
         exitedEvent.shouldBeTypeOf<TradeSessionExitedDomainEvent>()
-        exitedEvent.tradeSessionId shouldBe TradeSessionId(tradeSessionId)
-        exitedEvent.instrument shouldBe Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
-        exitedEvent.candleInterval shouldBe CandleInterval.ONE_MIN
+        exitedEvent.tradeSession shouldBeSameInstanceAs tradeSession
+        exitedEvent.lotsRequested shouldBe 5
+        exitedEvent.lotsExecuted shouldBe 5
     }
 
     "should resume trade session" - {
@@ -378,14 +403,19 @@ class TradeSessionTest : FreeSpec({
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                     status = currentStatus,
                     candleInterval = CandleInterval.ONE_MIN,
-                    lotsQuantity = 10,
+                    orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
                     currentPosition = CurrentPosition(
                         lotsQuantity = currentPositionLotsQuantity,
                         averagePrice = currentPositionAveragePrice
                     ),
                     strategy = tradeStrategy,
                     strategyType = "DUMMY",
-                    strategyParameters = StrategyParameters(mapOf("paramName" to 1))
+                    strategyParameters = StrategyParameters(
+                        mapOf(
+                            "paramName" to 1,
+                            LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 10
+                        )
+                    )
                 )
 
             //when
@@ -397,7 +427,7 @@ class TradeSessionTest : FreeSpec({
             domainEvents shouldHaveSize 1
             val stoppedEvent = domainEvents.first()
             stoppedEvent.shouldBeTypeOf<TradeSessionResumedDomainEvent>()
-            stoppedEvent.tradeSessionId shouldBe TradeSessionId(tradeSessionId)
+            stoppedEvent.tradeSession shouldBeSameInstanceAs tradeSession
         }
     }
 
@@ -412,10 +442,15 @@ class TradeSessionTest : FreeSpec({
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
-                lotsQuantity = 10,
+                orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
                 strategy = tradeStrategy,
                 strategyType = "DUMMY",
-                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
+                strategyParameters = StrategyParameters(
+                    mapOf(
+                        "paramName" to 1,
+                        LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 10
+                    )
+                )
             )
 
         //when
@@ -427,9 +462,7 @@ class TradeSessionTest : FreeSpec({
         domainEvents shouldHaveSize 1
         val stoppedEvent = domainEvents.first()
         stoppedEvent.shouldBeTypeOf<TradeSessionStoppedDomainEvent>()
-        stoppedEvent.tradeSessionId shouldBe TradeSessionId(tradeSessionId)
-        stoppedEvent.instrument shouldBe Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
-        stoppedEvent.candleInterval shouldBe CandleInterval.ONE_MIN
+        stoppedEvent.tradeSession shouldBeSameInstanceAs tradeSession
     }
 
     "should throw TradeSessionDomainException while adding new candle when new candle date intersects series dates" {
@@ -469,10 +502,15 @@ class TradeSessionTest : FreeSpec({
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
-                lotsQuantity = 10,
+                orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
                 strategy = tradeStrategy,
                 strategyType = "DUMMY",
-                strategyParameters = StrategyParameters(mapOf("paramName" to 1))
+                strategyParameters = StrategyParameters(
+                    mapOf(
+                        "paramName" to 1,
+                        LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 10
+                    )
+                )
             )
 
         //when
@@ -480,8 +518,7 @@ class TradeSessionTest : FreeSpec({
 
         //then
         ex shouldHaveMessage "Unable to process income candle: new candle date intersects trade session " +
-                "[id=$tradeSessionId, ticker=SBER, instrumentId=e6123145-9665-43e0-8413-cd61b8aa9b1, " +
-                "status=WAITING, candleInterval=ONE_MIN] series dates"
+                "[id=$tradeSessionId, ticker=SBER, strategyType=DUMMY, candleInterval=ONE_MIN, status=WAITING] series dates"
     }
 
 })

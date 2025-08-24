@@ -38,3 +38,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Other ###
+src/main/kotlin/ru/kcheranev/trading/core/strategy/factory/shadow

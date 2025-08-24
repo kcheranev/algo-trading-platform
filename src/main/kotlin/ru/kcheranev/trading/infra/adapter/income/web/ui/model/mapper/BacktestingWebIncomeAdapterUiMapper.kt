@@ -4,13 +4,17 @@ import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.Named
 import org.mapstruct.factory.Mappers
-import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeCommand
-import ru.kcheranev.trading.core.port.income.backtesting.StrategyParametersAnalyzeCommand
+import org.springframework.core.io.Resource
+import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeOnBrokerDataCommand
+import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeOnStoredDataCommand
+import ru.kcheranev.trading.core.port.income.backtesting.StrategyParametersAnalyzeOnBrokerDataCommand
+import ru.kcheranev.trading.core.port.income.backtesting.StrategyParametersAnalyzeOnStoredDataCommand
 import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.domain.model.StrategyParameters
 import ru.kcheranev.trading.domain.model.backtesting.DailyStrategyAnalyzeResult
 import ru.kcheranev.trading.domain.model.backtesting.StrategyAnalyzeResult
 import ru.kcheranev.trading.domain.model.backtesting.StrategyParametersAnalyzeResult
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.CheckedValueUiDto
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyAnalyzeRequestUiDto
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyParameterUiDto
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyParametersAnalyzeRequestUiDto
@@ -23,7 +27,16 @@ import ru.kcheranev.trading.infra.adapter.mapper.EntityIdMapper
 abstract class BacktestingWebIncomeAdapterUiMapper {
 
     @Mapping(target = "strategyParameters", qualifiedByName = ["mapStrategyParameters"])
-    abstract fun map(request: StrategyAnalyzeRequestUiDto, instrument: Instrument): StrategyAnalyzeCommand
+    abstract fun mapToStrategyAnalyzeOnBrokerDataCommand(
+        request: StrategyAnalyzeRequestUiDto,
+        instrument: Instrument
+    ): StrategyAnalyzeOnBrokerDataCommand
+
+    @Mapping(target = "strategyParameters", qualifiedByName = ["mapStrategyParameters"])
+    abstract fun mapToStrategyAnalyzeOnStoredDataCommand(
+        request: StrategyAnalyzeRequestUiDto,
+        candlesSeriesFile: Resource
+    ): StrategyAnalyzeOnStoredDataCommand
 
     @Named("mapStrategyParameters")
     fun mapStrategyParameters(source: Map<String, Number>) = StrategyParameters(source)
@@ -38,10 +51,25 @@ abstract class BacktestingWebIncomeAdapterUiMapper {
         source = "request.strategyParameters",
         qualifiedByName = ["mapMutableStrategyParameters"]
     )
-    abstract fun map(
+    abstract fun mapToStrategyParametersAnalyzeOnBrokerDataCommand(
         request: StrategyParametersAnalyzeRequestUiDto,
         instrument: Instrument
-    ): StrategyParametersAnalyzeCommand
+    ): StrategyParametersAnalyzeOnBrokerDataCommand
+
+    @Mapping(
+        target = "strategyParameters",
+        source = "request.strategyParameters",
+        qualifiedByName = ["mapNoMutableStrategyParameters"]
+    )
+    @Mapping(
+        target = "mutableStrategyParameters",
+        source = "request.strategyParameters",
+        qualifiedByName = ["mapMutableStrategyParameters"]
+    )
+    abstract fun mapToStrategyParametersAnalyzeOnStoredDataCommand(
+        request: StrategyParametersAnalyzeRequestUiDto,
+        candlesSeriesFile: Resource
+    ): StrategyParametersAnalyzeOnStoredDataCommand
 
     @Named("mapNoMutableStrategyParameters")
     fun mapNoMutableStrategyParameters(source: MutableMap<String, StrategyParameterUiDto>) =
@@ -54,6 +82,8 @@ abstract class BacktestingWebIncomeAdapterUiMapper {
         source.filter { it.value.mutable == true }
             .mapValues { it.value.value!! }
             .let(::StrategyParameters)
+
+    fun mapCheckedValue(source: CheckedValueUiDto) = if (source.checked) source.value else null
 
     abstract fun map(source: StrategyAnalyzeResult): StrategyAnalyzeResultUiDto
 

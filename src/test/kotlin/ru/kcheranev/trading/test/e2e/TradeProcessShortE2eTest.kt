@@ -10,6 +10,8 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.core.port.income.marketdata.ProcessIncomeCandleCommand
 import ru.kcheranev.trading.core.service.MarketDataProcessingService
+import ru.kcheranev.trading.core.strategy.lotsquantity.LOTS_QUANTITY_STRATEGY_PARAMETER_NAME
+import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategyType
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
@@ -58,7 +60,7 @@ class TradeProcessShortE2eTest(
                     name = "dummy",
                     type = "DUMMY_SHORT",
                     candleInterval = CandleInterval.ONE_MIN,
-                    parameters = MapWrapper(emptyMap())
+                    parameters = MapWrapper(mapOf(LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 4))
                 )
             )
 
@@ -68,7 +70,7 @@ class TradeProcessShortE2eTest(
             "/trade-sessions",
             CreateTradeSessionRequestDto(
                 strategyConfiguration.id,
-                4,
+                OrderLotsQuantityStrategyType.HARDCODED,
                 InstrumentDto("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
             ),
             CreateTradeSessionResponseDto::class.java

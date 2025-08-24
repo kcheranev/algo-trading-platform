@@ -3,6 +3,7 @@ package ru.kcheranev.trading.infra.adapter.outcome.persistence.entity
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
+import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategyType
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
@@ -21,8 +22,8 @@ data class TradeSessionEntity(
     val status: TradeSessionStatus,
     @Column("candle_interval")
     val candleInterval: CandleInterval,
-    @Column("lots_quantity")
-    val lotsQuantity: Int,
+    @Column("order_lots_quantity_strategy_type")
+    val orderLotsQuantityStrategyType: OrderLotsQuantityStrategyType,
     @Column("position_lots_quantity")
     val positionLotsQuantity: Int,
     @Column("position_average_price")
@@ -30,5 +31,5 @@ data class TradeSessionEntity(
     @Column("strategy_type")
     val strategyType: String,
     @Column("strategy_parameters")
-    val strategyParameters: MapWrapper<String>
+    val strategyParameters: MapWrapper
 )

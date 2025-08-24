@@ -1,8 +1,11 @@
 package ru.kcheranev.trading.core.service
 
+import arrow.core.Either
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.kcheranev.trading.core.config.TradingProperties.Companion.tradingProperties
+import ru.kcheranev.trading.core.error.Error
 import ru.kcheranev.trading.core.model.order.PostOrderResultAccumulator
 import ru.kcheranev.trading.core.port.income.tradesession.CreateTradeSessionCommand
 import ru.kcheranev.trading.core.port.income.tradesession.CreateTradeSessionUseCase
@@ -20,6 +23,7 @@ import ru.kcheranev.trading.core.port.mapper.commandMapper
 import ru.kcheranev.trading.core.port.outcome.broker.OrderServiceBrokerPort
 import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceBuyOrderCommand
 import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceSellOrderCommand
+import ru.kcheranev.trading.core.port.outcome.broker.WithdrawLimitsBrokerPort
 import ru.kcheranev.trading.core.port.outcome.broker.model.PostOrderResponse
 import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.GetStrategyConfigurationCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.StrategyConfigurationPersistencePort
@@ -31,10 +35,12 @@ import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.SaveTrade
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.TradeSessionPersistencePort
 import ru.kcheranev.trading.core.port.service.TradeStrategyServicePort
 import ru.kcheranev.trading.core.port.service.command.InitTradeStrategyCommand
+import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategyProvider
 import ru.kcheranev.trading.domain.entity.TradeOrder
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.model.TradeDirection
+import java.math.BigDecimal
 
 @Service
 class TradeSessionService(
@@ -42,13 +48,17 @@ class TradeSessionService(
     private val strategyConfigurationPersistencePort: StrategyConfigurationPersistencePort,
     private val tradeSessionPersistencePort: TradeSessionPersistencePort,
     private val orderServiceBrokerPort: OrderServiceBrokerPort,
-    private val tradeOrderPersistencePort: TradeOrderPersistencePort
+    private val tradeOrderPersistencePort: TradeOrderPersistencePort,
+    private val withdrawLimitsBrokerPort: WithdrawLimitsBrokerPort,
+    private val orderLotsQuantityStrategyProvider: OrderLotsQuantityStrategyProvider
 ) : SearchTradeSessionUseCase,
     CreateTradeSessionUseCase,
     EnterTradeSessionUseCase,
     ExitTradeSessionUseCase,
     StopTradeSessionUseCase,
     ResumeTradeSessionUseCase {
+
+    private val log = LoggerFactory.getLogger(javaClass)
 
     @Transactional
     override fun createTradeSession(command: CreateTradeSessionCommand): TradeSessionId {
@@ -70,7 +80,7 @@ class TradeSessionService(
                 strategyConfiguration = strategyConfiguration,
                 ticker = command.instrument.ticker,
                 instrumentId = command.instrument.id,
-                lotsQuantity = command.lotsQuantity,
+                orderLotsQuantityStrategy = orderLotsQuantityStrategyProvider.getOrderLotsQuantityStrategy(command.orderLotsQuantityStrategyType),
                 tradeStrategy = tradeStrategy
             )
         tradeSessionPersistencePort.insert(InsertTradeSessionCommand(tradeSession))
@@ -80,35 +90,50 @@ class TradeSessionService(
     @Transactional
     override fun enterTradeSession(command: EnterTradeSessionCommand) {
         val tradeSession = tradeSessionPersistencePort.get(GetTradeSessionCommand(command.tradeSessionId))
-        val postOrderResultAccumulator =
-            postOrderWithRetry(tradeSession.lotsQuantity) { remainLotsQuantity ->
-                val postOrderResponse =
-                    if (tradeSession.isMargin()) {
-                        orderServiceBrokerPort.postBestPriceSellOrder(
-                            PostBestPriceSellOrderCommand(tradeSession.instrument, remainLotsQuantity)
-                        )
-                    } else {
-                        orderServiceBrokerPort.postBestPriceBuyOrder(
-                            PostBestPriceBuyOrderCommand(tradeSession.instrument, remainLotsQuantity)
-                        )
-                    }
-                if (postOrderResponse.executed()) {
-                    val tradeOrder =
-                        TradeOrder.create(
-                            ticker = tradeSession.ticker,
-                            instrumentId = tradeSession.instrumentId,
-                            lotsQuantity = postOrderResponse.lotsExecuted,
-                            totalPrice = postOrderResponse.totalPrice,
-                            executedCommission = postOrderResponse.executedCommission,
-                            direction = if (tradeSession.isMargin()) TradeDirection.SELL else TradeDirection.BUY,
-                            tradeSessionId = tradeSession.id
-                        )
-                    tradeOrderPersistencePort.insert(InsertTradeOrderCommand(tradeOrder))
+        val lotsRequested = tradeSession.calculateOrderLotsQuantity()
+        withdrawLimitsBrokerPort.getWithdrawLimits()
+            .onRight { depositValue ->
+                val expectedPrice =
+                    tradeSession.lastCandleClosePrice() * lotsRequested.toBigDecimal() * BigDecimal(1.01)
+                if (depositValue < expectedPrice) {
+                    log.warn("It's unable to post order, not enough money on deposit")
+                    tradeSession.resume()
+                    tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
+                    return
                 }
-                return@postOrderWithRetry postOrderResponse
+            }
+        val postOrderResultAccumulator =
+            postOrderWithRetry(lotsRequested) { remainLotsQuantity ->
+                if (tradeSession.isMargin()) {
+                    orderServiceBrokerPort.postBestPriceSellOrder(
+                        PostBestPriceSellOrderCommand(tradeSession.instrument, remainLotsQuantity)
+                    )
+                } else {
+                    orderServiceBrokerPort.postBestPriceBuyOrder(
+                        PostBestPriceBuyOrderCommand(tradeSession.instrument, remainLotsQuantity)
+                    )
+                }.onRight { postOrderResponse ->
+                    if (postOrderResponse.executed()) {
+                        val tradeOrder =
+                            TradeOrder.create(
+                                ticker = tradeSession.ticker,
+                                instrumentId = tradeSession.instrumentId,
+                                lotsQuantity = postOrderResponse.lotsExecuted,
+                                totalPrice = postOrderResponse.totalPrice,
+                                executedCommission = postOrderResponse.executedCommission,
+                                direction = if (tradeSession.isMargin()) TradeDirection.SELL else TradeDirection.BUY,
+                                tradeSessionId = tradeSession.id
+                            )
+                        tradeOrderPersistencePort.insert(InsertTradeOrderCommand(tradeOrder))
+                    }
+                }
             }
         if (postOrderResultAccumulator.haveOrders()) {
-            tradeSession.enter(postOrderResultAccumulator.lotsExecuted, postOrderResultAccumulator.averagePrice)
+            tradeSession.enter(
+                lotsRequested,
+                postOrderResultAccumulator.lotsExecuted,
+                postOrderResultAccumulator.averagePrice
+            )
         } else {
             tradeSession.resume()
         }
@@ -120,30 +145,29 @@ class TradeSessionService(
         val tradeSession = tradeSessionPersistencePort.get(GetTradeSessionCommand(command.tradeSessionId))
         val postOrderResultAccumulator =
             postOrderWithRetry(tradeSession.currentPosition.lotsQuantity) { remainLotsQuantity ->
-                val postOrderResponse =
-                    if (tradeSession.isMargin()) {
-                        orderServiceBrokerPort.postBestPriceBuyOrder(
-                            PostBestPriceBuyOrderCommand(tradeSession.instrument, remainLotsQuantity)
-                        )
-                    } else {
-                        orderServiceBrokerPort.postBestPriceSellOrder(
-                            PostBestPriceSellOrderCommand(tradeSession.instrument, remainLotsQuantity)
-                        )
+                if (tradeSession.isMargin()) {
+                    orderServiceBrokerPort.postBestPriceBuyOrder(
+                        PostBestPriceBuyOrderCommand(tradeSession.instrument, remainLotsQuantity)
+                    )
+                } else {
+                    orderServiceBrokerPort.postBestPriceSellOrder(
+                        PostBestPriceSellOrderCommand(tradeSession.instrument, remainLotsQuantity)
+                    )
+                }.onRight { postOrderResponse ->
+                    if (postOrderResponse.executed()) {
+                        val tradeOrder =
+                            TradeOrder.create(
+                                ticker = tradeSession.ticker,
+                                instrumentId = tradeSession.instrumentId,
+                                lotsQuantity = postOrderResponse.lotsExecuted,
+                                totalPrice = postOrderResponse.totalPrice,
+                                executedCommission = postOrderResponse.executedCommission,
+                                direction = if (tradeSession.isMargin()) TradeDirection.BUY else TradeDirection.SELL,
+                                tradeSessionId = tradeSession.id
+                            )
+                        tradeOrderPersistencePort.insert(InsertTradeOrderCommand(tradeOrder))
                     }
-                if (postOrderResponse.executed()) {
-                    val tradeOrder =
-                        TradeOrder.create(
-                            ticker = tradeSession.ticker,
-                            instrumentId = tradeSession.instrumentId,
-                            lotsQuantity = postOrderResponse.lotsExecuted,
-                            totalPrice = postOrderResponse.totalPrice,
-                            executedCommission = postOrderResponse.executedCommission,
-                            direction = if (tradeSession.isMargin()) TradeDirection.BUY else TradeDirection.SELL,
-                            tradeSessionId = tradeSession.id
-                        )
-                    tradeOrderPersistencePort.insert(InsertTradeOrderCommand(tradeOrder))
                 }
-                return@postOrderWithRetry postOrderResponse
             }
         if (postOrderResultAccumulator.haveOrders()) {
             tradeSession.exit(postOrderResultAccumulator.lotsExecuted)
@@ -155,12 +179,12 @@ class TradeSessionService(
 
     private fun postOrderWithRetry(
         lotsQuantity: Int,
-        postOrder: (Int) -> PostOrderResponse
+        postOrder: (Int) -> Either<Error, PostOrderResponse>
     ): PostOrderResultAccumulator {
         val postOrderResultAccumulator = PostOrderResultAccumulator(lotsQuantity)
         for (placeOrderTry in 1..tradingProperties.placeOrderRetryCount) {
-            val postOrderResponse = postOrder(postOrderResultAccumulator.remainLotsQuantity())
-            postOrderResultAccumulator.accumulate(postOrderResponse)
+            postOrder(postOrderResultAccumulator.remainLotsQuantity())
+                .onRight(postOrderResultAccumulator::accumulate)
             if (postOrderResultAccumulator.completed()) {
                 break
             }

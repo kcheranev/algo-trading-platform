@@ -24,7 +24,7 @@ class DummyTestLongStrategyFactory : LongStrategyFactory() {
         return buildTradeStrategy(series, BaseStrategy(entryRule, exitRule, 4))
     }
 
-    override fun strategyName() = "DUMMY"
+    override val strategyName = "DUMMY"
 
     override fun strategyParameterNames() = emptyList<String>()
 

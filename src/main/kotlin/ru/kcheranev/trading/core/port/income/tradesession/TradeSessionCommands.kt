@@ -4,6 +4,7 @@ import ru.kcheranev.trading.common.Default
 import ru.kcheranev.trading.core.port.model.Page
 import ru.kcheranev.trading.core.port.model.sort.Sort
 import ru.kcheranev.trading.core.port.model.sort.TradeSessionSort
+import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategyType
 import ru.kcheranev.trading.domain.entity.StrategyConfigurationId
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
@@ -12,7 +13,7 @@ import ru.kcheranev.trading.domain.model.Instrument
 
 data class CreateTradeSessionCommand(
     val strategyConfigurationId: StrategyConfigurationId,
-    val lotsQuantity: Int,
+    val orderLotsQuantityStrategyType: OrderLotsQuantityStrategyType,
     val instrument: Instrument
 )
 

@@ -4,7 +4,7 @@
       layout:decorate="~{layouts/layout}">
 <body>
 <th:block layout:fragment="content">
-    <h4>Strategy configurations</h4>
+    <h4 class="mb-4">Strategy configurations</h4>
     <div th:switch="${#lists.isEmpty(strategyConfigurations)}">
         <span th:case="true">There are no strategy configurations</span>
         <div th:case="false">

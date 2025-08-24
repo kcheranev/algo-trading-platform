@@ -16,13 +16,15 @@ class TradeSessionStoppedDomainEventProcessor(
 
     @TransactionalEventListener
     fun processTradeSessionStoppedDomainEvent(event: TradeSessionStoppedDomainEvent) {
-        log.info(
-            "Unsubscribe to the market data stream ticker=${event.instrument.ticker}, " +
-                    "candleInterval=${event.candleInterval}"
-        )
-        marketDataStreamSubscriptionBrokerPort.unsubscribeCandles(
-            UnsubscribeCandlesOrderCommand(event.instrument, event.candleInterval)
-        )
+        with(event.tradeSession) {
+            log.info("Unsubscribe to the market data stream ticker=$ticker, candleInterval=$candleInterval")
+            marketDataStreamSubscriptionBrokerPort.unsubscribeCandles(
+                UnsubscribeCandlesOrderCommand(
+                    instrument,
+                    candleInterval
+                )
+            )
+        }
     }
 
 }

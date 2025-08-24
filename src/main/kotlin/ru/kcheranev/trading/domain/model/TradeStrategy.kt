@@ -63,6 +63,13 @@ class TradeStrategy(
                 .toLocalDateTime()
         }
 
+    fun lastCandleClose(): BigDecimal? =
+        if (series.isEmpty) {
+            null
+        } else {
+            series.lastBar.closePrice.toBigDecimal()
+        }
+
     fun isFreshCandleSeries(candleInterval: CandleInterval): Boolean {
         val lastCandleDate = lastCandleDate() ?: return false
         return Duration.between(lastCandleDate, DateSupplier.currentDateTime())

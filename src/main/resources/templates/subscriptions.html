@@ -4,7 +4,7 @@
       layout:decorate="~{layouts/layout}">
 <body>
 <th:block layout:fragment="content">
-    <h4>Candle subscriptions</h4>
+    <h4 class="mb-4">Candle subscriptions</h4>
     <div th:switch="${#lists.isEmpty(candleSubscriptions)}">
         <span th:case="true">There are no candle subscriptions</span>
         <div th:case="false">

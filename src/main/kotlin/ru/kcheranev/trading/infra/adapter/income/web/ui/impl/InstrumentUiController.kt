@@ -1,0 +1,42 @@
+package ru.kcheranev.trading.infra.adapter.income.web.ui.impl
+
+import org.springframework.stereotype.Controller
+import org.springframework.ui.Model
+import org.springframework.validation.BindingResult
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import ru.kcheranev.trading.core.port.income.instrument.CreateInstrumentUseCase
+import ru.kcheranev.trading.core.port.income.instrument.FindAllInstrumentsUseCase
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.mapper.instrumentWebIncomeAdapterUiMapper
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.CreateInstrumentRequestUiDto
+
+@Controller
+@RequestMapping("ui/instruments")
+class InstrumentUiController(
+    private val createInstrumentUseCase: CreateInstrumentUseCase,
+    private val findAllInstrumentsUseCase: FindAllInstrumentsUseCase
+) {
+
+    @PostMapping
+    fun create(
+        @ModelAttribute("createInstrumentRequest") request: CreateInstrumentRequestUiDto,
+        bindingResult: BindingResult
+    ): String {
+        createInstrumentUseCase.createInstrument(
+            instrumentWebIncomeAdapterUiMapper.map(request)
+        )
+        return "redirect:/ui/instruments"
+    }
+
+    @GetMapping
+    fun findAll(model: Model): String {
+        val instruments =
+            findAllInstrumentsUseCase.findAll().map(instrumentWebIncomeAdapterUiMapper::map)
+        model.addAttribute("instruments", instruments)
+        model.addAttribute("createInstrumentRequest", CreateInstrumentRequestUiDto())
+        return "instruments"
+    }
+
+}

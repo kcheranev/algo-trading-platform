@@ -1,5 +1,6 @@
 package ru.kcheranev.trading.infra.adapter.income.web.ui.model.response
 
+import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategyType
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import java.math.BigDecimal
@@ -11,7 +12,7 @@ data class TradeSessionUiDto(
     val instrumentId: String,
     val status: TradeSessionStatus,
     val candleInterval: CandleInterval,
-    val lotsQuantity: Int,
+    val orderLotsQuantityStrategyType: OrderLotsQuantityStrategyType,
     val currentPosition: CurrentPositionUiDto,
     val strategyType: String,
     val strategyParameters: Map<String, Number>

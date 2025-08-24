@@ -1,4 +1,7 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
   application:
     name: trading-app
   datasource:

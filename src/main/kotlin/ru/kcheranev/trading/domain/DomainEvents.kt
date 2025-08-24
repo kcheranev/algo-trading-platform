@@ -1,54 +1,42 @@
 package ru.kcheranev.trading.domain
 
-import ru.kcheranev.trading.domain.entity.TradeSessionId
-import ru.kcheranev.trading.domain.model.CandleInterval
-import ru.kcheranev.trading.domain.model.Instrument
+import ru.kcheranev.trading.domain.entity.TradeSession
 
 sealed class DomainEvent
 
+sealed class TradeSessionDomainEvent : DomainEvent()
+
 data class TradeSessionCreatedDomainEvent(
-    val instrument: Instrument,
-    val candleInterval: CandleInterval
-) : DomainEvent()
+    val tradeSession: TradeSession
+) : TradeSessionDomainEvent()
 
 data class TradeSessionPendedForEntryDomainEvent(
-    val tradeSessionId: TradeSessionId,
-    val instrument: Instrument,
-    val candleInterval: CandleInterval,
-    val lotsQuantity: Int
-) : DomainEvent()
+    val tradeSession: TradeSession
+) : TradeSessionDomainEvent()
 
 data class TradeSessionPendedForExitDomainEvent(
-    val tradeSessionId: TradeSessionId,
-    val instrument: Instrument,
-    val candleInterval: CandleInterval,
-    val lotsQuantityInPosition: Int
-) : DomainEvent()
+    val tradeSession: TradeSession
+) : TradeSessionDomainEvent()
 
 data class TradeSessionEnteredDomainEvent(
-    val tradeSessionId: TradeSessionId,
-    val instrument: Instrument,
-    val candleInterval: CandleInterval
-) : DomainEvent()
+    val tradeSession: TradeSession,
+    val lotsRequested: Int
+) : TradeSessionDomainEvent()
 
 data class TradeSessionExitedDomainEvent(
-    val tradeSessionId: TradeSessionId,
-    val instrument: Instrument,
-    val candleInterval: CandleInterval
-) : DomainEvent()
+    val tradeSession: TradeSession,
+    val lotsRequested: Int,
+    val lotsExecuted: Int
+) : TradeSessionDomainEvent()
 
 data class TradeSessionStoppedDomainEvent(
-    val tradeSessionId: TradeSessionId,
-    val instrument: Instrument,
-    val candleInterval: CandleInterval
-) : DomainEvent()
+    val tradeSession: TradeSession
+) : TradeSessionDomainEvent()
 
 data class TradeStrategySeriesCandleAddedDomainEvent(
-    val tradeSessionId: TradeSessionId
-) : DomainEvent()
+    val tradeSession: TradeSession
+) : TradeSessionDomainEvent()
 
 data class TradeSessionResumedDomainEvent(
-    val tradeSessionId: TradeSessionId,
-    val instrument: Instrument,
-    val candleInterval: CandleInterval
-) : DomainEvent()
+    val tradeSession: TradeSession
+) : TradeSessionDomainEvent()

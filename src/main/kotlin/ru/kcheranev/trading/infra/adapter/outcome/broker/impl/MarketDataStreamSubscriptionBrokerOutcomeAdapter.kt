@@ -36,8 +36,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
 
     override fun subscribeCandles(command: SubscribeCandlesOrderCommand) {
         lock.withLock {
-            val instrument = command.instrument
-            val candleInterval = command.candleInterval
+            val (instrument, candleInterval) = command
             val candleSubscription = CandleSubscription(instrument, candleInterval)
             if (!candleSubscriptionCacheHolder.contains(candleSubscription)) {
                 log.info("Activate subscription for the trade session, ticker=${instrument.ticker}, candleInterval=$candleInterval")
@@ -56,8 +55,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
 
     override fun unsubscribeCandles(command: UnsubscribeCandlesOrderCommand) {
         lock.withLock {
-            val instrument = command.instrument
-            val candleInterval = command.candleInterval
+            val (instrument, candleInterval) = command
             val candleSubscription = CandleSubscription(instrument, candleInterval)
             if (!candleSubscriptionCacheHolder.contains(candleSubscription)) {
                 return

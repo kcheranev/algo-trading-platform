@@ -1,6 +1,7 @@
 package ru.kcheranev.trading.core.service
 
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import ru.kcheranev.trading.core.port.income.instrument.CreateInstrumentCommand
 import ru.kcheranev.trading.core.port.income.instrument.CreateInstrumentUseCase
 import ru.kcheranev.trading.core.port.income.instrument.FindAllInstrumentsUseCase
@@ -14,6 +15,7 @@ class InstrumentService(
 ) : CreateInstrumentUseCase,
     FindAllInstrumentsUseCase {
 
+    @Transactional
     override fun createInstrument(command: CreateInstrumentCommand) {
         val instrument =
             Instrument.create(

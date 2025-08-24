@@ -16,13 +16,12 @@ class TradeSessionResumedDomainEventProcessor(
 
     @TransactionalEventListener
     fun processTradeSessionResumedDomainEvent(event: TradeSessionResumedDomainEvent) {
-        log.info(
-            "Subscribe to the market data stream ticker=${event.instrument.ticker}, " +
-                    "candleInterval=${event.candleInterval}"
-        )
-        marketDataStreamSubscriptionBrokerPort.subscribeCandles(
-            SubscribeCandlesOrderCommand(event.instrument, event.candleInterval)
-        )
+        with(event.tradeSession) {
+            log.info("Subscribe to the market data stream ticker=${instrument.ticker}, candleInterval=$candleInterval")
+            marketDataStreamSubscriptionBrokerPort.subscribeCandles(
+                SubscribeCandlesOrderCommand(instrument, candleInterval)
+            )
+        }
     }
 
 }

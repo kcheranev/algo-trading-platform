@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.multipart.MultipartFile
 import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeUseCase
 import ru.kcheranev.trading.core.port.income.instrument.FindAllInstrumentsUseCase
 import ru.kcheranev.trading.core.port.income.strategy.GetStrategyParametersNamesCommand
@@ -15,11 +17,12 @@ import ru.kcheranev.trading.core.port.income.strategy.GetStrategyTypesUseCase
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.domain.model.backtesting.ProfitTypeSort
-import ru.kcheranev.trading.infra.adapter.income.web.ui.model.common.InstrumentUiDto
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.mapper.backtestingWebIncomeAdapterUiMapper
-import ru.kcheranev.trading.infra.adapter.income.web.ui.model.mapper.commonModelUiMapper
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.mapper.instrumentWebIncomeAdapterUiMapper
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.CandlesDataSource
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyParameterUiDto
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyParametersAnalyzeRequestUiDto
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.response.InstrumentUiResponseDto
 
 @Controller
 @RequestMapping("ui/backtesting")
@@ -40,7 +43,7 @@ class BacktestingStrategyParametersAnalyzeUiController(
     fun candleIntervals() = CandleInterval.entries.map(CandleInterval::name)
 
     @ModelAttribute("instruments")
-    fun instruments() = findAllInstrumentsUseCase.findAll().map(commonModelUiMapper::map)
+    fun instruments() = findAllInstrumentsUseCase.findAll().map(instrumentWebIncomeAdapterUiMapper::map)
 
     @GetMapping("parameters-analyze")
     fun analyzeStrategyParameters(model: Model): String {
@@ -51,18 +54,34 @@ class BacktestingStrategyParametersAnalyzeUiController(
     @PostMapping("parameters-analyze")
     fun analyzeStrategyParameters(
         @ModelAttribute("strategyParametersAnalyzeRequest") request: StrategyParametersAnalyzeRequestUiDto,
+        @RequestParam("candlesSeriesFile") candlesSeriesFile: MultipartFile?,
         model: Model,
         bindingResult: BindingResult
     ): String {
-        @Suppress("UNCHECKED_CAST")
-        val ticker =
-            (model.getAttribute("instruments") as List<InstrumentUiDto>)
-                .first { it.brokerInstrumentId == request.brokerInstrumentId }
-                .let(InstrumentUiDto::ticker)
         val analyzeResultsDto =
-            strategyAnalyzeUseCase.analyzeStrategyParameters(
-                backtestingWebIncomeAdapterUiMapper.map(request, Instrument(request.brokerInstrumentId!!, ticker))
-            ).map(backtestingWebIncomeAdapterUiMapper::map)
+            when (request.candlesSeriesSource) {
+                CandlesDataSource.FILE ->
+                    strategyAnalyzeUseCase.analyzeStrategyParametersOnStoredData(
+                        backtestingWebIncomeAdapterUiMapper.mapToStrategyParametersAnalyzeOnStoredDataCommand(
+                            request,
+                            candlesSeriesFile!!.resource
+                        )
+                    ).map(backtestingWebIncomeAdapterUiMapper::map)
+
+                CandlesDataSource.BROKER -> {
+                    @Suppress("UNCHECKED_CAST")
+                    val ticker =
+                        (model.getAttribute("instruments") as List<InstrumentUiResponseDto>)
+                            .first { it.brokerInstrumentId == request.brokerInstrumentId }
+                            .let(InstrumentUiResponseDto::ticker)
+                    strategyAnalyzeUseCase.analyzeStrategyParametersOnBrokerData(
+                        backtestingWebIncomeAdapterUiMapper.mapToStrategyParametersAnalyzeOnBrokerDataCommand(
+                            request,
+                            Instrument(request.brokerInstrumentId!!, ticker)
+                        )
+                    ).map(backtestingWebIncomeAdapterUiMapper::map)
+                }
+            }
         model.addAttribute("analyzeResults", analyzeResultsDto)
         return "backtesting/parameters-analyze"
     }

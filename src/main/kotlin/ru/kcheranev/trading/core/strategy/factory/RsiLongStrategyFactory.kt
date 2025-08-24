@@ -35,7 +35,7 @@ class RsiLongStrategyFactory : LongStrategyFactory() {
         return buildTradeStrategy(series, BaseStrategy(entryRule, exitRule, length))
     }
 
-    override fun strategyName() = "RSI"
+    override val strategyName = "RSI"
 
     override fun strategyParameterNames() = RsiStrategyLongParameter.entries.map { it.alias() }
 

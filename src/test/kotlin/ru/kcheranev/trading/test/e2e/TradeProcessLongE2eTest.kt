@@ -10,6 +10,8 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.core.port.income.marketdata.ProcessIncomeCandleCommand
 import ru.kcheranev.trading.core.service.MarketDataProcessingService
+import ru.kcheranev.trading.core.strategy.lotsquantity.LOTS_QUANTITY_STRATEGY_PARAMETER_NAME
+import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategyType
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.domain.model.CandleInterval
@@ -23,6 +25,7 @@ import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessio
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import ru.kcheranev.trading.test.IntegrationTest
 import ru.kcheranev.trading.test.stub.grpc.MarketDataBrokerGrpcStub
+import ru.kcheranev.trading.test.stub.grpc.OperationsBrokerGrpcStub
 import ru.kcheranev.trading.test.stub.grpc.OrdersBrokerGrpcStub
 import ru.kcheranev.trading.test.stub.grpc.UsersBrokerGrpcStub
 import ru.kcheranev.trading.test.stub.http.TelegramNotificationHttpStub
@@ -49,6 +52,8 @@ class TradeProcessLongE2eTest(
 
     val ordersBrokerGrpcStub = OrdersBrokerGrpcStub(testName)
 
+    val operationsBrokerGrpcStub = OperationsBrokerGrpcStub(testName)
+
     "should execute long trade process" {
         //create strategy configuration
         val strategyConfiguration =
@@ -58,7 +63,7 @@ class TradeProcessLongE2eTest(
                     name = "dummy",
                     type = "DUMMY_LONG",
                     candleInterval = CandleInterval.ONE_MIN,
-                    parameters = MapWrapper(emptyMap())
+                    parameters = MapWrapper(mapOf(LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 4))
                 )
             )
 
@@ -68,7 +73,7 @@ class TradeProcessLongE2eTest(
             "/trade-sessions",
             CreateTradeSessionRequestDto(
                 strategyConfiguration.id,
-                4,
+                OrderLotsQuantityStrategyType.HARDCODED,
                 InstrumentDto("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
             ),
             CreateTradeSessionResponseDto::class.java
@@ -77,6 +82,7 @@ class TradeProcessLongE2eTest(
 
         //income candle event
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
+        operationsBrokerGrpcStub.stubForGetWithdrawLimits("get-withdraw-limits.json")
         ordersBrokerGrpcStub.stubForPostBuyOrder("post-buy-order.json")
         ordersBrokerGrpcStub.stubForPostSellOrder("post-sell-order.json")
         telegramNotificationHttpStub.stubForSendNotification()

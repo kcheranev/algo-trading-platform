@@ -27,7 +27,7 @@ class BullishEngulfingStrategyFactory : LongStrategyFactory() {
         return buildTradeStrategy(series, BaseStrategy(entryRule, exitRule, 1))
     }
 
-    override fun strategyName() = "BULLISH_ENGULFING"
+    override val strategyName = "BULLISH_ENGULFING"
 
     override fun strategyParameterNames() = BullishEngulfingStrategyLongParameter.entries.map { it.alias() }
 

@@ -1,0 +1,11 @@
+{
+  "money": [
+    {
+      "currency": "RUB",
+      "units": "0",
+      "nano": "0"
+    }
+  ],
+  "blocked": [],
+  "blockedGuarantee": []
+}

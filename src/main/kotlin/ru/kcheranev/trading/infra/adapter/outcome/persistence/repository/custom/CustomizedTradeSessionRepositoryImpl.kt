@@ -4,8 +4,8 @@ import org.springframework.jdbc.core.JdbcTemplate
 import ru.kcheranev.trading.core.port.model.sort.TradeSessionSort
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.SearchTradeSessionCommand
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.addAndCondition
-import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.condition.EqualsCondition
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.query.EqualsCondition
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.custom.query.addAndCondition
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.rowmapper.TradeSessionEntityRowMapper
 
 private const val DEFAULT_OFFSET = 0
@@ -21,20 +21,26 @@ class CustomizedTradeSessionRepositoryImpl(
         val queryBuilder = StringBuilder()
         queryBuilder.append("SELECT * FROM trade_session")
         val conditionsBuilder = StringBuilder()
+        val parameters = mutableListOf<Any>()
         if (command.id != null) {
-            conditionsBuilder.addAndCondition(EqualsCondition("id", command.id.value))
+            conditionsBuilder.addAndCondition(EqualsCondition("id"))
+            parameters.add(command.id.value)
         }
         if (command.ticker != null) {
-            conditionsBuilder.addAndCondition(EqualsCondition("ticker", command.ticker))
+            conditionsBuilder.addAndCondition(EqualsCondition("ticker"))
+            parameters.add(command.ticker)
         }
         if (command.instrumentId != null) {
-            conditionsBuilder.addAndCondition(EqualsCondition("instrument_id", command.instrumentId))
+            conditionsBuilder.addAndCondition(EqualsCondition("instrument_id"))
+            parameters.add(command.instrumentId)
         }
         if (command.status != null) {
-            conditionsBuilder.addAndCondition(EqualsCondition("status", command.status))
+            conditionsBuilder.addAndCondition(EqualsCondition("status"))
+            parameters.add(command.status.name)
         }
         if (command.candleInterval != null) {
-            conditionsBuilder.addAndCondition(EqualsCondition("candle_interval", command.candleInterval))
+            conditionsBuilder.addAndCondition(EqualsCondition("candle_interval"))
+            parameters.add(command.candleInterval.name)
         }
         if (conditionsBuilder.isNotEmpty()) {
             queryBuilder.append(" WHERE $conditionsBuilder")
@@ -54,7 +60,7 @@ class CustomizedTradeSessionRepositoryImpl(
         } else {
             queryBuilder.append(" LIMIT $DEFAULT_LIMIT OFFSET $DEFAULT_OFFSET")
         }
-        return jdbcTemplate.query(queryBuilder.toString(), tradeSessionEntityRowMapper)
+        return jdbcTemplate.query(queryBuilder.toString(), tradeSessionEntityRowMapper, *parameters.toTypedArray())
     }
 
 }

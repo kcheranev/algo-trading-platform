@@ -9,6 +9,8 @@ import io.mockk.every
 import io.mockk.mockk
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import ru.kcheranev.trading.core.port.income.subscription.RefreshCandleSubscriptionsUseCase
+import ru.kcheranev.trading.core.strategy.lotsquantity.LOTS_QUANTITY_STRATEGY_PARAMETER_NAME
+import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategyType
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
@@ -58,11 +60,11 @@ class RefreshCandleSubscriptionsIntegrationTest(
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b13",
                 status = TradeSessionStatus.IN_POSITION,
                 candleInterval = CandleInterval.ONE_MIN,
-                lotsQuantity = 10,
+                orderLotsQuantityStrategyType = OrderLotsQuantityStrategyType.HARDCODED,
                 positionLotsQuantity = 10,
                 positionAveragePrice = BigDecimal("100"),
                 strategyType = "DUMMY_LONG",
-                strategyParameters = MapWrapper(mapOf("paramName" to 1))
+                strategyParameters = MapWrapper(mapOf("paramName" to 1, LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 10))
             )
         )
         val tradeStrategy =
@@ -100,11 +102,11 @@ class RefreshCandleSubscriptionsIntegrationTest(
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b13",
                 status = TradeSessionStatus.IN_POSITION,
                 candleInterval = CandleInterval.ONE_MIN,
-                lotsQuantity = 10,
+                orderLotsQuantityStrategyType = OrderLotsQuantityStrategyType.HARDCODED,
                 positionLotsQuantity = 10,
                 positionAveragePrice = BigDecimal("100"),
                 strategyType = "DUMMY_LONG",
-                strategyParameters = MapWrapper(mapOf("paramName" to 1))
+                strategyParameters = MapWrapper(mapOf("paramName" to 1, LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 10))
             )
         )
         val tradeStrategyId2 = UUID.randomUUID()
@@ -115,11 +117,11 @@ class RefreshCandleSubscriptionsIntegrationTest(
                 instrumentId = "b993e814-9986-4434-ae88-b086066714a0",
                 status = TradeSessionStatus.IN_POSITION,
                 candleInterval = CandleInterval.ONE_MIN,
-                lotsQuantity = 10,
+                orderLotsQuantityStrategyType = OrderLotsQuantityStrategyType.HARDCODED,
                 positionLotsQuantity = 5,
                 positionAveragePrice = BigDecimal("50"),
                 strategyType = "DUMMY_LONG",
-                strategyParameters = MapWrapper(mapOf("paramName" to 1))
+                strategyParameters = MapWrapper(mapOf("paramName" to 1, LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 10))
             )
         )
         val tradeStrategy =

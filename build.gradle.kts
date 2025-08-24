@@ -10,6 +10,7 @@ plugins {
 group = "ru.kcheranev"
 version = "1.0.0"
 
+val arrowVersion by extra("1.2.4")
 val thymeleafExtrasJava8timeVersion by extra("3.0.4.RELEASE")
 val tinkoffApiVersion by extra("1.5")
 val ta4jVersion by extra("0.17")
@@ -46,6 +47,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.retry:spring-retry")
+    implementation("io.arrow-kt:arrow-core:$arrowVersion")
     implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.thymeleaf.extras:thymeleaf-extras-java8time:$thymeleafExtrasJava8timeVersion")

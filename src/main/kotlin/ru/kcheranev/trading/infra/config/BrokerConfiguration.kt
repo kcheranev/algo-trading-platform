@@ -28,4 +28,7 @@ class BrokerConfiguration {
     @Bean
     fun marketDataService(brokerApi: BrokerApi) = brokerApi.investApi.marketDataService
 
+    @Bean
+    fun operationsService(brokerApi: BrokerApi) = brokerApi.investApi.operationsService
+
 }

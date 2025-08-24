@@ -8,12 +8,12 @@ import ru.kcheranev.trading.domain.TradeSessionPendedForEntryDomainEvent
 
 @Component
 class TradeSessionPendedForEntryDomainEventProcessor(
-    private val enterTradeSessionUseCase: EnterTradeSessionUseCase,
+    private val enterTradeSessionUseCase: EnterTradeSessionUseCase
 ) {
 
     @TransactionalEventListener
     fun processTradeSessionPendedForEntryDomainEvent(event: TradeSessionPendedForEntryDomainEvent) {
-        enterTradeSessionUseCase.enterTradeSession(EnterTradeSessionCommand(event.tradeSessionId))
+        enterTradeSessionUseCase.enterTradeSession(EnterTradeSessionCommand(event.tradeSession.id))
     }
 
 }

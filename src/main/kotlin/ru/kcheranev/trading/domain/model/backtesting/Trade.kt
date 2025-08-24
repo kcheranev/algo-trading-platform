@@ -1,7 +1,7 @@
 package ru.kcheranev.trading.domain.model.backtesting
 
-import ru.kcheranev.trading.common.date.max
-import ru.kcheranev.trading.common.date.min
+import ru.kcheranev.trading.common.max
+import ru.kcheranev.trading.common.min
 import ru.kcheranev.trading.domain.model.TradeDirection
 import java.math.BigDecimal
 

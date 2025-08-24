@@ -11,16 +11,16 @@ CREATE TABLE strategy_configuration
 
 CREATE TABLE trade_session
 (
-    id                        uuid              NOT NULL,
-    ticker                    character varying NOT NULL,
-    instrument_id             character varying NOT NULL,
-    status                    character varying NOT NULL,
-    candle_interval           character varying NOT NULL,
-    lots_quantity             integer           NOT NULL,
-    position_lots_quantity    integer           NOT NULL,
-    position_average_price    numeric           NOT NULL,
-    strategy_type             character varying NOT NULL,
-    strategy_parameters       jsonb             NOT NULL,
+    id                                uuid              NOT NULL,
+    ticker                            character varying NOT NULL,
+    instrument_id                     character varying NOT NULL,
+    status                            character varying NOT NULL,
+    candle_interval                   character varying NOT NULL,
+    order_lots_quantity_strategy_type character varying NOT NULL,
+    position_lots_quantity            integer           NOT NULL,
+    position_average_price            numeric           NOT NULL,
+    strategy_type                     character varying NOT NULL,
+    strategy_parameters               jsonb             NOT NULL,
     CONSTRAINT trade_session_pkey PRIMARY KEY (id)
 );
 

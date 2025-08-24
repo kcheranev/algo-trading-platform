@@ -3,6 +3,7 @@ package ru.kcheranev.trading.infra.adapter.outcome.persistence
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.factory.Mappers
+import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategy
 import ru.kcheranev.trading.domain.entity.Instrument
 import ru.kcheranev.trading.domain.entity.StrategyConfiguration
 import ru.kcheranev.trading.domain.entity.TradeOrder
@@ -22,6 +23,7 @@ abstract class PersistenceOutcomeAdapterMapper {
 
     @Mapping(source = "currentPosition.lotsQuantity", target = "positionLotsQuantity")
     @Mapping(source = "currentPosition.averagePrice", target = "positionAveragePrice")
+    @Mapping(source = "orderLotsQuantityStrategy.type", target = "orderLotsQuantityStrategyType")
     abstract fun map(source: TradeSession): TradeSessionEntity
 
     @Mapping(source = "entity.id", target = "id")
@@ -29,12 +31,16 @@ abstract class PersistenceOutcomeAdapterMapper {
     @Mapping(source = "entity.instrumentId", target = "instrumentId")
     @Mapping(source = "entity.status", target = "status")
     @Mapping(source = "entity.candleInterval", target = "candleInterval")
-    @Mapping(source = "entity.lotsQuantity", target = "lotsQuantity")
     @Mapping(source = "entity.positionLotsQuantity", target = "currentPosition.lotsQuantity")
     @Mapping(source = "entity.positionAveragePrice", target = "currentPosition.averagePrice")
     @Mapping(source = "tradeStrategy", target = "strategy")
+    @Mapping(source = "orderLotsQuantityStrategy", target = "orderLotsQuantityStrategy")
     @Mapping(target = "events", ignore = true)
-    abstract fun map(entity: TradeSessionEntity, tradeStrategy: TradeStrategy): TradeSession
+    abstract fun map(
+        entity: TradeSessionEntity,
+        tradeStrategy: TradeStrategy,
+        orderLotsQuantityStrategy: OrderLotsQuantityStrategy
+    ): TradeSession
 
     @Mapping(source = "positionLotsQuantity", target = "currentPosition.lotsQuantity")
     @Mapping(source = "positionAveragePrice", target = "currentPosition.averagePrice")
@@ -56,7 +62,7 @@ abstract class PersistenceOutcomeAdapterMapper {
 
     fun map(source: StrategyParameters) = MapWrapper(source)
 
-    fun map(source: MapWrapper<String>) = StrategyParameters(source.value)
+    fun map(source: MapWrapper) = StrategyParameters(source.value)
 
 }
 

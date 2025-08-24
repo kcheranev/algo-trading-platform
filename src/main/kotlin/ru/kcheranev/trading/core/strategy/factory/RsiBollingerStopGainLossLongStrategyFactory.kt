@@ -41,7 +41,7 @@ class RsiBollingerStopGainLossLongStrategyFactory : LongStrategyFactory() {
         return buildTradeStrategy(series, BaseStrategy(entryRule, exitRule, max(rsiLength, bollingerLength)))
     }
 
-    override fun strategyName() = "RSI_BOLLINGER_STOP_GAIN_LOSS"
+    override val strategyName = "RSI_BOLLINGER_STOP_GAIN_LOSS"
 
     override fun strategyParameterNames() = RsiBollingerStopGainLossStrategyParameter.entries.map { it.alias() }
 

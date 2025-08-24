@@ -20,8 +20,7 @@ data class StrategyParametersAnalyzeRequestDto(
     @Schema(description = "Strategy type") val strategyType: String,
     @Schema(description = "Strategy parameters") val strategyParameters: Map<String, Number> = emptyMap(),
     @Schema(description = "Mutable strategy parameters") val mutableStrategyParameters: Map<String, Number> = emptyMap(),
-    @Schema(description = "Division factor") val divisionFactor: BigDecimal,
-    @Schema(description = "Variants count") val variantsCount: Int,
+    @Schema(description = "Parameters mutation") val parametersMutation: StrategyParametersMutationDto,
     @Schema(description = "Backtesting result filter") val resultFilter: StrategyAnalyzeResultFilterDto?,
     @Schema(description = "Profit type sort") val profitTypeSort: ProfitTypeSort?,
     @Schema(description = "Instrument") val instrument: InstrumentDto,
@@ -34,4 +33,9 @@ data class StrategyAnalyzeResultFilterDto(
     @Schema(description = "Results limit") val resultsLimit: Int?,
     @Schema(description = "Minimal profit loss trades ratio") val minProfitLossTradesRatio: BigDecimal?,
     @Schema(description = "Trades by day count factor") val tradesByDayCountFactor: BigDecimal?
+)
+
+data class StrategyParametersMutationDto(
+    @Schema(description = "Division factor") var divisionFactor: BigDecimal,
+    @Schema(description = "Variants count") var variantsCount: Int
 )

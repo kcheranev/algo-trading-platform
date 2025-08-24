@@ -9,6 +9,8 @@ import io.mockk.mockk
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import org.springframework.http.HttpStatus
+import ru.kcheranev.trading.core.strategy.lotsquantity.LOTS_QUANTITY_STRATEGY_PARAMETER_NAME
+import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategyType
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.SearchTradeSessionRequestDto
@@ -39,11 +41,11 @@ class SearchTradeSessionIntegrationTest(
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
-                lotsQuantity = 10,
+                orderLotsQuantityStrategyType = OrderLotsQuantityStrategyType.HARDCODED,
                 positionLotsQuantity = 0,
                 positionAveragePrice = BigDecimal.ZERO,
                 strategyType = "DUMMY_LONG",
-                strategyParameters = MapWrapper(mapOf("paramName" to 1))
+                strategyParameters = MapWrapper(mapOf("paramName" to 1, LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 10))
             )
         )
         tradeStrategyCache.put(tradeSession1Id, mockk())
@@ -55,11 +57,11 @@ class SearchTradeSessionIntegrationTest(
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b2",
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
-                lotsQuantity = 10,
+                orderLotsQuantityStrategyType = OrderLotsQuantityStrategyType.HARDCODED,
                 positionLotsQuantity = 0,
                 positionAveragePrice = BigDecimal.ZERO,
                 strategyType = "DUMMY_LONG",
-                strategyParameters = MapWrapper(mapOf("paramName" to 1))
+                strategyParameters = MapWrapper(mapOf("paramName" to 1, LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 10))
             )
         )
         tradeStrategyCache.put(tradeSession2Id, mockk())

@@ -52,7 +52,7 @@ class RsiBollingerShortStrategyFactory : ShortStrategyFactory() {
         return buildTradeStrategy(series, BaseStrategy(entryRule, exitRule, max(rsiLength, bollingerLength)))
     }
 
-    override fun strategyName() = "RSI_BOLLINGER"
+    override val strategyName = "RSI_BOLLINGER"
 
     override fun strategyParameterNames() = RsiBollingerShortStrategyParameter.entries.map { it.alias() }
 

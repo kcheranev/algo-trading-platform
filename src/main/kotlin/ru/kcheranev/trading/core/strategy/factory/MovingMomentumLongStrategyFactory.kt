@@ -63,7 +63,7 @@ class MovingMomentumLongStrategyFactory : LongStrategyFactory() {
         return buildTradeStrategy(series, BaseStrategy(entryRule, exitRule))
     }
 
-    override fun strategyName() = "MOVING_MOMENTUM"
+    override val strategyName = "MOVING_MOMENTUM"
 
     override fun strategyParameterNames() = MovingMomentumLongStrategyParameter.entries.map { it.alias() }
 }

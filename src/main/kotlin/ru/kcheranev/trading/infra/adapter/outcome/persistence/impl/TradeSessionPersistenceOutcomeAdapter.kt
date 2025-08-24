@@ -15,6 +15,8 @@ import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.SearchTra
 import ru.kcheranev.trading.core.port.outcome.persistence.tradesession.TradeSessionPersistencePort
 import ru.kcheranev.trading.core.port.service.TradeStrategyServicePort
 import ru.kcheranev.trading.core.port.service.command.InitTradeStrategyCommand
+import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategyProvider
+import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategyType
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.Instrument
@@ -31,6 +33,7 @@ class TradeSessionPersistenceOutcomeAdapter(
     private val tradeSessionRepository: TradeSessionRepository,
     private val tradeStrategyCache: TradeStrategyCache,
     private val tradeStrategyServicePort: TradeStrategyServicePort,
+    private val orderLotsQuantityStrategyProvider: OrderLotsQuantityStrategyProvider,
     private val eventPublisher: ApplicationEventPublisher
 ) : TradeSessionPersistencePort {
 
@@ -56,6 +59,9 @@ class TradeSessionPersistenceOutcomeAdapter(
         }
     }
 
+    private fun getOrderLotsQuantityStrategy(orderLotsQuantityStrategyType: OrderLotsQuantityStrategyType) =
+        orderLotsQuantityStrategyProvider.getOrderLotsQuantityStrategy(orderLotsQuantityStrategyType)
+
     override fun get(command: GetTradeSessionCommand): TradeSession {
         val tradeSessionId = command.tradeSessionId
         val tradeSessionEntity =
@@ -63,8 +69,11 @@ class TradeSessionPersistenceOutcomeAdapter(
                 .orElseThrow {
                     PersistenceNotFoundException("Trade session entity with id ${tradeSessionId.value} is not exist")
                 }
-        val tradeStrategy = getOrCreateTradeStrategy(tradeSessionEntity)
-        return persistenceOutcomeAdapterMapper.map(tradeSessionEntity, tradeStrategy)
+        return persistenceOutcomeAdapterMapper.map(
+            tradeSessionEntity,
+            getOrCreateTradeStrategy(tradeSessionEntity),
+            getOrderLotsQuantityStrategy(tradeSessionEntity.orderLotsQuantityStrategyType)
+        )
     }
 
     override fun search(command: SearchTradeSessionCommand) =
@@ -73,11 +82,23 @@ class TradeSessionPersistenceOutcomeAdapter(
 
     override fun getReadyForOrderTradeSessions() =
         tradeSessionRepository.getReadyForOrderTradeSessions()
-            .map { persistenceOutcomeAdapterMapper.map(it, getOrCreateTradeStrategy(it)) }
+            .map {
+                persistenceOutcomeAdapterMapper.map(
+                    it,
+                    getOrCreateTradeStrategy(it),
+                    getOrderLotsQuantityStrategy(it.orderLotsQuantityStrategyType)
+                )
+            }
 
     override fun getReadyForOrderTradeSessions(command: GetReadyToOrderTradeSessionsCommand) =
         tradeSessionRepository.getReadyForOrderTradeSessions(command.instrumentId, command.candleInterval)
-            .map { persistenceOutcomeAdapterMapper.map(it, getOrCreateTradeStrategy(it)) }
+            .map {
+                persistenceOutcomeAdapterMapper.map(
+                    it,
+                    getOrCreateTradeStrategy(it),
+                    getOrderLotsQuantityStrategy(it.orderLotsQuantityStrategyType)
+                )
+            }
 
     override fun isReadyForOrderTradeSessionExists(command: IsReadyToOrderTradeSessionExistsCommand) =
         tradeSessionRepository.isReadyForOrderTradeSessionExists(command.instrumentId, command.candleInterval)

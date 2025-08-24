@@ -31,7 +31,7 @@ class TradeStrategyService(
         val tradeStrategy =
             strategyFactory.initStrategy(
                 command.strategyParameters,
-                CustomizedBarSeries(series, command.candleInterval)
+                CustomizedBarSeries(series)
             )
         val initCandlesAmount =
             if (tradeStrategy.unstableBars == 0) {

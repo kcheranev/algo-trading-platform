@@ -11,6 +11,8 @@ import io.kotest.matchers.shouldNotBe
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import org.springframework.http.HttpStatus
+import ru.kcheranev.trading.core.strategy.lotsquantity.LOTS_QUANTITY_STRATEGY_PARAMETER_NAME
+import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategyType
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
@@ -51,7 +53,7 @@ class CreateTradeSessionIntegrationTest(
                     name = "dummy",
                     type = "DUMMY_LONG",
                     candleInterval = CandleInterval.ONE_MIN,
-                    parameters = MapWrapper(mapOf("param1" to 1))
+                    parameters = MapWrapper(mapOf("param1" to 1, LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 1))
                 )
             )
         marketDataBrokerGrpcStub.stubForGetCandles("get-candles.json")
@@ -61,7 +63,7 @@ class CreateTradeSessionIntegrationTest(
             "/trade-sessions",
             CreateTradeSessionRequestDto(
                 strategyConfiguration.id,
-                4,
+                OrderLotsQuantityStrategyType.HARDCODED,
                 InstrumentDto("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
             ),
             CreateTradeSessionResponseDto::class.java
@@ -83,7 +85,8 @@ class CreateTradeSessionIntegrationTest(
         tradeSession.instrumentId shouldBe "e6123145-9665-43e0-8413-cd61b8aa9b1"
         tradeSession.status shouldBe TradeSessionStatus.WAITING
         tradeSession.candleInterval shouldBe CandleInterval.ONE_MIN
-        tradeSession.lotsQuantity shouldBe 4
+        tradeSession.orderLotsQuantityStrategyType shouldBe OrderLotsQuantityStrategyType.HARDCODED
+        tradeSession.strategyParameters.value shouldBe mapOf("param1" to 1, LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 1)
 
         val tradeStrategies = tradeSessionCache.tradeStrategies
         tradeStrategies shouldHaveSize 1

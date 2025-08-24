@@ -1,4 +1,4 @@
-package ru.kcheranev.trading.common.date
+package ru.kcheranev.trading.common
 
 import java.math.BigDecimal
 import java.math.RoundingMode

@@ -1,4 +1,4 @@
-package ru.kcheranev.trading.common.date
+package ru.kcheranev.trading.common
 
 import org.springframework.cache.Cache
 

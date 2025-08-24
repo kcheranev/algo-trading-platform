@@ -18,5 +18,5 @@ data class StrategyConfigurationEntity(
     @Column("candle_interval")
     val candleInterval: CandleInterval,
     @Column("parameters")
-    val parameters: MapWrapper<String>
+    val parameters: MapWrapper
 )

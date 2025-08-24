@@ -5,8 +5,12 @@ import ru.kcheranev.trading.domain.model.backtesting.StrategyParametersAnalyzeRe
 
 interface StrategyAnalyzeUseCase {
 
-    fun analyzeStrategy(command: StrategyAnalyzeCommand): StrategyAnalyzeResult
+    fun analyzeStrategyOnBrokerData(command: StrategyAnalyzeOnBrokerDataCommand): StrategyAnalyzeResult
 
-    fun analyzeStrategyParameters(command: StrategyParametersAnalyzeCommand): List<StrategyParametersAnalyzeResult>
+    fun analyzeStrategyOnStoredData(command: StrategyAnalyzeOnStoredDataCommand): StrategyAnalyzeResult
+
+    fun analyzeStrategyParametersOnBrokerData(command: StrategyParametersAnalyzeOnBrokerDataCommand): List<StrategyParametersAnalyzeResult>
+
+    fun analyzeStrategyParametersOnStoredData(command: StrategyParametersAnalyzeOnStoredDataCommand): List<StrategyParametersAnalyzeResult>
 
 }

@@ -2,8 +2,8 @@ package ru.kcheranev.trading.infra.adapter.income.web.rest.model.mapper
 
 import org.mapstruct.Mapper
 import org.mapstruct.factory.Mappers
-import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeCommand
-import ru.kcheranev.trading.core.port.income.backtesting.StrategyParametersAnalyzeCommand
+import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeOnBrokerDataCommand
+import ru.kcheranev.trading.core.port.income.backtesting.StrategyParametersAnalyzeOnBrokerDataCommand
 import ru.kcheranev.trading.domain.model.backtesting.DailyStrategyAnalyzeResult
 import ru.kcheranev.trading.domain.model.backtesting.StrategyAnalyzeResult
 import ru.kcheranev.trading.domain.model.backtesting.StrategyParametersAnalyzeResult
@@ -17,9 +17,9 @@ import ru.kcheranev.trading.infra.adapter.mapper.EntityIdMapper
 @Mapper(uses = [EntityIdMapper::class])
 abstract class BacktestingWebIncomeAdapterMapper {
 
-    abstract fun map(source: StrategyAnalyzeRequestDto): StrategyAnalyzeCommand
+    abstract fun map(source: StrategyAnalyzeRequestDto): StrategyAnalyzeOnBrokerDataCommand
 
-    abstract fun map(source: StrategyParametersAnalyzeRequestDto): StrategyParametersAnalyzeCommand
+    abstract fun map(source: StrategyParametersAnalyzeRequestDto): StrategyParametersAnalyzeOnBrokerDataCommand
 
     abstract fun map(source: StrategyAnalyzeResult): StrategyAnalyzeResultDto
 

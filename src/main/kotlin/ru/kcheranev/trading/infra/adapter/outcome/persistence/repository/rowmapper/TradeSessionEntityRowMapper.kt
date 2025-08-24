@@ -3,6 +3,7 @@ package ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.rowmap
 import org.postgresql.util.PGobject
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Component
+import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategyType
 import ru.kcheranev.trading.domain.entity.TradeSessionStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
@@ -22,7 +23,7 @@ class TradeSessionEntityRowMapper(
             instrumentId = rs.getString("instrument_id"),
             status = TradeSessionStatus.valueOf(rs.getString("status")),
             candleInterval = CandleInterval.valueOf(rs.getString("candle_interval")),
-            lotsQuantity = rs.getInt("lots_quantity"),
+            orderLotsQuantityStrategyType = OrderLotsQuantityStrategyType.valueOf(rs.getString("order_lots_quantity_strategy_type")),
             positionLotsQuantity = rs.getInt("position_lots_quantity"),
             positionAveragePrice = rs.getBigDecimal("position_average_price"),
             strategyType = rs.getString("strategy_type"),

@@ -38,6 +38,13 @@ class OrdersBrokerGrpcStub(testName: String) : AbstractGrpcStub(testName) {
         stubForPostOrder(fileName, newMatchConditions)
     }
 
+    fun stubForPostOrderFailed() {
+        ordersService.stubFor(
+            WireMockGrpc.method("PostOrder")
+                .willReturn(WireMockGrpc.Status.INTERNAL, "Error")
+        )
+    }
+
     private fun stubForPostOrder(responseFileName: String, matchConditions: Map<String, String> = emptyMap()) {
         ordersService.stubFor(
             WireMockGrpc.method("PostOrder")
@@ -90,6 +97,12 @@ class OrdersBrokerGrpcStub(testName: String) : AbstractGrpcStub(testName) {
             requests[0].bodyAsString,
             CustomComparator(JSONCompareMode.STRICT, Customization("orderId") { _, _ -> true })
         )
+    }
+
+    fun verifyForNoPostOrder() {
+        val requests =
+            grpcWireMockServer.findAll(postRequestedFor(urlMatching("/${OrdersServiceGrpc.SERVICE_NAME}/PostOrder")))
+        requests.shouldHaveSize(0)
     }
 
 }

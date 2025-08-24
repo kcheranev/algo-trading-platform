@@ -28,9 +28,9 @@ abstract class LongStrategyFactory : StrategyFactory {
             strategy = strategy
         )
 
-    protected abstract fun strategyName(): String
+    protected abstract val strategyName: String
 
-    override fun strategyType() = strategyName() + "_LONG"
+    override fun strategyType() = "${strategyName}_LONG"
 
 }
 
@@ -43,8 +43,8 @@ abstract class ShortStrategyFactory : StrategyFactory {
             strategy = strategy
         )
 
-    protected abstract fun strategyName(): String
+    protected abstract val strategyName: String
 
-    override fun strategyType() = strategyName() + "_SHORT"
+    override fun strategyType() = "${strategyName}_SHORT"
 
 }
