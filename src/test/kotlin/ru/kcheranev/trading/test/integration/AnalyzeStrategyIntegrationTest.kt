@@ -11,8 +11,11 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.TradeDirection
+import ru.kcheranev.trading.domain.model.backtesting.ProfitTypeSort
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.common.InstrumentDto
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StrategyAnalyzeRequestDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StrategyAnalyzeResultFilterDto
+import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StrategyParametersMutationDto
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.StrategyAnalyzeResponseDto
 import ru.kcheranev.trading.test.IntegrationTest
 import ru.kcheranev.trading.test.stub.grpc.MarketDataBrokerGrpcStub
@@ -39,10 +42,21 @@ class AnalyzeStrategyIntegrationTest(
 
         //when
         val strategyAnalyzeResponse = testRestTemplate.postForEntity(
-            "/backtesting/analyze",
+            "/backtesting",
             StrategyAnalyzeRequestDto(
                 strategyType = "DUMMY_LONG",
                 strategyParameters = emptyMap(),
+                mutableStrategyParameters = emptyMap(),
+                parametersMutation = StrategyParametersMutationDto(
+                    divisionFactor = BigDecimal(2),
+                    variantsCount = 5,
+                ),
+                resultFilter = StrategyAnalyzeResultFilterDto(
+                    resultsLimit = 1,
+                    minProfitLossTradesRatio = BigDecimal(1),
+                    tradesByDayCountFactor = BigDecimal(1)
+                ),
+                profitTypeSort = ProfitTypeSort.GROSS,
                 instrument = InstrumentDto("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
                 candleInterval = CandleInterval.ONE_MIN,
                 from = LocalDate.parse("2024-01-30"),
@@ -53,7 +67,9 @@ class AnalyzeStrategyIntegrationTest(
 
         //then
         strategyAnalyzeResponse.statusCode shouldBe HttpStatus.OK
-        val strategyAnalyzeResult = strategyAnalyzeResponse.body?.analyzeResult
+        val strategyParametersAnalyzeResult = strategyAnalyzeResponse.body?.analyzeResults?.first()
+        strategyParametersAnalyzeResult.shouldNotBeNull()
+        val strategyAnalyzeResult = strategyParametersAnalyzeResult.analyzeResult
         strategyAnalyzeResult.shouldNotBeNull()
         strategyAnalyzeResult.strategyAnalyzeResultByMonth shouldHaveSize 1
         strategyAnalyzeResult.strategyAnalyzeResultByMonth.keys.first() shouldBe YearMonth.parse("2024-01")

@@ -12,45 +12,36 @@ enum class CandlesDataSource {
 }
 
 data class StrategyAnalyzeRequestUiDto(
-    var strategyType: String? = null,
-    var strategyParameters: MutableMap<String, Number?> = mutableMapOf(),
-    var brokerInstrumentId: String? = null,
-    var candleInterval: CandleInterval? = null,
-    var from: LocalDate? = null,
-    var to: LocalDate? = null,
-    val candlesSeriesSource: CandlesDataSource = CandlesDataSource.BROKER
-)
-
-data class StrategyParametersAnalyzeRequestUiDto(
-    var strategyType: String? = null,
-    var strategyParameters: MutableMap<String, StrategyParameterUiDto> = mutableMapOf(),
-    var parametersMutation: StrategyParametersMutationUiDto = StrategyParametersMutationUiDto(),
-    var resultFilter: StrategyAnalyzeResultFilterUiDto = StrategyAnalyzeResultFilterUiDto(),
-    var profitTypeSort: ProfitTypeSort = ProfitTypeSort.NET,
-    var brokerInstrumentId: String? = null,
-    var candleInterval: CandleInterval? = null,
-    var from: LocalDate? = null,
-    var to: LocalDate? = null,
-    val candlesSeriesSource: CandlesDataSource = CandlesDataSource.BROKER
+    val strategyType: String? = null,
+    val strategyParameters: MutableMap<String, StrategyParameterUiDto> = mutableMapOf(),
+    val parametersMutation: StrategyParametersMutationUiDto = StrategyParametersMutationUiDto(),
+    val resultFilter: StrategyAnalyzeResultFilterUiDto = StrategyAnalyzeResultFilterUiDto(),
+    val profitTypeSort: ProfitTypeSort = ProfitTypeSort.NET,
+    val brokerInstrumentId: String? = null,
+    val candleInterval: CandleInterval? = null,
+    val from: LocalDate? = null,
+    val to: LocalDate? = null,
+    val candlesSeriesSource: CandlesDataSource = CandlesDataSource.FILE,
+    var candlesSeriesFileName: String? = null
 )
 
 data class StrategyParameterUiDto(
-    var value: Number? = null,
-    var mutable: Boolean? = null
+    val value: Number? = null,
+    val mutable: Boolean? = null
 )
 
 data class CheckedValueUiDto(
-    var value: BigDecimal,
-    var checked: Boolean
+    val value: BigDecimal,
+    val checked: Boolean
 )
 
 data class StrategyAnalyzeResultFilterUiDto(
-    var resultsLimit: Int = 15,
-    var minProfitLossTradesRatio: CheckedValueUiDto = CheckedValueUiDto(BigDecimal(1), false),
-    var tradesByDayCountFactor: CheckedValueUiDto = CheckedValueUiDto(BigDecimal(1), false)
+    val resultsLimit: Int = 15,
+    val minProfitLossTradesRatio: CheckedValueUiDto = CheckedValueUiDto(BigDecimal(1), false),
+    val tradesByDayCountFactor: CheckedValueUiDto = CheckedValueUiDto(BigDecimal(1), false)
 )
 
 data class StrategyParametersMutationUiDto(
-    var divisionFactor: BigDecimal = BigDecimal(2),
-    var variantsCount: Int = 5
+    val divisionFactor: BigDecimal = BigDecimal(2),
+    val variantsCount: Int = 5
 )

@@ -17,14 +17,14 @@ class HistoricCandlesService(
 
     override fun storeHistoricCandles(command: StoreHistoricCandlesCommand) {
         val (instrument, from, to, candleInterval) = command
-        val command =
+        val getHistoricCandlesForLongPeriodCommand =
             GetHistoricCandlesForLongPeriodCommand(
                 instrument = Instrument(id = instrument.id, ticker = instrument.ticker),
                 from = from,
                 to = to,
                 candleInterval = candleInterval
             )
-        val candles = historicCandleBrokerOutcomeAdapter.getHistoricCandlesForLongPeriod(command)
+        val candles = historicCandleBrokerOutcomeAdapter.getHistoricCandlesForLongPeriod(getHistoricCandlesForLongPeriodCommand)
         val fileName = "${instrument.ticker}_from-${from}_to-${to}_$candleInterval"
         File("$fileName.json").writeText(objectMapper.writeValueAsString(candles))
     }

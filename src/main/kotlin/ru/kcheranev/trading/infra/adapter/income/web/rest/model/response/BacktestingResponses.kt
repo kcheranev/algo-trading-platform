@@ -6,12 +6,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 
-data class StrategyParametersAnalyzeResponseDto(
-    val analyzeResults: List<StrategyParametersAnalyzeResultDto>
-)
-
 data class StrategyAnalyzeResponseDto(
-    val analyzeResult: StrategyAnalyzeResultDto
+    val analyzeResults: List<StrategyParametersAnalyzeResultDto>
 )
 
 data class StrategyParametersAnalyzeResultDto(

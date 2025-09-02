@@ -11,21 +11,6 @@ import java.time.LocalDate
 data class StrategyAnalyzeOnBrokerDataCommand(
     val strategyType: String,
     val strategyParameters: StrategyParameters,
-    val instrument: Instrument,
-    val candleInterval: CandleInterval,
-    val from: LocalDate,
-    val to: LocalDate
-)
-
-data class StrategyAnalyzeOnStoredDataCommand(
-    val strategyType: String,
-    val strategyParameters: StrategyParameters,
-    val candlesSeriesFile: Resource
-)
-
-data class StrategyParametersAnalyzeOnBrokerDataCommand(
-    val strategyType: String,
-    val strategyParameters: StrategyParameters,
     val mutableStrategyParameters: StrategyParameters,
     val parametersMutation: StrategyParametersMutation,
     val resultFilter: StrategyAnalyzeResultFilter?,
@@ -36,7 +21,7 @@ data class StrategyParametersAnalyzeOnBrokerDataCommand(
     val to: LocalDate
 )
 
-data class StrategyParametersAnalyzeOnStoredDataCommand(
+data class StrategyAnalyzeOnStoredDataCommand(
     val strategyType: String,
     val strategyParameters: StrategyParameters,
     val mutableStrategyParameters: StrategyParameters,

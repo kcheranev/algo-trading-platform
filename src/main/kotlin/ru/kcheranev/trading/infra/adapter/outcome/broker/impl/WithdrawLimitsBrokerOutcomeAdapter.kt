@@ -3,13 +3,11 @@ package ru.kcheranev.trading.infra.adapter.outcome.broker.impl
 import arrow.core.Either
 import arrow.core.Either.Companion.catch
 import arrow.core.raise.either
-import arrow.core.raise.ensureNotNull
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import ru.kcheranev.trading.common.defaultCurrency
 import ru.kcheranev.trading.core.error.BrokerIntegrationError
 import ru.kcheranev.trading.core.error.GetWithdrawLimitsError
-import ru.kcheranev.trading.core.error.NoRubleMoneyError
 import ru.kcheranev.trading.core.port.outcome.broker.WithdrawLimitsBrokerPort
 import ru.tinkoff.piapi.core.OperationsService
 import java.math.BigDecimal
@@ -30,9 +28,10 @@ class WithdrawLimitsBrokerOutcomeAdapter(
                     .onLeft { ex -> log.error("An error has been occurred while getting withdraw limits", ex) }
                     .mapLeft { GetWithdrawLimitsError }
                     .bind()
-            val money = withdrawLimits.money.first { it.currency == defaultCurrency }
-            ensureNotNull(money) { NoRubleMoneyError }
-            money.value
+            withdrawLimits.money
+                .firstOrNull { money -> money.currency.equals(defaultCurrency, true) }
+                ?.value
+                ?: BigDecimal.ZERO
         }
 
 }

@@ -6,12 +6,12 @@ import java.math.BigDecimal
 class StrategyParameters(map: Map<String, Number>) : HashMap<String, Number>(map) {
 
     fun getAsInt(key: String) =
-        get(key) as Int? ?: throw StrategyParamValidationException("Trade strategy parameter $key is not present")
+        get(key)?.toInt() ?: throw StrategyParamValidationException("Trade strategy parameter $key is not present")
 
     fun getAsInt(strategyParameter: StrategyParameter) = getAsInt(strategyParameter.alias())
 
     fun getAsBigDecimal(key: String) =
-        get(key) as BigDecimal?
+        get(key)?.let { parameterValue -> BigDecimal(parameterValue.toString()) }
             ?: throw StrategyParamValidationException("Trade strategy parameter $key is not present")
 
     fun getAsBigDecimal(strategyParameter: StrategyParameter) = getAsBigDecimal(strategyParameter.alias())

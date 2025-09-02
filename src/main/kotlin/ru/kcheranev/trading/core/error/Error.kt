@@ -36,12 +36,6 @@ data object GetWithdrawLimitsError : BrokerIntegrationError {
 
 }
 
-data object NoRubleMoneyError : BrokerIntegrationError {
-
-    override val message = "There is no ruble money on trading account"
-
-}
-
 data object NotificationError : IntegrationError {
 
     override val message = "An error has been occurred while sending a notification"

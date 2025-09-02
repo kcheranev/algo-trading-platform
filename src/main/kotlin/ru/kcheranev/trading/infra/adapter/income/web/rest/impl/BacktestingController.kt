@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeUseCase
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.mapper.backtestingWebIncomeAdapterMapper
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StrategyAnalyzeRequestDto
-import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.StrategyParametersAnalyzeRequestDto
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.StrategyAnalyzeResponseDto
-import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.StrategyParametersAnalyzeResponseDto
 
 @Tag(name = "Backtesting")
 @RestController
@@ -20,20 +18,11 @@ class BacktestingController(
     private val strategyAnalyzeUseCase: StrategyAnalyzeUseCase
 ) {
 
-    @Operation(summary = "Analyze trade strategy")
-    @PostMapping("analyze")
-    fun analyzeStrategy(@RequestBody request: StrategyAnalyzeRequestDto) =
+    @Operation(summary = "Analyze strategy")
+    @PostMapping
+    fun analyzeStrategyParameters(@RequestBody request: StrategyAnalyzeRequestDto) =
         StrategyAnalyzeResponseDto(
-            backtestingWebIncomeAdapterMapper.map(
-                strategyAnalyzeUseCase.analyzeStrategyOnBrokerData(backtestingWebIncomeAdapterMapper.map(request))
-            )
-        )
-
-    @Operation(summary = "Analyze strategy parameters")
-    @PostMapping("analyze-parameters")
-    fun analyzeStrategyParameters(@RequestBody request: StrategyParametersAnalyzeRequestDto) =
-        StrategyParametersAnalyzeResponseDto(
-            strategyAnalyzeUseCase.analyzeStrategyParametersOnBrokerData(backtestingWebIncomeAdapterMapper.map(request))
+            strategyAnalyzeUseCase.analyzeStrategyOnBrokerData(backtestingWebIncomeAdapterMapper.map(request))
                 .map(backtestingWebIncomeAdapterMapper::map)
         )
 

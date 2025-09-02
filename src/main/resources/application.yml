@@ -1,7 +1,9 @@
 spring:
   servlet:
     multipart:
+      enabled: true
       max-file-size: 50MB
+      max-request-size: 50MB
   application:
     name: trading-app
   datasource:
@@ -18,6 +20,8 @@ spring:
       use-big-decimal-for-floats: true
 
 application:
+  backtesting:
+    tempFileDirectory: ${TEMP_FILE_DIRECTORY}
   trading:
     default-commission: 0.0004
     available-delayed-candles-count: 3

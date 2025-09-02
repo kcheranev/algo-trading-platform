@@ -9,15 +9,6 @@ import java.time.LocalDate
 
 data class StrategyAnalyzeRequestDto(
     @Schema(description = "Strategy type") val strategyType: String,
-    @Schema(description = "Strategy parameters") val strategyParameters: Map<String, Number>,
-    @Schema(description = "Instrument") val instrument: InstrumentDto,
-    @Schema(description = "Candle interval") val candleInterval: CandleInterval,
-    @Schema(description = "Start of strategy backtesting period") val from: LocalDate,
-    @Schema(description = "End of strategy backtesting period") val to: LocalDate
-)
-
-data class StrategyParametersAnalyzeRequestDto(
-    @Schema(description = "Strategy type") val strategyType: String,
     @Schema(description = "Strategy parameters") val strategyParameters: Map<String, Number> = emptyMap(),
     @Schema(description = "Mutable strategy parameters") val mutableStrategyParameters: Map<String, Number> = emptyMap(),
     @Schema(description = "Parameters mutation") val parametersMutation: StrategyParametersMutationDto,

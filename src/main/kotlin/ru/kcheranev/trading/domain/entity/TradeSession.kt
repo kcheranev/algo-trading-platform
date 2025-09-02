@@ -44,8 +44,7 @@ data class TradeSession(
 
     val instrument = Instrument(instrumentId, ticker)
 
-    val about =
-        "[id=${id.value}, ticker=$ticker, strategyType=$strategyType, candleInterval=$candleInterval, status=$status]"
+    val about = "[id=${id.value}, ticker=$ticker, strategyType=$strategyType, candleInterval=$candleInterval, status=$status]"
 
     fun processIncomeCandle(candle: Candle) {
         val isReadyForOrder = status == WAITING || status == IN_POSITION

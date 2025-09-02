@@ -1,5 +1,6 @@
-package ru.kcheranev.trading.infra.adapter.income.web.ui.impl.backtesting
+package ru.kcheranev.trading.infra.adapter.income.web.ui.impl
 
+import org.springframework.core.io.FileSystemResource
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.validation.BindingResult
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.SessionAttributes
 import org.springframework.web.multipart.MultipartFile
 import ru.kcheranev.trading.core.port.income.backtesting.StrategyAnalyzeUseCase
 import ru.kcheranev.trading.core.port.income.instrument.FindAllInstrumentsUseCase
@@ -20,18 +22,26 @@ import ru.kcheranev.trading.domain.model.backtesting.ProfitTypeSort
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.mapper.backtestingWebIncomeAdapterUiMapper
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.mapper.instrumentWebIncomeAdapterUiMapper
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.CandlesDataSource
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyAnalyzeRequestUiDto
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyParameterUiDto
-import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyParametersAnalyzeRequestUiDto
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.response.InstrumentUiResponseDto
+import ru.kcheranev.trading.infra.config.properties.BacktestingProperties
+import java.nio.file.Paths
+import kotlin.io.path.createTempFile
+import kotlin.io.path.writeBytes
 
 @Controller
 @RequestMapping("ui/backtesting")
-class BacktestingStrategyParametersAnalyzeUiController(
+@SessionAttributes(names = ["candlesSeriesSystemFileName", "candlesSeriesFileName"])
+class BacktestingUiController(
     private val strategyAnalyzeUseCase: StrategyAnalyzeUseCase,
     private val getStrategyTypesUseCase: GetStrategyTypesUseCase,
     private val getStrategyParametersNamesUseCase: GetStrategyParametersNamesUseCase,
-    private val findAllInstrumentsUseCase: FindAllInstrumentsUseCase
+    private val findAllInstrumentsUseCase: FindAllInstrumentsUseCase,
+    backtestingProperties: BacktestingProperties
 ) {
+
+    private val tempFileDirectory = backtestingProperties.tempFileDirectory
 
     @ModelAttribute("strategyTypes")
     fun strategyTypes() = getStrategyTypesUseCase.getStrategyTypes()
@@ -45,28 +55,45 @@ class BacktestingStrategyParametersAnalyzeUiController(
     @ModelAttribute("instruments")
     fun instruments() = findAllInstrumentsUseCase.findAll().map(instrumentWebIncomeAdapterUiMapper::map)
 
-    @GetMapping("parameters-analyze")
+    @GetMapping
     fun analyzeStrategyParameters(model: Model): String {
-        model.addAttribute("strategyParametersAnalyzeRequest", StrategyParametersAnalyzeRequestUiDto())
-        return "backtesting/parameters-analyze"
+        model.addAttribute("strategyAnalyzeRequest", StrategyAnalyzeRequestUiDto())
+        return "backtesting"
     }
 
-    @PostMapping("parameters-analyze")
+    @PostMapping
     fun analyzeStrategyParameters(
-        @ModelAttribute("strategyParametersAnalyzeRequest") request: StrategyParametersAnalyzeRequestUiDto,
+        @ModelAttribute("strategyAnalyzeRequest") request: StrategyAnalyzeRequestUiDto,
         @RequestParam("candlesSeriesFile") candlesSeriesFile: MultipartFile?,
         model: Model,
         bindingResult: BindingResult
     ): String {
         val analyzeResultsDto =
             when (request.candlesSeriesSource) {
-                CandlesDataSource.FILE ->
-                    strategyAnalyzeUseCase.analyzeStrategyParametersOnStoredData(
-                        backtestingWebIncomeAdapterUiMapper.mapToStrategyParametersAnalyzeOnStoredDataCommand(
+                CandlesDataSource.FILE -> {
+                    val candlesSeriesFileResource =
+                        if (candlesSeriesFile!!.originalFilename!!.isNotEmpty()) {
+                            val tempCandleSeriesFile =
+                                createTempFile(
+                                    directory = Paths.get(tempFileDirectory),
+                                    prefix = "candle_series",
+                                    suffix = ".json"
+                                )
+                            tempCandleSeriesFile.writeBytes(candlesSeriesFile.resource.contentAsByteArray)
+                            tempCandleSeriesFile.toFile().deleteOnExit()
+                            model.addAttribute("candlesSeriesFileName", candlesSeriesFile.originalFilename)
+                            model.addAttribute("candlesSeriesSystemFileName", tempCandleSeriesFile.toFile().name)
+                            candlesSeriesFile.resource
+                        } else {
+                            FileSystemResource("$tempFileDirectory/${model.getAttribute("candlesSeriesSystemFileName")}")
+                        }
+                    strategyAnalyzeUseCase.analyzeStrategyOnStoredData(
+                        backtestingWebIncomeAdapterUiMapper.mapToStrategyAnalyzeOnStoredDataCommand(
                             request,
-                            candlesSeriesFile!!.resource
+                            candlesSeriesFileResource
                         )
                     ).map(backtestingWebIncomeAdapterUiMapper::map)
+                }
 
                 CandlesDataSource.BROKER -> {
                     @Suppress("UNCHECKED_CAST")
@@ -74,8 +101,8 @@ class BacktestingStrategyParametersAnalyzeUiController(
                         (model.getAttribute("instruments") as List<InstrumentUiResponseDto>)
                             .first { it.brokerInstrumentId == request.brokerInstrumentId }
                             .let(InstrumentUiResponseDto::ticker)
-                    strategyAnalyzeUseCase.analyzeStrategyParametersOnBrokerData(
-                        backtestingWebIncomeAdapterUiMapper.mapToStrategyParametersAnalyzeOnBrokerDataCommand(
+                    strategyAnalyzeUseCase.analyzeStrategyOnBrokerData(
+                        backtestingWebIncomeAdapterUiMapper.mapToStrategyAnalyzeOnBrokerDataCommand(
                             request,
                             Instrument(request.brokerInstrumentId!!, ticker)
                         )
@@ -83,19 +110,19 @@ class BacktestingStrategyParametersAnalyzeUiController(
                 }
             }
         model.addAttribute("analyzeResults", analyzeResultsDto)
-        return "backtesting/parameters-analyze"
+        return "backtesting"
     }
 
-    @PostMapping(value = ["parameters-analyze"], params = ["reloadStrategyParameters"])
+    @PostMapping(params = ["reloadStrategyParameters"])
     fun reloadStrategyParameters(
-        @ModelAttribute("strategyParametersAnalyzeRequest") request: StrategyParametersAnalyzeRequestUiDto,
+        @ModelAttribute("strategyAnalyzeRequest") request: StrategyAnalyzeRequestUiDto,
         bindingResult: BindingResult
     ): String {
         request.strategyParameters.clear()
         getStrategyParametersNamesUseCase.getStrategyParametersNames(
             GetStrategyParametersNamesCommand(request.strategyType!!)
         ).forEach { request.strategyParameters[it] = StrategyParameterUiDto() }
-        return "backtesting/parameters-analyze"
+        return "backtesting"
     }
 
 }

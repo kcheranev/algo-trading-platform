@@ -4,9 +4,9 @@
       layout:decorate="~{layouts/layout}">
 <body>
 <th:block layout:fragment="content">
-    <h4 class="mb-5">Backtesting parameters analyze</h4>
-    <form id="analyzeForm" action="#" th:action="@{/ui/backtesting/parameters-analyze}"
-          enctype="multipart/form-data" th:object="${strategyParametersAnalyzeRequest}"
+    <h4 class="mb-5">Backtesting</h4>
+    <form id="analyzeForm" action="#" th:action="@{/ui/backtesting}"
+          enctype="multipart/form-data" th:object="${strategyAnalyzeRequest}"
           method="post" class="row gy-3 mb-5">
         <div class="col-12"><h5>Base parameters</h5></div>
         <div class="col-6">
@@ -23,8 +23,26 @@
                     </select>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="candlesSeriesProvider"
-                           id="candlesSeriesBrokerOption" value="BROKER" checked th:field="*{candlesSeriesSource}">
+                    <input class="form-check-input" type="radio"
+                           id="candlesSeriesFileOption" value="FILE" checked th:field="*{candlesSeriesSource}">
+                    <label class="form-check-label" for="candlesSeriesFileOption">
+                        <h5>Candles series from file</h5>
+                    </label>
+                    <div class="row gy-3 mt-1" id="fileInputFields">
+                        <div class="col-12">
+                            <label for="candlesSeriesFile" class="form-label">Candles series file</label>
+                            <input id="candlesSeriesFile" type="file" name="candlesSeriesFile" class="form-control"
+                                   accept=".json">
+                        </div>
+                        <th:block th:if="${session.candlesSeriesFileName != null}">
+                            <small class="text-body-secondary"
+                                   th:text="'Loaded file ' + ${session.candlesSeriesFileName}"></small>
+                        </th:block>
+                    </div>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio"
+                           id="candlesSeriesBrokerOption" value="BROKER" th:field="*{candlesSeriesSource}">
                     <label class="form-check-label" for="candlesSeriesBrokerOption">
                         <h5>Candles series from broker api</h5>
                     </label>
@@ -61,29 +79,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="candlesSeriesProvider"
-                           id="candlesSeriesFileOption" value="FILE" th:field="*{candlesSeriesSource}">
-                    <label class="form-check-label" for="candlesSeriesFileOption">
-                        <h5>Candles series from file</h5>
-                    </label>
-                    <div class="row gy-3 mt-1" id="fileInputFields">
-                        <div class="col-12">
-                            <label for="candlesSeriesFile" class="form-label">Candles series file</label>
-                            <input id="candlesSeriesFile" type="file" name="candlesSeriesFile" class="form-control"
-                                   accept=".json">
-                        </div>
-                    </div>
-                </div>
                 <div class="col-12"><h5>Mutation parameters</h5></div>
                 <div class="col-6">
                     <label for="divisionFactor" class="form-label">Division factor</label>
-                    <input id="divisionFactor" type="text" class="form-control"
+                    <input id="divisionFactor" type="number" step="any" class="form-control"
                            th:field="*{parametersMutation.divisionFactor}">
                 </div>
                 <div class="col-6">
                     <label for="variantsCount" class="form-label">Variants count</label>
-                    <input id="variantsCount" type="text" class="form-control"
+                    <input id="variantsCount" type="number" step="any" class="form-control"
                            th:field="*{parametersMutation.variantsCount}">
                 </div>
                 <div class="col-12"><h5>Result filtering</h5></div>
@@ -94,7 +98,7 @@
                             <input class="form-check-input mt-0" type="checkbox"
                                    th:field="*{resultFilter.minProfitLossTradesRatio.checked}">
                         </div>
-                        <input id="minProfitLossTradesRatio" type="text" class="form-control"
+                        <input id="minProfitLossTradesRatio" type="number" step="any" class="form-control"
                                th:field="*{resultFilter.minProfitLossTradesRatio.value}">
                     </div>
                 </div>
@@ -105,13 +109,14 @@
                             <input class="form-check-input mt-0" type="checkbox"
                                    th:field="*{resultFilter.tradesByDayCountFactor.checked}">
                         </div>
-                        <input id="tradesByDayCountFactor" type="text" class="form-control"
+                        <input id="tradesByDayCountFactor" type="number" step="any" class="form-control"
                                th:field="*{resultFilter.tradesByDayCountFactor.value}">
                     </div>
                 </div>
                 <div class="col-6">
                     <label for="resultsLimit" class="form-label">Result limit</label>
-                    <input id="resultsLimit" type="text" class="form-control" th:field="*{resultFilter.resultsLimit}">
+                    <input id="resultsLimit" type="number" step="any" class="form-control"
+                           th:field="*{resultFilter.resultsLimit}">
                 </div>
                 <div class="col-12"><h5>Result sorting</h5></div>
                 <div class="col-6">
@@ -144,7 +149,7 @@
                                         </div>
                                         <input class="form-control" th:id="${strategyParameter.key}"
                                                th:field="*{strategyParameters[__${strategyParameter.key}__].value}"
-                                               type="text">
+                                               type="number" step="any">
                                     </div>
                                 </div>
                             </th:block>
