@@ -13,6 +13,8 @@ data class InstrumentEntity(
     val name: String,
     @Column("ticker")
     val ticker: String,
+    @Column("lot")
+    val lot: Int,
     @Column("broker_instrument_id")
     val brokerInstrumentId: String
 )

@@ -14,21 +14,24 @@ class BrokerConfiguration {
         BrokerApi.init(brokerProperties.token, brokerProperties.appName)
 
     @Bean
-    fun ordersService(brokerApi: BrokerApi) = brokerApi.investApi.ordersService
-
-    @Bean
     fun loggingOrderServiceDecorator(ordersService: OrdersService) = LoggingOrdersServiceDecorator(ordersService)
 
     @Bean
-    fun usersService(brokerApi: BrokerApi) = brokerApi.investApi.userService
+    fun brokerOrdersService(brokerApi: BrokerApi) = brokerApi.investApi.ordersService
 
     @Bean
-    fun marketDataStreamService(brokerApi: BrokerApi) = brokerApi.investApi.marketDataStreamService
+    fun brokerUsersService(brokerApi: BrokerApi) = brokerApi.investApi.userService
 
     @Bean
-    fun marketDataService(brokerApi: BrokerApi) = brokerApi.investApi.marketDataService
+    fun brokerMarketDataStreamService(brokerApi: BrokerApi) = brokerApi.investApi.marketDataStreamService
 
     @Bean
-    fun operationsService(brokerApi: BrokerApi) = brokerApi.investApi.operationsService
+    fun brokerMarketDataService(brokerApi: BrokerApi) = brokerApi.investApi.marketDataService
+
+    @Bean
+    fun brokerOperationsService(brokerApi: BrokerApi) = brokerApi.investApi.operationsService
+
+    @Bean
+    fun brokerInstrumentService(brokerApi: BrokerApi) = brokerApi.investApi.instrumentsService
 
 }

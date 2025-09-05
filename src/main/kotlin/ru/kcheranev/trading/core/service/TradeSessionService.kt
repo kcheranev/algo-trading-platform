@@ -1,6 +1,7 @@
 package ru.kcheranev.trading.core.service
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -23,7 +24,6 @@ import ru.kcheranev.trading.core.port.mapper.commandMapper
 import ru.kcheranev.trading.core.port.outcome.broker.OrderServiceBrokerPort
 import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceBuyOrderCommand
 import ru.kcheranev.trading.core.port.outcome.broker.PostBestPriceSellOrderCommand
-import ru.kcheranev.trading.core.port.outcome.broker.WithdrawLimitsBrokerPort
 import ru.kcheranev.trading.core.port.outcome.broker.model.PostOrderResponse
 import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.GetStrategyConfigurationCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.strategyconfiguration.StrategyConfigurationPersistencePort
@@ -40,7 +40,6 @@ import ru.kcheranev.trading.domain.entity.TradeOrder
 import ru.kcheranev.trading.domain.entity.TradeSession
 import ru.kcheranev.trading.domain.entity.TradeSessionId
 import ru.kcheranev.trading.domain.model.TradeDirection
-import java.math.BigDecimal
 
 @Service
 class TradeSessionService(
@@ -49,7 +48,6 @@ class TradeSessionService(
     private val tradeSessionPersistencePort: TradeSessionPersistencePort,
     private val orderServiceBrokerPort: OrderServiceBrokerPort,
     private val tradeOrderPersistencePort: TradeOrderPersistencePort,
-    private val withdrawLimitsBrokerPort: WithdrawLimitsBrokerPort,
     private val orderLotsQuantityStrategyProvider: OrderLotsQuantityStrategyProvider
 ) : SearchTradeSessionUseCase,
     CreateTradeSessionUseCase,
@@ -90,18 +88,14 @@ class TradeSessionService(
     @Transactional
     override fun enterTradeSession(command: EnterTradeSessionCommand) {
         val tradeSession = tradeSessionPersistencePort.get(GetTradeSessionCommand(command.tradeSessionId))
-        val lotsRequested = tradeSession.calculateOrderLotsQuantity()
-        withdrawLimitsBrokerPort.getWithdrawLimits()
-            .onRight { depositValue ->
-                val expectedPrice =
-                    tradeSession.lastCandleClosePrice() * lotsRequested.toBigDecimal() * BigDecimal(1.01)
-                if (depositValue < expectedPrice) {
-                    log.warn("It's unable to post order, not enough money on deposit")
+        val lotsRequested =
+            tradeSession.calculateOrderLotsQuantity()
+                .getOrElse { error ->
+                    log.warn(error.message)
                     tradeSession.resume()
                     tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
                     return
                 }
-            }
         val postOrderResultAccumulator =
             postOrderWithRetry(lotsRequested) { remainLotsQuantity ->
                 if (tradeSession.isMargin()) {

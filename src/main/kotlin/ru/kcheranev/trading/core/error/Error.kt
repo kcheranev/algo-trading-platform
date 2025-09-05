@@ -8,6 +8,24 @@ sealed interface Error {
 
 sealed interface DomainError : Error
 
+data object OrderLotsQuantityCalculatingError : DomainError {
+
+    override val message = "An error has been occurred while calculating lots quantity"
+
+}
+
+data object NotEnoughMoneyOnDepositError : DomainError {
+
+    override val message = "Not enough money on deposit"
+
+}
+
+data class ValidationError(private val errors: List<String>) : DomainError {
+
+    override val message = "Validation error: ${errors.joinToString(", ")}"
+
+}
+
 sealed interface IntegrationError : Error
 
 sealed interface BrokerIntegrationError : IntegrationError
@@ -30,9 +48,15 @@ data object GetTradingAccountError : BrokerIntegrationError {
 
 }
 
-data object GetWithdrawLimitsError : BrokerIntegrationError {
+data object GetPortfolioError : BrokerIntegrationError {
 
-    override val message = "An error has been occurred while getting withdraw limits"
+    override val message = "An error has been occurred while getting portfolio"
+
+}
+
+data object GetShareByIdError : BrokerIntegrationError {
+
+    override val message = "An error has been occurred while getting share by id"
 
 }
 

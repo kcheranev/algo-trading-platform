@@ -15,17 +15,20 @@ class TelegramNotificationOutcomeAdapter(
     private val restTemplate: RestTemplate
 ) : NotificationPort {
 
+    private val enabled = telegramNotificationProperties.enabled
+
     private val apiUrl = telegramNotificationProperties.apiUrl
 
     private val chatId = telegramNotificationProperties.chatId
 
     override fun sendNotification(command: SendNotificationCommand): Either<NotificationError, Unit> =
         catch {
-            restTemplate.postForLocation(
-                "$apiUrl/sendMessage?chat_id=${chatId}&text=${command.text}",
-                Unit
-            )
-            return@catch
+            if (enabled) {
+                restTemplate.postForLocation(
+                    "$apiUrl/sendMessage?chat_id=${chatId}&text=${command.text}",
+                    Unit
+                )
+            }
         }.mapLeft { NotificationError }
 
 }

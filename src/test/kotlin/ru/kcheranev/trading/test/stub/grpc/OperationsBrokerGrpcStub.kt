@@ -16,9 +16,9 @@ class OperationsBrokerGrpcStub(testName: String) : AbstractGrpcStub(testName) {
             OperationsServiceGrpc.SERVICE_NAME
         )
 
-    fun stubForGetWithdrawLimits(fileName: String) {
+    fun stubForGetPortfolio(fileName: String) {
         operationsService.stubFor(
-            WireMockGrpc.method("GetWithdrawLimits")
+            WireMockGrpc.method("GetPortfolio")
                 .willReturn(
                     json(grpcResponse(fileName))
                 )

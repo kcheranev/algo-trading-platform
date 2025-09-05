@@ -8,7 +8,7 @@ import ru.tinkoff.piapi.contract.v1.Quotation
 import ru.tinkoff.piapi.core.OrdersService
 import ru.tinkoff.piapi.core.utils.MapperUtils.moneyValueToBigDecimal
 
-class LoggingOrdersServiceDecorator(private val ordersService: OrdersService) {
+class LoggingOrdersServiceDecorator(private val brokerOrdersService: OrdersService) {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -33,7 +33,7 @@ class LoggingOrdersServiceDecorator(private val ordersService: OrdersService) {
             orderId = $orderId
         """.trimIndent()
         )
-        val postOrderResponse = ordersService.postOrderSync(
+        val postOrderResponse = brokerOrdersService.postOrderSync(
             instrumentId,
             quantity,
             price,

@@ -16,11 +16,11 @@ import ru.kcheranev.trading.domain.model.Candle
 import ru.kcheranev.trading.infra.adapter.outcome.broker.brokerOutcomeAdapterMapper
 import ru.tinkoff.piapi.core.MarketDataService
 
-private const val HISTORIC_CANDLES_CACHE = "historicCandlesCache"
+private const val HISTORIC_CANDLES_CACHE = "historicCandles"
 
 @Component
 class HistoricCandleBrokerOutcomeAdapter(
-    private val marketDataService: MarketDataService,
+    private val brokerMarketDataService: MarketDataService,
     cacheManager: CacheManager
 ) : HistoricCandleBrokerPort {
 
@@ -32,7 +32,7 @@ class HistoricCandleBrokerOutcomeAdapter(
 
     override fun getHistoricCandles(command: GetHistoricCandlesCommand) =
         historicCandlesCache.getOrPut(command.digest()) {
-            marketDataService.getCandlesSync(
+            brokerMarketDataService.getCandlesSync(
                 command.instrument.id,
                 command.from.toMskInstant(),
                 command.to.toMskInstant(),

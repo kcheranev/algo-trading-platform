@@ -6,5 +6,6 @@ data class InstrumentUiResponseDto(
     val id: UUID,
     val name: String,
     val ticker: String,
+    val lot: String,
     val brokerInstrumentId: String
 )

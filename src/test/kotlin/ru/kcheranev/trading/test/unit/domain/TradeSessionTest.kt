@@ -1,5 +1,6 @@
 package ru.kcheranev.trading.test.unit.domain
 
+import arrow.core.right
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.datatest.withData
@@ -20,8 +21,8 @@ import org.ta4j.core.Strategy
 import ru.kcheranev.trading.common.date.toMskZonedDateTime
 import ru.kcheranev.trading.core.config.TradingProperties
 import ru.kcheranev.trading.core.config.TradingScheduleInterval
-import ru.kcheranev.trading.core.strategy.lotsquantity.HardcodedOrderLotsQuantityStrategy
 import ru.kcheranev.trading.core.strategy.lotsquantity.LOTS_QUANTITY_STRATEGY_PARAMETER_NAME
+import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategy
 import ru.kcheranev.trading.domain.TradeSessionCreatedDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionEnteredDomainEvent
 import ru.kcheranev.trading.domain.TradeSessionExitedDomainEvent
@@ -51,6 +52,11 @@ import java.util.UUID
 class TradeSessionTest : FreeSpec({
 
     extensions(MockDateSupplierExtension())
+
+    val orderLotsQuantityStrategy =
+        mockk<OrderLotsQuantityStrategy> {
+            every { getLotsQuantity(any()) } returns 10.right()
+        }
 
     beforeSpec {
         mockkObject(TradingProperties.Companion)
@@ -89,7 +95,7 @@ class TradeSessionTest : FreeSpec({
                 strategyConfiguration = strategyConfiguration,
                 ticker = "SBER",
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
-                orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
+                orderLotsQuantityStrategy = orderLotsQuantityStrategy,
                 tradeStrategy = tradeStrategy
             )
 
@@ -99,7 +105,6 @@ class TradeSessionTest : FreeSpec({
         tradeSession.instrumentId shouldBe "e6123145-9665-43e0-8413-cd61b8aa9b1"
         tradeSession.status shouldBe TradeSessionStatus.WAITING
         tradeSession.candleInterval shouldBe CandleInterval.ONE_MIN
-        tradeSession.orderLotsQuantityStrategy.shouldBeTypeOf<HardcodedOrderLotsQuantityStrategy>()
         tradeSession.strategy shouldBe tradeStrategy
         tradeSession.strategyType shouldBe "strategy-type"
         tradeSession.strategyParameters shouldBe StrategyParameters(
@@ -155,7 +160,7 @@ class TradeSessionTest : FreeSpec({
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
-                orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
+                orderLotsQuantityStrategy = orderLotsQuantityStrategy,
                 strategy = tradeStrategy,
                 strategyType = "DUMMY",
                 strategyParameters = StrategyParameters(
@@ -204,7 +209,7 @@ class TradeSessionTest : FreeSpec({
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
-                orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
+                orderLotsQuantityStrategy = orderLotsQuantityStrategy,
                 strategy = tradeStrategy,
                 strategyType = "DUMMY",
                 strategyParameters = StrategyParameters(
@@ -268,7 +273,7 @@ class TradeSessionTest : FreeSpec({
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.IN_POSITION,
                 candleInterval = CandleInterval.ONE_MIN,
-                orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
+                orderLotsQuantityStrategy = orderLotsQuantityStrategy,
                 currentPosition = CurrentPosition(lotsQuantity = 5, averagePrice = BigDecimal("42")),
                 strategy = tradeStrategy,
                 strategyType = "DUMMY",
@@ -314,7 +319,7 @@ class TradeSessionTest : FreeSpec({
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.PENDING_ENTER,
                 candleInterval = CandleInterval.ONE_MIN,
-                orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
+                orderLotsQuantityStrategy = orderLotsQuantityStrategy,
                 strategy = tradeStrategy,
                 strategyType = "DUMMY",
                 strategyParameters = StrategyParameters(
@@ -351,7 +356,7 @@ class TradeSessionTest : FreeSpec({
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.PENDING_EXIT,
                 candleInterval = CandleInterval.ONE_MIN,
-                orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
+                orderLotsQuantityStrategy = orderLotsQuantityStrategy,
                 currentPosition = CurrentPosition(5, BigDecimal(100)),
                 strategy = tradeStrategy,
                 strategyType = "DUMMY",
@@ -403,7 +408,7 @@ class TradeSessionTest : FreeSpec({
                     instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                     status = currentStatus,
                     candleInterval = CandleInterval.ONE_MIN,
-                    orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
+                    orderLotsQuantityStrategy = orderLotsQuantityStrategy,
                     currentPosition = CurrentPosition(
                         lotsQuantity = currentPositionLotsQuantity,
                         averagePrice = currentPositionAveragePrice
@@ -442,7 +447,7 @@ class TradeSessionTest : FreeSpec({
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
-                orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
+                orderLotsQuantityStrategy = orderLotsQuantityStrategy,
                 strategy = tradeStrategy,
                 strategyType = "DUMMY",
                 strategyParameters = StrategyParameters(
@@ -502,7 +507,7 @@ class TradeSessionTest : FreeSpec({
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
-                orderLotsQuantityStrategy = HardcodedOrderLotsQuantityStrategy(),
+                orderLotsQuantityStrategy = orderLotsQuantityStrategy,
                 strategy = tradeStrategy,
                 strategyType = "DUMMY",
                 strategyParameters = StrategyParameters(

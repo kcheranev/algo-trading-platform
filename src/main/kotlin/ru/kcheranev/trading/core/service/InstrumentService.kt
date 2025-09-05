@@ -21,6 +21,7 @@ class InstrumentService(
             Instrument.create(
                 name = command.name,
                 ticker = command.ticker,
+                lot = command.lot,
                 brokerInstrumentId = command.brokerInstrumentId
             )
         instrumentPersistencePort.insert(InsertInstrumentCommand(instrument))

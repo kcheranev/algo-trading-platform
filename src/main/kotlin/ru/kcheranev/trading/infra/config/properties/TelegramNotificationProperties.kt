@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding
 
 @ConfigurationProperties("application.infra.notification.telegram")
 class TelegramNotificationProperties @ConstructorBinding constructor(
+    val enabled: Boolean,
     val apiUrl: String,
     val chatId: String
 )

@@ -19,6 +19,7 @@ import ru.kcheranev.trading.domain.model.TradeDirection
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.common.InstrumentDto
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.request.CreateTradeSessionRequestDto
 import ru.kcheranev.trading.infra.adapter.income.web.rest.model.response.CreateTradeSessionResponseDto
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.InstrumentEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.StrategyConfigurationEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
@@ -52,7 +53,7 @@ class TradeProcessShortE2eTest(
     val ordersBrokerGrpcStub = OrdersBrokerGrpcStub(testName)
 
     "should execute short trade process" {
-        //create strategy configuration
+        //create strategy configuration and instrument
         val strategyConfiguration =
             jdbcTemplate.insert(
                 StrategyConfigurationEntity(
@@ -63,6 +64,15 @@ class TradeProcessShortE2eTest(
                     parameters = MapWrapper(mapOf(LOTS_QUANTITY_STRATEGY_PARAMETER_NAME to 4))
                 )
             )
+        jdbcTemplate.insert(
+            InstrumentEntity(
+                id = UUID.randomUUID(),
+                name = "Сбербанк",
+                ticker = "SBER",
+                lot = 1,
+                brokerInstrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+            )
+        )
 
         //start trade session
         marketDataBrokerGrpcStub.stubForGetCandles("get-candles.json")

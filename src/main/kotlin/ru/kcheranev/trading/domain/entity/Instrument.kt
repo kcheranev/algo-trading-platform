@@ -6,6 +6,7 @@ data class Instrument(
     val id: InstrumentId,
     val name: String,
     val ticker: String,
+    val lot: Int,
     val brokerInstrumentId: String
 ) {
 
@@ -14,11 +15,13 @@ data class Instrument(
         fun create(
             name: String,
             ticker: String,
+            lot: Int,
             brokerInstrumentId: String
         ) = Instrument(
             id = InstrumentId.init(),
             name = name,
             ticker = ticker,
+            lot = lot,
             brokerInstrumentId = brokerInstrumentId
         )
 

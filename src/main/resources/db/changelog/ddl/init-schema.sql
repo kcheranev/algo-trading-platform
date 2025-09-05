@@ -47,6 +47,7 @@ CREATE TABLE instrument
     id                   uuid              NOT NULL,
     ticker               character varying NOT NULL,
     name                 character varying NOT NULL,
+    lot                  integer           NOT NULL,
     broker_instrument_id character varying NOT NULL,
     CONSTRAINT instrument_pkey PRIMARY KEY (id),
     CONSTRAINT instrument_ticker_unq UNIQUE (ticker),

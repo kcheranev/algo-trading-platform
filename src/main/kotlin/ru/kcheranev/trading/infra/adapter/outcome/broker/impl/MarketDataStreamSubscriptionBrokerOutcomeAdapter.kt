@@ -24,7 +24,7 @@ import kotlin.concurrent.withLock
 
 @Component
 class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
-    private val marketDataStreamService: MarketDataStreamService,
+    private val brokerMarketDataStreamService: MarketDataStreamService,
     private val processCandleUseCase: ProcessCandleUseCase,
     private val tradeSessionPersistencePort: TradeSessionPersistencePort,
     private val candleSubscriptionCacheHolder: CandleSubscriptionCacheHolder
@@ -40,7 +40,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
             val candleSubscription = CandleSubscription(instrument, candleInterval)
             if (!candleSubscriptionCacheHolder.contains(candleSubscription)) {
                 log.info("Activate subscription for the trade session, ticker=${instrument.ticker}, candleInterval=$candleInterval")
-                marketDataStreamService.newStream(
+                brokerMarketDataStreamService.newStream(
                     candleSubscription.id,
                     CandleSubscriptionBrokerIncomeAdapter(processCandleUseCase)
                 ) { ex -> log.error(ex.toString()) }
@@ -66,7 +66,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
                 )
             if (!isReadyForOrderTradeSessionExists) {
                 log.info("Deactivate subscription for the trade session, ticker=${instrument.ticker}, candleInterval=$candleInterval")
-                marketDataStreamService.getStreamById(candleSubscription.id)
+                brokerMarketDataStreamService.getStreamById(candleSubscription.id)
                     .unsubscribeCandles(
                         listOf(command.instrument.id),
                         brokerOutcomeAdapterMapper.mapToSubscriptionInterval(candleInterval)

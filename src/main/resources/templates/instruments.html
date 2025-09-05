@@ -29,6 +29,11 @@
                                    th:value="*{ticker}">
                         </div>
                         <div class="mb-3">
+                            <label for="instrumentLot" class="form-label">Lot</label>
+                            <input id="instrumentLot" type="number" class="form-control" name="lot"
+                                   th:value="*{lot}">
+                        </div>
+                        <div class="mb-3">
                             <label for="brokerInstrumentId" class="form-label">Broker instrument id</label>
                             <input id="brokerInstrumentId" type="text" class="form-control" name="brokerInstrumentId"
                                    th:value="*{brokerInstrumentId}">

@@ -4,8 +4,11 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import ru.kcheranev.trading.core.port.outcome.persistence.instrument.GetInstrumentByBrokerInstrumentIdCommand
+import ru.kcheranev.trading.core.port.outcome.persistence.instrument.GetInstrumentCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.instrument.InsertInstrumentCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.instrument.InstrumentPersistencePort
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.PersistenceNotFoundException
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.persistenceOutcomeAdapterMapper
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.repository.InstrumentRepository
 
@@ -19,6 +22,16 @@ class InstrumentPersistenceOutcomeAdapter(
     override fun insert(command: InsertInstrumentCommand) {
         jdbcTemplate.insert(persistenceOutcomeAdapterMapper.map(command.instrument))
     }
+
+    override fun get(command: GetInstrumentCommand) =
+        instrumentRepository.findById(command.instrumentId.value)
+            .orElseThrow { PersistenceNotFoundException("Instrument entity with id ${command.instrumentId.value} is not exists") }
+            .let(persistenceOutcomeAdapterMapper::map)
+
+    override fun getByBrokerInstrumentId(command: GetInstrumentByBrokerInstrumentIdCommand) =
+        instrumentRepository.getInstrumentByBrokerInstrumentId(command.brokerInstrumentId)
+            .orElseThrow { PersistenceNotFoundException("Instrument entity with brokerInstrumentId ${command.brokerInstrumentId} is not exists") }
+            .let(persistenceOutcomeAdapterMapper::map)
 
     override fun findAll() =
         instrumentRepository.findAll()

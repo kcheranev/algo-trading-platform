@@ -53,3 +53,7 @@ data class GetLastHistoricCandlesCommand(
     val candleInterval: CandleInterval,
     val quantity: Int
 )
+
+data class GetShareByIdCommand(
+    val instrumentId: String
+)

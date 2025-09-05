@@ -10,40 +10,47 @@ import ru.kcheranev.trading.core.error.OrderLotsQuantityCalculatingError
 import ru.kcheranev.trading.core.port.outcome.broker.OperationServiceBrokerPort
 import ru.kcheranev.trading.core.port.outcome.persistence.instrument.GetInstrumentByBrokerInstrumentIdCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.instrument.InstrumentPersistencePort
-import ru.kcheranev.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategyType.HARDCODED
+import ru.kcheranev.trading.core.util.validate
 import ru.kcheranev.trading.domain.entity.TradeSession
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-const val LOTS_QUANTITY_STRATEGY_PARAMETER_NAME = "lotsQuantity"
+const val DEPOSIT_PERCENT_STRATEGY_PARAMETER_NAME = "depositPercent"
 
 @Component
-class HardcodedOrderLotsQuantityStrategy(
+class DepositPercentOrderLotsQuantityStrategy(
     private val instrumentPersistencePort: InstrumentPersistencePort,
     private val operationServiceBrokerPort: OperationServiceBrokerPort
 ) : OrderLotsQuantityStrategy {
 
-    override val type = HARDCODED
+    override val type = OrderLotsQuantityStrategyType.DEPOSIT_PERCENT
 
     private val factor = BigDecimal("1.1")
 
     override fun getLotsQuantity(tradeSession: TradeSession): Either<DomainError, Int> =
         either {
-            val hardcodedLotsQuantity = tradeSession.strategyParameters.getAsInt(LOTS_QUANTITY_STRATEGY_PARAMETER_NAME)
-            if (tradeSession.isMargin()) {
-                return@either hardcodedLotsQuantity
+            val depositPercent = tradeSession.strategyParameters.getAsBigDecimal(DEPOSIT_PERCENT_STRATEGY_PARAMETER_NAME)
+            validate {
+                field("depositPercent") {
+                    depositPercent.shouldNotBeNull()
+                    depositPercent.shouldBeLessThan(BigDecimal("1.0"))
+                }
             }
-            val instrument = instrumentPersistencePort.getByBrokerInstrumentId(GetInstrumentByBrokerInstrumentIdCommand(tradeSession.instrumentId))
-            val currencyAmount =
+            val portfolio =
                 operationServiceBrokerPort.getPortfolio()
                     .mapLeft { OrderLotsQuantityCalculatingError }
                     .bind()
-                    .currencyAmount
-            val fullLotAmount = tradeSession.lastCandleClosePrice() * instrument.lot.toBigDecimal()
-            if (currencyAmount > fullLotAmount * hardcodedLotsQuantity.toBigDecimal() * factor) {
-                hardcodedLotsQuantity
+            val instrument = instrumentPersistencePort.getByBrokerInstrumentId(GetInstrumentByBrokerInstrumentIdCommand(tradeSession.instrumentId))
+            val fullLotAmount = tradeSession.lastCandleClosePrice() * instrument.lot.toBigDecimal() * factor
+            val depositDependentLotsQuantity =
+                (portfolio.totalPortfolioAmount * depositPercent).divide(fullLotAmount, 0, RoundingMode.DOWN).toInt()
+            if (tradeSession.isMargin()) {
+                return@either depositDependentLotsQuantity
+            }
+            if (portfolio.currencyAmount >= portfolio.totalPortfolioAmount * depositPercent) {
+                depositDependentLotsQuantity
             } else {
-                val lotsQuantity = currencyAmount.divide(fullLotAmount * factor, 0, RoundingMode.DOWN).toInt()
+                val lotsQuantity = portfolio.currencyAmount.divide(fullLotAmount, RoundingMode.DOWN).toInt()
                 ensure(lotsQuantity > 0) { NotEnoughMoneyOnDepositError }
                 lotsQuantity
             }

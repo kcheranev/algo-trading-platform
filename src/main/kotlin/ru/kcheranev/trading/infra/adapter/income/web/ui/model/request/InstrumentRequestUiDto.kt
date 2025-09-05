@@ -3,6 +3,7 @@ package ru.kcheranev.trading.infra.adapter.income.web.ui.model.request
 data class CreateInstrumentRequestUiDto(
     val name: String? = null,
     val ticker: String? = null,
+    val lot: Int? = null,
     val brokerInstrumentId: String? = null
 )
 

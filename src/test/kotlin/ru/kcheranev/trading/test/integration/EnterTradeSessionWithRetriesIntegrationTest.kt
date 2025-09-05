@@ -23,6 +23,7 @@ import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.domain.model.Position
 import ru.kcheranev.trading.domain.model.TradeStrategy
+import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.InstrumentEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
 import ru.kcheranev.trading.infra.adapter.outcome.persistence.impl.TradeStrategyCache
@@ -57,6 +58,18 @@ class EnterTradeSessionWithRetriesIntegrationTest(
     val ordersBrokerGrpcStub = OrdersBrokerGrpcStub(testName)
 
     val operationsBrokerGrpcStub = OperationsBrokerGrpcStub(testName)
+
+    beforeEach {
+        jdbcTemplate.insert(
+            InstrumentEntity(
+                id = UUID.randomUUID(),
+                name = "Сбербанк",
+                ticker = "SBER",
+                lot = 1,
+                brokerInstrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+            )
+        )
+    }
 
     "should enter trade session with retries" {
         //given
@@ -112,7 +125,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
-        operationsBrokerGrpcStub.stubForGetWithdrawLimits("get-withdraw-limits.json")
+        operationsBrokerGrpcStub.stubForGetPortfolio("get-portfolio.json")
         ordersBrokerGrpcStub.stubForPostBuyOrder(
             "post-buy-order-requested-10-executed-4.json",
             mapOf("quantity" to "10")
@@ -202,7 +215,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
-        operationsBrokerGrpcStub.stubForGetWithdrawLimits("get-withdraw-limits.json")
+        operationsBrokerGrpcStub.stubForGetPortfolio("get-portfolio.json")
         ordersBrokerGrpcStub.stubForPostBuyOrder(
             "post-buy-order-requested-10-executed-4.json",
             mapOf("quantity" to "10")
@@ -292,7 +305,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
-        operationsBrokerGrpcStub.stubForGetWithdrawLimits("get-withdraw-limits.json")
+        operationsBrokerGrpcStub.stubForGetPortfolio("get-portfolio.json")
         ordersBrokerGrpcStub.stubForPostBuyOrder(
             "post-buy-order-requested-10-executed-0.json",
             mapOf("quantity" to "10")
@@ -368,7 +381,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
-        operationsBrokerGrpcStub.stubForGetWithdrawLimits("get-withdraw-limits.json")
+        operationsBrokerGrpcStub.stubForGetPortfolio("get-portfolio.json")
         ordersBrokerGrpcStub.stubForPostOrderFailed()
         telegramNotificationHttpStub.stubForSendNotification()
 
@@ -441,7 +454,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
-        operationsBrokerGrpcStub.stubForGetWithdrawLimits("get-withdraw-limits-zero-deposit.json")
+        operationsBrokerGrpcStub.stubForGetPortfolio("get-portfolio-zero-currency-amount.json")
         ordersBrokerGrpcStub.stubForPostBuyOrder(
             "post-buy-order-requested-10-executed-0.json",
             mapOf("quantity" to "10")

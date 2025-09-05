@@ -6,6 +6,10 @@ interface InstrumentPersistencePort {
 
     fun insert(command: InsertInstrumentCommand)
 
+    fun get(command: GetInstrumentCommand): Instrument
+
+    fun getByBrokerInstrumentId(command: GetInstrumentByBrokerInstrumentIdCommand): Instrument
+
     fun findAll(): List<Instrument>
 
 }
