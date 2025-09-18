@@ -1,6 +1,6 @@
 package ru.kcheranev.trading.core.port.outcome.broker
 
-import ru.kcheranev.trading.core.exception.OutcomeCommandValidationException
+import ru.kcheranev.trading.core.util.Validator.Companion.validateOrThrow
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
 import java.time.LocalDate
@@ -34,8 +34,8 @@ data class GetHistoricCandlesCommand(
 ) {
 
     init {
-        if (from.toLocalDate() != to.toLocalDate()) {
-            throw OutcomeCommandValidationException("From day must be equals to to day")
+        validateOrThrow {
+            if (from.toLocalDate() != to.toLocalDate()) addError("From day must be equals to to day")
         }
     }
 

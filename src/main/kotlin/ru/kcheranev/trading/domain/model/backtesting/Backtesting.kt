@@ -139,10 +139,7 @@ class Backtesting(
         parameters: Map<String, Number>
     ): StrategyParametersAnalyzeResult? =
         try {
-            StrategyParametersAnalyzeResult(
-                analyzeStrategy(strategyFactory, StrategyParameters(parameters)),
-                parameters
-            )
+            StrategyParametersAnalyzeResult(analyzeStrategy(strategyFactory, StrategyParameters(parameters)), parameters)
         } catch (_: Exception) {
             null
         }

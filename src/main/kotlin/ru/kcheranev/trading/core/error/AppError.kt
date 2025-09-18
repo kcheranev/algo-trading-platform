@@ -1,12 +1,12 @@
 package ru.kcheranev.trading.core.error
 
-sealed interface Error {
+sealed interface AppError {
 
     val message: String
 
 }
 
-sealed interface DomainError : Error
+sealed interface DomainError : AppError
 
 data object OrderLotsQuantityCalculatingError : DomainError {
 
@@ -20,13 +20,32 @@ data object NotEnoughMoneyOnDepositError : DomainError {
 
 }
 
-data class ValidationError(private val errors: List<String>) : DomainError {
+data class ValidationError(
+    val errors: List<String> = emptyList(),
+    val fieldErrors: Map<String, List<String>> = emptyMap()
+) : AppError {
 
-    override val message = "Validation error: ${errors.joinToString(", ")}"
+    override val message = "Validation error: ${errorMessage()}"
+
+    fun errorMessage(): String {
+        val messageBuilder = StringBuilder()
+        if (errors.isNotEmpty()) {
+            messageBuilder.append(errors.joinToString(", "))
+        }
+        if (fieldErrors.isNotEmpty()) {
+            fieldErrors.forEach { key, value ->
+                if (messageBuilder.isNotEmpty()) {
+                    messageBuilder.append(". ")
+                }
+                messageBuilder.append("$key: ${value.joinToString(", ")}")
+            }
+        }
+        return messageBuilder.toString()
+    }
 
 }
 
-sealed interface IntegrationError : Error
+sealed interface IntegrationError : AppError
 
 sealed interface BrokerIntegrationError : IntegrationError
 

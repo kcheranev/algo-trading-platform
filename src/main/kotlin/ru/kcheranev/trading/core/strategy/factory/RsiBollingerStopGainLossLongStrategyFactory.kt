@@ -21,11 +21,11 @@ import kotlin.math.max
 class RsiBollingerStopGainLossLongStrategyFactory : LongStrategyFactory() {
 
     override fun initStrategy(parameters: StrategyParameters, series: CustomizedBarSeries): TradeStrategy {
-        val overSold = parameters.getAsInt(RsiBollingerStopGainLossStrategyParameter.OVER_SOLD)
-        val rsiLength = parameters.getAsInt(RsiBollingerStopGainLossStrategyParameter.RSI_LENGTH)
-        val bollingerLength = parameters.getAsInt(RsiBollingerStopGainLossStrategyParameter.BOLLINGER_LENGTH)
-        val gainPercentage = parameters.getAsBigDecimal(RsiBollingerStopGainLossStrategyParameter.GAIN_PERCENTAGE)
-        val lossPercentage = parameters.getAsBigDecimal(RsiBollingerStopGainLossStrategyParameter.LOSS_PERCENTAGE)
+        val overSold = parameters.getAsIntOrThrow(RsiBollingerStopGainLossStrategyParameter.OVER_SOLD)
+        val rsiLength = parameters.getAsIntOrThrow(RsiBollingerStopGainLossStrategyParameter.RSI_LENGTH)
+        val bollingerLength = parameters.getAsIntOrThrow(RsiBollingerStopGainLossStrategyParameter.BOLLINGER_LENGTH)
+        val gainPercentage = parameters.getAsBigDecimalOrThrow(RsiBollingerStopGainLossStrategyParameter.GAIN_PERCENTAGE)
+        val lossPercentage = parameters.getAsBigDecimalOrThrow(RsiBollingerStopGainLossStrategyParameter.LOSS_PERCENTAGE)
 
         val closePrice = ClosePriceIndicator(series)
         val rsi = RSIIndicator(closePrice, rsiLength)

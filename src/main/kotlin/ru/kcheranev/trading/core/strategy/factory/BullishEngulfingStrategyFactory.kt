@@ -16,8 +16,8 @@ import ru.kcheranev.trading.domain.model.TradeStrategy
 class BullishEngulfingStrategyFactory : LongStrategyFactory() {
 
     override fun initStrategy(parameters: StrategyParameters, series: CustomizedBarSeries): TradeStrategy {
-        val gainPercentage = parameters.getAsBigDecimal(BullishEngulfingStrategyLongParameter.GAIN_PERCENTAGE)
-        val lossPercentage = parameters.getAsBigDecimal(BullishEngulfingStrategyLongParameter.LOSS_PERCENTAGE)
+        val gainPercentage = parameters.getAsBigDecimalOrThrow(BullishEngulfingStrategyLongParameter.GAIN_PERCENTAGE)
+        val lossPercentage = parameters.getAsBigDecimalOrThrow(BullishEngulfingStrategyLongParameter.LOSS_PERCENTAGE)
 
         val bullishEngulfingIndicator = BullishEngulfingIndicator(series)
 

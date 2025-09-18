@@ -78,3 +78,8 @@ data class OrderUiDto(
     val netPrice: BigDecimal,
     val grossPrice: BigDecimal
 )
+
+data class ErrorsUiDto(
+    val errors: List<String> = emptyList(),
+    val fieldErrors: Map<String, List<String>> = emptyMap()
+)

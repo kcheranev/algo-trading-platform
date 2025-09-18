@@ -2,14 +2,14 @@ package ru.kcheranev.trading.core.strategy.lotsquantity
 
 import arrow.core.Either
 import org.springframework.stereotype.Component
-import ru.kcheranev.trading.core.error.DomainError
+import ru.kcheranev.trading.core.error.AppError
 import ru.kcheranev.trading.domain.entity.TradeSession
 
 sealed interface OrderLotsQuantityStrategy {
 
     val type: OrderLotsQuantityStrategyType
 
-    fun getLotsQuantity(tradeSession: TradeSession): Either<DomainError, Int>
+    fun getLotsQuantity(tradeSession: TradeSession): Either<AppError, Int>
 
 }
 

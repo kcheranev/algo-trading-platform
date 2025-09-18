@@ -18,7 +18,7 @@ data class StrategyAnalyzeRequestUiDto(
     val resultFilter: StrategyAnalyzeResultFilterUiDto = StrategyAnalyzeResultFilterUiDto(),
     val profitTypeSort: ProfitTypeSort = ProfitTypeSort.NET,
     val brokerInstrumentId: String? = null,
-    val candleInterval: CandleInterval? = null,
+    val candleInterval: CandleInterval = CandleInterval.FIVE_MIN,
     val from: LocalDate? = null,
     val to: LocalDate? = null,
     val candlesSeriesSource: CandlesDataSource = CandlesDataSource.FILE,
@@ -27,7 +27,7 @@ data class StrategyAnalyzeRequestUiDto(
 
 data class StrategyParameterUiDto(
     val value: Number? = null,
-    val mutable: Boolean? = null
+    val mutable: Boolean = false
 )
 
 data class CheckedValueUiDto(

@@ -5,7 +5,7 @@ spring:
       max-file-size: 50MB
       max-request-size: 50MB
   application:
-    name: trading-app
+    name: algo-trading-platform
   datasource:
     url: ${DATASOURCE_URL}
     username: postgres
@@ -43,8 +43,8 @@ application:
       trading-account-name: trading_account
     notification.telegram:
       enabled: true
-      token: ${TELEGRAM_TOKEN}
-      chat-id: ${TELEGRAM_CHAT_ID}
+      token: ${TELEGRAM_TOKEN:tgToken}
+      chat-id: ${TELEGRAM_CHAT_ID:tgChatId}
       api-url: https://api.telegram.org/bot${application.infra.notification.telegram.token}
   schedule:
     enabled: true

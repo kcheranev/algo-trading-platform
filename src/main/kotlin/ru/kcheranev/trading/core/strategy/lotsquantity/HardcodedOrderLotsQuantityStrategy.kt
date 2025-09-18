@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensure
 import org.springframework.stereotype.Component
-import ru.kcheranev.trading.core.error.DomainError
+import ru.kcheranev.trading.core.error.AppError
 import ru.kcheranev.trading.core.error.NotEnoughMoneyOnDepositError
 import ru.kcheranev.trading.core.error.OrderLotsQuantityCalculatingError
 import ru.kcheranev.trading.core.port.outcome.broker.OperationServiceBrokerPort
@@ -27,9 +27,9 @@ class HardcodedOrderLotsQuantityStrategy(
 
     private val factor = BigDecimal("1.1")
 
-    override fun getLotsQuantity(tradeSession: TradeSession): Either<DomainError, Int> =
+    override fun getLotsQuantity(tradeSession: TradeSession): Either<AppError, Int> =
         either {
-            val hardcodedLotsQuantity = tradeSession.strategyParameters.getAsInt(LOTS_QUANTITY_STRATEGY_PARAMETER_NAME)
+            val hardcodedLotsQuantity = tradeSession.strategyParameters.getAsInt(LOTS_QUANTITY_STRATEGY_PARAMETER_NAME).bind()
             if (tradeSession.isMargin()) {
                 return@either hardcodedLotsQuantity
             }

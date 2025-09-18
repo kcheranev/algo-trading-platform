@@ -17,10 +17,10 @@ import ru.kcheranev.trading.domain.model.TradeStrategy
 class ThreeWhiteSoldiersStrategyFactory : LongStrategyFactory() {
 
     override fun initStrategy(parameters: StrategyParameters, series: CustomizedBarSeries): TradeStrategy {
-        val barCount = parameters.getAsInt(ThreeWhiteSoldiersStrategyLongParameter.BAR_COUNT)
-        val factor = parameters.getAsBigDecimal(ThreeWhiteSoldiersStrategyLongParameter.FACTOR)
-        val gainPercentage = parameters.getAsBigDecimal(ThreeWhiteSoldiersStrategyLongParameter.GAIN_PERCENTAGE)
-        val lossPercentage = parameters.getAsBigDecimal(ThreeWhiteSoldiersStrategyLongParameter.LOSS_PERCENTAGE)
+        val barCount = parameters.getAsIntOrThrow(ThreeWhiteSoldiersStrategyLongParameter.BAR_COUNT)
+        val factor = parameters.getAsBigDecimalOrThrow(ThreeWhiteSoldiersStrategyLongParameter.FACTOR)
+        val gainPercentage = parameters.getAsBigDecimalOrThrow(ThreeWhiteSoldiersStrategyLongParameter.GAIN_PERCENTAGE)
+        val lossPercentage = parameters.getAsBigDecimalOrThrow(ThreeWhiteSoldiersStrategyLongParameter.LOSS_PERCENTAGE)
 
         val bullishEngulfingIndicator = ThreeWhiteSoldiersIndicator(series, barCount, DecimalNum.valueOf(factor, 4))
 

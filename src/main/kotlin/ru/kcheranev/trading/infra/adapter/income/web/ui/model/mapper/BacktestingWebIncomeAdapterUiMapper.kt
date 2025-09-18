@@ -55,13 +55,13 @@ abstract class BacktestingWebIncomeAdapterUiMapper {
 
     @Named("mapNoMutableStrategyParameters")
     fun mapNoMutableStrategyParameters(source: MutableMap<String, StrategyParameterUiDto>) =
-        source.filter { it.value.mutable == false }
+        source.filter { !it.value.mutable }
             .mapValues { it.value.value!! }
             .let(::StrategyParameters)
 
     @Named("mapMutableStrategyParameters")
     fun mapMutableStrategyParameters(source: MutableMap<String, StrategyParameterUiDto>) =
-        source.filter { it.value.mutable == true }
+        source.filter { it.value.mutable }
             .mapValues { it.value.value!! }
             .let(::StrategyParameters)
 

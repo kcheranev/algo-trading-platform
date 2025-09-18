@@ -7,4 +7,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "trading-app"
+rootProject.name = "algo-trading-platform"

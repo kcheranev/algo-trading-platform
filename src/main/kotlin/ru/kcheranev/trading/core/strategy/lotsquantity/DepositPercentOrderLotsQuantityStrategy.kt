@@ -4,13 +4,13 @@ import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensure
 import org.springframework.stereotype.Component
-import ru.kcheranev.trading.core.error.DomainError
+import ru.kcheranev.trading.core.error.AppError
 import ru.kcheranev.trading.core.error.NotEnoughMoneyOnDepositError
 import ru.kcheranev.trading.core.error.OrderLotsQuantityCalculatingError
 import ru.kcheranev.trading.core.port.outcome.broker.OperationServiceBrokerPort
 import ru.kcheranev.trading.core.port.outcome.persistence.instrument.GetInstrumentByBrokerInstrumentIdCommand
 import ru.kcheranev.trading.core.port.outcome.persistence.instrument.InstrumentPersistencePort
-import ru.kcheranev.trading.core.util.validate
+import ru.kcheranev.trading.core.util.Validator.Companion.validate
 import ru.kcheranev.trading.domain.entity.TradeSession
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -27,13 +27,12 @@ class DepositPercentOrderLotsQuantityStrategy(
 
     private val factor = BigDecimal("1.1")
 
-    override fun getLotsQuantity(tradeSession: TradeSession): Either<DomainError, Int> =
+    override fun getLotsQuantity(tradeSession: TradeSession): Either<AppError, Int> =
         either {
-            val depositPercent = tradeSession.strategyParameters.getAsBigDecimal(DEPOSIT_PERCENT_STRATEGY_PARAMETER_NAME)
+            val depositPercent = tradeSession.strategyParameters.getAsBigDecimal(DEPOSIT_PERCENT_STRATEGY_PARAMETER_NAME).bind()
             validate {
                 field("depositPercent") {
-                    depositPercent.shouldNotBeNull()
-                    depositPercent.shouldBeLessThan(BigDecimal("1.0"))
+                    depositPercent.shouldBeLessThanOrEquals(BigDecimal("1.0"))
                 }
             }
             val portfolio =

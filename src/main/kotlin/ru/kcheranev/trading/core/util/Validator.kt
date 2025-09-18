@@ -6,22 +6,26 @@ import arrow.core.raise.Raise
 import arrow.core.raise.either
 import org.slf4j.LoggerFactory
 import ru.kcheranev.trading.core.error.ValidationError
-import java.math.BigDecimal
+import ru.kcheranev.trading.domain.exception.ValidationException
 
-class Validator(private val fieldPrefix: String? = null) {
+class Validator {
 
     val errors: MutableList<String> = mutableListOf()
+
+    val fieldErrors: MutableMap<String, MutableList<String>> = mutableMapOf()
 
     fun addError(error: String) {
         errors.add(error)
     }
 
-    fun addErrors(errors: List<String>) {
-        this.errors.addAll(errors)
+    fun addFieldError(fieldName: String, error: String) {
+        fieldErrors.compute(fieldName) { _, value ->
+            value?.apply { add(error) } ?: mutableListOf(error)
+        }
     }
 
     fun field(fieldName: String, doValidate: FieldValidator.() -> Unit) {
-        val fieldValidator = FieldValidator(this, fieldPrefix, fieldName)
+        val fieldValidator = FieldValidator(this, fieldName)
         fieldValidator.doValidate()
     }
 
@@ -36,10 +40,18 @@ class Validator(private val fieldPrefix: String? = null) {
                     .onLeft { ex -> log.error("An error has been occurred while validating", ex) }
                     .mapLeft { ValidationError(listOf("Validation failed")) }
                     .bind()
-                if (validator.errors.isNotEmpty()) {
-                    raise(ValidationError(validator.errors))
+                if (validator.fieldErrors.isNotEmpty()) {
+                    raise(ValidationError(validator.errors, validator.fieldErrors))
                 }
-            }
+            }.onLeft { validationError -> log.warn(validationError.message) }
+
+        fun Raise<ValidationError>.validate(doValidate: Validator.() -> Unit) {
+            Validator.validate(doValidate).onLeft { error -> raise(error) }
+        }
+
+        fun validateOrThrow(doValidate: Validator.() -> Unit) {
+            validate(doValidate).onLeft { validationError -> throw ValidationException("Validation failed", validationError.errors) }
+        }
 
     }
 
@@ -47,96 +59,98 @@ class Validator(private val fieldPrefix: String? = null) {
 
 class FieldValidator(
     private val validator: Validator,
-    prefix: String?,
-    fieldName: String
+    private val fieldName: String
 ) {
 
-    private val fieldPath = if (prefix == null) fieldName else "$prefix.$fieldName"
-
-    fun String?.shouldNotBeBlank() {
-        if (this != null && this.isEmpty()) {
-            validator.addError("$fieldPath must not be blank")
-        }
-    }
-
-    fun String?.shouldHaveMinLength(minLength: Int) {
-        if (this != null && this.length < minLength) {
-            validator.addError("$fieldPath length must be greater than or equal to $minLength")
-        }
-    }
-
-    fun String?.shouldHaveMaxLength(maxLength: Int) {
-        if (this != null && this.length > maxLength) {
-            validator.addError("$fieldPath length must be less than or equal to $maxLength")
-        }
-    }
-
-    fun String?.shouldMatch(regex: String) {
-        if (this != null && !regex.toRegex().matches(this)) {
-            validator.addError("$fieldPath must be match to regex $regex")
-        }
-    }
-
-    fun String?.shouldNotBeNullOrBlank() {
-        shouldNotBeNull()
-        shouldNotBeBlank()
-    }
-
-    fun String?.shouldStartsWith(prefix: String) {
-        if (this != null && !startsWith(prefix)) {
-            validator.addError("$fieldPath should starts with $prefix")
-        }
-    }
-
-    fun Any?.shouldNotBeNull() {
+    fun Any?.shouldNotBeNull(message: String? = null) {
         if (this == null) {
-            validator.addError("$fieldPath must not be null")
+            validator.addFieldError(fieldName, message ?: "$fieldName must not be null")
         }
     }
 
-    fun Map<String, Any>?.shouldHaveAtMostSize(size: Int) {
-        if (this != null && this.size > size) {
-            validator.addError("$fieldPath size must be less or equal than $size")
+    fun <T> Comparable<T>?.shouldBeGreaterThan(value: T, message: String? = null) {
+        if (this != null && this <= value) {
+            validator.addFieldError(fieldName, message ?: "$fieldName must be greater than $value")
         }
     }
 
-    fun Long?.shouldBePositive() {
-        if (this != null && this <= 0) {
-            validator.addError("$fieldPath must be positive")
+    fun <T> Comparable<T>?.shouldBeLessThan(value: T, message: String? = null) {
+        if (this != null && this >= value) {
+            validator.addFieldError(fieldName, message ?: "$fieldName must be less than $value")
         }
     }
 
-    fun BigDecimal?.shouldBeLessThan(value: BigDecimal) {
+    fun <T> Comparable<T>?.shouldBeGreaterThanOrEquals(value: T, message: String? = null) {
+        if (this != null && this < value) {
+            validator.addFieldError(fieldName, message ?: "$fieldName must be greater than $value or equals")
+        }
+    }
+
+    fun <T> Comparable<T>?.shouldBeLessThanOrEquals(value: T, message: String? = null) {
         if (this != null && this > value) {
-            validator.addError("$fieldPath must be less than $value")
+            validator.addFieldError(fieldName, message ?: "$fieldName must be less than $value or equals")
         }
     }
 
-    fun <T> T?.shouldNotBe(value: T) {
+    fun String?.shouldNotBeBlank(message: String? = null) {
+        if (this != null && this.isEmpty()) {
+            validator.addFieldError(fieldName, message ?: "$fieldName must not be blank")
+        }
+    }
+
+    fun String?.shouldHaveMinLength(minLength: Int, message: String? = null) {
+        if (this != null && this.length < minLength) {
+            validator.addFieldError(fieldName, message ?: "$fieldName length must be greater than or equal to $minLength")
+        }
+    }
+
+    fun String?.shouldHaveMaxLength(maxLength: Int, message: String? = null) {
+        if (this != null && this.length > maxLength) {
+            validator.addFieldError(fieldName, message ?: "$fieldName length must be less than or equal to $maxLength")
+        }
+    }
+
+    fun String?.shouldMatch(regex: String, message: String? = null) {
+        if (this != null && !regex.toRegex().matches(this)) {
+            validator.addFieldError(fieldName, message ?: "$fieldName must be match to regex $regex")
+        }
+    }
+
+    fun String?.shouldStartsWith(prefix: String, message: String? = null) {
+        if (this != null && !startsWith(prefix)) {
+            validator.addFieldError(fieldName, message ?: "$fieldName should starts with $prefix")
+        }
+    }
+
+    fun Map<String, Any>?.shouldHaveAtMostSize(size: Int, message: String? = null) {
+        if (this != null && this.size > size) {
+            validator.addFieldError(fieldName, message ?: "$fieldName size must be less or equal than $size")
+        }
+    }
+
+    fun Long?.shouldBePositive(message: String? = null) {
+        if (this != null && this <= 0) {
+            validator.addFieldError(fieldName, message ?: "$fieldName must be positive")
+        }
+    }
+
+    fun <T> T?.shouldNotBe(value: T, message: String? = null) {
         if (this != null && this == value) {
-            validator.addError("$fieldPath must not be $value")
+            validator.addFieldError(fieldName, message ?: "$fieldName must not be $value")
         }
     }
 
-    fun <T> Collection<T>?.shouldNotBeNullOrEmpty() {
-        shouldNotBeNull()
-        shouldNotBeEmpty()
-    }
-
-    fun <T> Collection<T>?.shouldNotBeEmpty() {
+    fun <T> Collection<T>?.shouldNotBeEmpty(message: String? = null) {
         if (this != null && isEmpty()) {
-            validator.addError("$fieldPath must not be empty")
+            validator.addFieldError(fieldName, message ?: "$fieldName must not be empty")
         }
     }
 
-    fun <T> Collection<T>?.shouldHaveAtMostSize(maxSize: Int) {
+    fun <T> Collection<T>?.shouldHaveAtMostSize(maxSize: Int, message: String? = null) {
         if (this != null && size > maxSize) {
-            validator.addError("$fieldPath size must be less than or equal to $maxSize")
+            validator.addFieldError(fieldName, message ?: "$fieldName size must be less than or equal to $maxSize")
         }
     }
 
 }
 
-fun Raise<ValidationError>.validate(doValidate: Validator.() -> Unit) {
-    Validator.validate { doValidate }.onLeft { error -> raise(error) }
-}

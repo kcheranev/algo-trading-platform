@@ -16,6 +16,7 @@ import ru.kcheranev.trading.core.port.income.instrument.FindAllInstrumentsUseCas
 import ru.kcheranev.trading.core.port.income.strategy.GetStrategyParametersNamesCommand
 import ru.kcheranev.trading.core.port.income.strategy.GetStrategyParametersNamesUseCase
 import ru.kcheranev.trading.core.port.income.strategy.GetStrategyTypesUseCase
+import ru.kcheranev.trading.core.util.Validator.Companion.validate
 import ru.kcheranev.trading.domain.model.CandleInterval
 import ru.kcheranev.trading.domain.model.Instrument
 import ru.kcheranev.trading.domain.model.backtesting.ProfitTypeSort
@@ -24,7 +25,9 @@ import ru.kcheranev.trading.infra.adapter.income.web.ui.model.mapper.instrumentW
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.CandlesDataSource
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyAnalyzeRequestUiDto
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.request.StrategyParameterUiDto
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.response.ErrorsUiDto
 import ru.kcheranev.trading.infra.adapter.income.web.ui.model.response.InstrumentUiResponseDto
+import ru.kcheranev.trading.infra.adapter.income.web.ui.model.response.StrategyParametersAnalyzeResultUiDto
 import ru.kcheranev.trading.infra.config.properties.BacktestingProperties
 import java.nio.file.Paths
 import kotlin.io.path.createTempFile
@@ -68,6 +71,41 @@ class BacktestingUiController(
         model: Model,
         bindingResult: BindingResult
     ): String {
+        validate {
+            with(request) {
+                field("strategyType") { strategyType.shouldNotBeNull("Strategy type field must be filled in") }
+                strategyParameters.forEach { fieldName, fieldValue ->
+                    field(fieldName) { fieldValue.value.shouldNotBeNull("$fieldName field must be filled in") }
+                }
+                when (candlesSeriesSource) {
+                    CandlesDataSource.FILE -> {
+                        if (model.getAttribute("candlesSeriesSystemFileName") == null) {
+                            field("candlesSeriesFile") {
+                                candlesSeriesFile.shouldNotBeNull("Candle series file field must be filled in")
+                                candlesSeriesFile?.originalFilename?.shouldNotBeBlank("Candle series file field must be filled in")
+                            }
+                        }
+                    }
+
+                    CandlesDataSource.BROKER -> {
+                        field("brokerInstrumentId") { brokerInstrumentId.shouldNotBeNull("Broker instrument id field must be filled in") }
+                        field("from") {
+                            from.shouldNotBeNull("From field must be filled in")
+                        }
+                        field("to") {
+                            to.shouldNotBeNull("To field must be filled in")
+                            if (from != null) {
+                                to.shouldBeGreaterThanOrEquals(from, "To field value must be after from field value")
+                            }
+                        }
+                    }
+                }
+            }
+        }.onLeft { validationResult ->
+            model.addAttribute("validationErrors", ErrorsUiDto(validationResult.errors, validationResult.fieldErrors))
+            model.addAttribute("analyzeResults", emptyList<StrategyParametersAnalyzeResultUiDto>())
+            return "backtesting"
+        }
         val analyzeResultsDto =
             when (request.candlesSeriesSource) {
                 CandlesDataSource.FILE -> {

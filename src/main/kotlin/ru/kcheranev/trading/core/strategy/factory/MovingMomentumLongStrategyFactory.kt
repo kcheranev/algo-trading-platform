@@ -10,13 +10,13 @@ import org.ta4j.core.rules.CrossedDownIndicatorRule
 import org.ta4j.core.rules.CrossedUpIndicatorRule
 import org.ta4j.core.rules.OverIndicatorRule
 import org.ta4j.core.rules.UnderIndicatorRule
-import ru.kcheranev.trading.core.exception.StrategyParamValidationException
 import ru.kcheranev.trading.core.strategy.factory.MovingMomentumLongStrategyParameter.EMA_MACD_BAR_COUNT
 import ru.kcheranev.trading.core.strategy.factory.MovingMomentumLongStrategyParameter.LONG_EMA_BAR_COUNT
 import ru.kcheranev.trading.core.strategy.factory.MovingMomentumLongStrategyParameter.LONG_MACD_BAR_COUNT
 import ru.kcheranev.trading.core.strategy.factory.MovingMomentumLongStrategyParameter.SHORT_EMA_BAR_COUNT
 import ru.kcheranev.trading.core.strategy.factory.MovingMomentumLongStrategyParameter.SHORT_MACD_BAR_COUNT
 import ru.kcheranev.trading.core.strategy.factory.MovingMomentumLongStrategyParameter.STOCHASTIC_OSCILLATOR_K_BAR_COUNT
+import ru.kcheranev.trading.core.util.Validator.Companion.validateOrThrow
 import ru.kcheranev.trading.domain.model.CustomizedBarSeries
 import ru.kcheranev.trading.domain.model.StrategyParameter
 import ru.kcheranev.trading.domain.model.StrategyParameters
@@ -29,18 +29,16 @@ class MovingMomentumLongStrategyFactory : LongStrategyFactory() {
         parameters: StrategyParameters,
         series: CustomizedBarSeries
     ): TradeStrategy {
-        val shortEmaBarCount = parameters.getAsInt(SHORT_EMA_BAR_COUNT)
-        val longEmaBarCount = parameters.getAsInt(LONG_EMA_BAR_COUNT)
-        val shortMacdBarCount = parameters.getAsInt(SHORT_MACD_BAR_COUNT)
-        val longMacdBarCount = parameters.getAsInt(LONG_MACD_BAR_COUNT)
-        val emaMacdBarCount = parameters.getAsInt(EMA_MACD_BAR_COUNT)
-        val stochasticOscillatorKBarCount = parameters.getAsInt(STOCHASTIC_OSCILLATOR_K_BAR_COUNT)
+        val shortEmaBarCount = parameters.getAsIntOrThrow(SHORT_EMA_BAR_COUNT)
+        val longEmaBarCount = parameters.getAsIntOrThrow(LONG_EMA_BAR_COUNT)
+        val shortMacdBarCount = parameters.getAsIntOrThrow(SHORT_MACD_BAR_COUNT)
+        val longMacdBarCount = parameters.getAsIntOrThrow(LONG_MACD_BAR_COUNT)
+        val emaMacdBarCount = parameters.getAsIntOrThrow(EMA_MACD_BAR_COUNT)
+        val stochasticOscillatorKBarCount = parameters.getAsIntOrThrow(STOCHASTIC_OSCILLATOR_K_BAR_COUNT)
 
-        if (shortEmaBarCount >= longEmaBarCount) {
-            throw StrategyParamValidationException("longEmaBarCount must be greater than shortEmaBarCount")
-        }
-        if (shortMacdBarCount >= longMacdBarCount) {
-            throw StrategyParamValidationException("longMacdBarCount must be greater than shortMacdBarCount")
+        validateOrThrow {
+            if (shortEmaBarCount >= longEmaBarCount) addError("longEmaBarCount must be greater than shortEmaBarCount")
+            if (shortMacdBarCount >= longMacdBarCount) addError("longMacdBarCount must be greater than shortMacdBarCount")
         }
 
         val closePrice = ClosePriceIndicator(series)

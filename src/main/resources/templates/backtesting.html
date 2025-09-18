@@ -29,10 +29,18 @@
                         <h5>Candles series from file</h5>
                     </label>
                     <div class="row gy-3 mt-1" id="fileInputFields">
-                        <div class="col-12">
+                        <div class="col-12"
+                             th:with="hasCandlesSeriesFileError=${validationErrors != null && validationErrors.fieldErrors.containsKey('candlesSeriesFile')}">
                             <label for="candlesSeriesFile" class="form-label">Candles series file</label>
                             <input id="candlesSeriesFile" type="file" name="candlesSeriesFile" class="form-control"
-                                   accept=".json">
+                                   accept=".json" th:classappend="${hasCandlesSeriesFileError} ? 'is-invalid' : ''"
+                                   th:attr="aria-describedby=${hasCandlesSeriesFileError} ? 'validationCandlesSeriesFileError' : null">
+                            <div th:if="${hasCandlesSeriesFileError}" id="validationCandlesSeriesFileError"
+                                 class="invalid-feedback">
+                                <div th:each="err : ${validationErrors.fieldErrors.get('candlesSeriesFile')}"
+                                     th:text="${err}"
+                                     class="error"/>
+                            </div>
                         </div>
                         <th:block th:if="${session.candlesSeriesFileName != null}">
                             <small class="text-body-secondary"
@@ -69,13 +77,27 @@
                                 </option>
                             </select>
                         </div>
-                        <div class="col-6">
+                        <div class="col-6"
+                             th:with="hasFromError=${validationErrors != null && validationErrors.fieldErrors.containsKey('from')}">
                             <label for="fromDate" class="form-label">Date from</label>
-                            <input id="fromDate" type="date" name="from" class="form-control" th:value="*{from}">
+                            <input id="fromDate" type="date" name="from" class="form-control"
+                                   th:value="*{from}" th:classappend="${hasFromError} ? 'is-invalid' : ''"
+                                   th:attr="aria-describedby=${hasFromError} ? 'validationFromError' : null">
+                            <div th:if="${hasFromError}" id="validationFromError" class="invalid-feedback">
+                                <div th:each="err : ${validationErrors.fieldErrors.get('from')}" th:text="${err}"
+                                     class="error"/>
+                            </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-6"
+                             th:with="hasToError=${validationErrors != null && validationErrors.fieldErrors.containsKey('to')}">
                             <label for="toDate" class="form-label">Date to</label>
-                            <input id="toDate" type="date" name="to" class="form-control" th:value="*{to}">
+                            <input id="toDate" type="date" name="to" class="form-control" th:value="*{to}"
+                                   th:classappend="${hasToError} ? 'is-invalid' : ''"
+                                   th:attr="aria-describedby=${hasToError} ? 'validationToError' : null">
+                            <div th:if="${hasToError}" id="validationToError" class="invalid-feedback">
+                                <div th:each="err : ${validationErrors.fieldErrors.get('to')}" th:text="${err}"
+                                     class="error"/>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -142,14 +164,22 @@
                                 <div class="col-12">
                                     <label class="form-label" th:text="${strategyParameter.key}"
                                            th:for="${strategyParameter.key}"></label>
-                                    <div class="input-group">
+                                    <div class="input-group"
+                                         th:with="hasError=${validationErrors != null && validationErrors.fieldErrors.containsKey(strategyParameter.key)}">
                                         <div class="input-group-text">
                                             <input class="form-check-input mt-0" type="checkbox"
                                                    th:field="*{strategyParameters[__${strategyParameter.key}__].mutable}">
                                         </div>
                                         <input class="form-control" th:id="${strategyParameter.key}"
                                                th:field="*{strategyParameters[__${strategyParameter.key}__].value}"
+                                               th:classappend="${hasError} ? 'is-invalid' : ''"
+                                               th:attr="aria-describedby=${hasError} ? ${strategyParameter.key} + 'Error' : null"
                                                type="number" step="any">
+                                        <div th:if="${hasError}" th:id="${strategyParameter.key} + 'Error'"
+                                             class="invalid-feedback">
+                                            <div th:each="err : ${validationErrors.fieldErrors.get(strategyParameter.key)}"
+                                                 th:text="${err}" class="error"/>
+                                        </div>
                                     </div>
                                 </div>
                             </th:block>
