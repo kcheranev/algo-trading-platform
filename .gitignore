@@ -40,4 +40,4 @@ out/
 .vscode/
 
 ### Other ###
-src/main/kotlin/ru/kcheranev/trading/core/strategy/factory/shadow
+src/main/kotlin/com/github/trading/core/strategy/factory/shadow

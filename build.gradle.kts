@@ -7,7 +7,7 @@ plugins {
     kotlin("plugin.spring")
 }
 
-group = "ru.kcheranev"
+group = "com.github"
 version = "1.0.0"
 
 val arrowVersion by extra("1.2.4")

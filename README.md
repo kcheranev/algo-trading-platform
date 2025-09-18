@@ -26,11 +26,11 @@ markets.
 
 To add a new strategy:
 
-1. Create a class implementing the interface: `ru.kcheranev.trading.core.strategy.factory.StrategyFactory`.
+1. Create a class implementing the interface: `com.github.trading.core.strategy.factory.StrategyFactory`.
 2. Register it as a Spring bean.
 
 📌 **Example strategies** are available in the package:  
-`ru.kcheranev.trading.core.strategy.factory`
+`com.github.trading.core.strategy.factory`
 
 ---
 
@@ -50,7 +50,7 @@ Supported data sources:
 
 The platform provides a REST API for managing strategies and trading sessions.  
 Interactive API documentation (Swagger UI) is available at:  
-👉 [http://localhost:8080/ui/swagger](http://localhost:8080/ui/swagger)
+👉 [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
 
 ---
 
