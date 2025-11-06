@@ -4,11 +4,11 @@ import com.github.trading.core.strategy.factory.RsiStrategyLongParameter.LENGTH
 import com.github.trading.core.strategy.factory.RsiStrategyLongParameter.OVER_BOUGHT
 import com.github.trading.core.strategy.factory.RsiStrategyLongParameter.OVER_SOLD
 import com.github.trading.core.util.Validator.Companion.validateOrThrow
-import com.github.trading.domain.model.CustomizedBarSeries
 import com.github.trading.domain.model.StrategyParameter
 import com.github.trading.domain.model.StrategyParameters
 import com.github.trading.domain.model.TradeStrategy
 import org.springframework.stereotype.Component
+import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseStrategy
 import org.ta4j.core.indicators.RSIIndicator
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator
@@ -18,7 +18,7 @@ import org.ta4j.core.rules.CrossedUpIndicatorRule
 @Component
 class RsiLongStrategyFactory : LongStrategyFactory() {
 
-    override fun initStrategy(parameters: StrategyParameters, series: CustomizedBarSeries): TradeStrategy {
+    override fun initStrategy(parameters: StrategyParameters, series: BarSeries): TradeStrategy {
         val overSold = parameters.getAsIntOrThrow(OVER_SOLD)
         val overBought = parameters.getAsIntOrThrow(OVER_BOUGHT)
         val length = parameters.getAsIntOrThrow(LENGTH)
@@ -37,7 +37,7 @@ class RsiLongStrategyFactory : LongStrategyFactory() {
 
     override val strategyName = "RSI"
 
-    override fun strategyParameterNames() = RsiStrategyLongParameter.entries.map { it.alias() }
+    override fun strategyParameterNames() = RsiStrategyLongParameter.entries.map(RsiStrategyLongParameter::alias)
 
 }
 

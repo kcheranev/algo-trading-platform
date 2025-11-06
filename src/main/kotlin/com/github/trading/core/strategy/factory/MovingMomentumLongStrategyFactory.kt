@@ -7,15 +7,15 @@ import com.github.trading.core.strategy.factory.MovingMomentumLongStrategyParame
 import com.github.trading.core.strategy.factory.MovingMomentumLongStrategyParameter.SHORT_MACD_BAR_COUNT
 import com.github.trading.core.strategy.factory.MovingMomentumLongStrategyParameter.STOCHASTIC_OSCILLATOR_K_BAR_COUNT
 import com.github.trading.core.util.Validator.Companion.validateOrThrow
-import com.github.trading.domain.model.CustomizedBarSeries
 import com.github.trading.domain.model.StrategyParameter
 import com.github.trading.domain.model.StrategyParameters
 import com.github.trading.domain.model.TradeStrategy
 import org.springframework.stereotype.Component
+import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseStrategy
-import org.ta4j.core.indicators.EMAIndicator
 import org.ta4j.core.indicators.MACDIndicator
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator
+import org.ta4j.core.indicators.averages.EMAIndicator
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator
 import org.ta4j.core.rules.CrossedDownIndicatorRule
 import org.ta4j.core.rules.CrossedUpIndicatorRule
@@ -25,10 +25,7 @@ import org.ta4j.core.rules.UnderIndicatorRule
 @Component
 class MovingMomentumLongStrategyFactory : LongStrategyFactory() {
 
-    override fun initStrategy(
-        parameters: StrategyParameters,
-        series: CustomizedBarSeries
-    ): TradeStrategy {
+    override fun initStrategy(parameters: StrategyParameters, series: BarSeries): TradeStrategy {
         val shortEmaBarCount = parameters.getAsIntOrThrow(SHORT_EMA_BAR_COUNT)
         val longEmaBarCount = parameters.getAsIntOrThrow(LONG_EMA_BAR_COUNT)
         val shortMacdBarCount = parameters.getAsIntOrThrow(SHORT_MACD_BAR_COUNT)
@@ -63,7 +60,7 @@ class MovingMomentumLongStrategyFactory : LongStrategyFactory() {
 
     override val strategyName = "MOVING_MOMENTUM"
 
-    override fun strategyParameterNames() = MovingMomentumLongStrategyParameter.entries.map { it.alias() }
+    override fun strategyParameterNames() = MovingMomentumLongStrategyParameter.entries.map(MovingMomentumLongStrategyParameter::alias)
 }
 
 private enum class MovingMomentumLongStrategyParameter(private val alias: String) : StrategyParameter {

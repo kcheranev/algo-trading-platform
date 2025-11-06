@@ -3,7 +3,7 @@ package com.github.trading.core.service
 import com.github.trading.core.port.income.subscription.RefreshCandleSubscriptionsUseCase
 import com.github.trading.core.port.income.subscription.SearchCandleSubscriptionUseCase
 import com.github.trading.core.port.outcome.broker.MarketDataStreamSubscriptionBrokerPort
-import com.github.trading.core.port.outcome.broker.SubscribeCandlesOrderCommand
+import com.github.trading.core.port.outcome.broker.SubscribeCandlesCommand
 import com.github.trading.core.port.outcome.broker.UnsubscribeCandlesOrderCommand
 import com.github.trading.core.port.outcome.persistence.tradesession.TradeSessionPersistencePort
 import com.github.trading.domain.model.subscription.CandleSubscription
@@ -31,7 +31,7 @@ class SubscriptionService(
         expectedCandleSubscriptions.minus(activeCandleSubscriptions)
             .forEach {
                 marketDataStreamSubscriptionBrokerPort.subscribeCandles(
-                    SubscribeCandlesOrderCommand(it.instrument, it.candleInterval)
+                    SubscribeCandlesCommand(it.instrument, it.candleInterval)
                 )
             }
     }

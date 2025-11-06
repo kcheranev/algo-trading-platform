@@ -2,9 +2,6 @@ package com.github.trading.infra.adapter.outcome.broker.impl
 
 import arrow.core.Either
 import arrow.core.Either.Companion.catch
-import org.slf4j.LoggerFactory
-import org.springframework.cache.CacheManager
-import org.springframework.stereotype.Component
 import com.github.trading.common.getOrPut
 import com.github.trading.core.error.BrokerIntegrationError
 import com.github.trading.core.error.GetShareByIdError
@@ -12,13 +9,19 @@ import com.github.trading.core.port.outcome.broker.GetShareByIdCommand
 import com.github.trading.core.port.outcome.broker.InstrumentServiceBrokerPort
 import com.github.trading.domain.exception.InfrastructureException
 import com.github.trading.domain.model.Share
-import ru.tinkoff.piapi.core.InstrumentsService
+import org.slf4j.LoggerFactory
+import org.springframework.cache.CacheManager
+import org.springframework.stereotype.Component
+import ru.tinkoff.piapi.contract.v1.InstrumentIdType
+import ru.tinkoff.piapi.contract.v1.InstrumentRequest
+import ru.tinkoff.piapi.contract.v1.InstrumentsServiceGrpc.InstrumentsServiceBlockingStub
+import ru.ttech.piapi.core.connector.SyncStubWrapper
 
 private const val INSTRUMENTS_CACHE = "instruments"
 
 @Component
 class InstrumentBrokerOutcomeAdapter(
-    private val brokerInstrumentsService: InstrumentsService,
+    private val brokerInstrumentServiceWrapper: SyncStubWrapper<InstrumentsServiceBlockingStub>,
     cacheManager: CacheManager
 ) : InstrumentServiceBrokerPort {
 
@@ -31,7 +34,14 @@ class InstrumentBrokerOutcomeAdapter(
     override fun getShareById(command: GetShareByIdCommand): Either<BrokerIntegrationError, Share> =
         catch {
             instrumentsCache.getOrPut(command.instrumentId) {
-                brokerInstrumentsService.getShareByUidSync(command.instrumentId)
+                brokerInstrumentServiceWrapper.callSyncMethod { stub ->
+                    stub.shareBy(
+                        InstrumentRequest.newBuilder()
+                            .setIdType(InstrumentIdType.INSTRUMENT_ID_TYPE_UID)
+                            .setId(command.instrumentId)
+                            .build()
+                    )
+                }.instrument
             }.let { share -> Share(id = share.uid, ticker = share.ticker, lot = share.lot) }
         }.onLeft { ex -> log.error("An error has been occurred while getting share by id", ex) }
             .mapLeft { GetShareByIdError }

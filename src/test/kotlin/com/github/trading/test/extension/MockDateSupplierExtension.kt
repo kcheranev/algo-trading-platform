@@ -4,7 +4,7 @@ import com.github.trading.common.date.DateSupplier
 import io.kotest.core.listeners.AfterEachListener
 import io.kotest.core.listeners.BeforeEachListener
 import io.kotest.core.test.TestCase
-import io.kotest.core.test.TestResult
+import io.kotest.engine.test.TestResult
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject

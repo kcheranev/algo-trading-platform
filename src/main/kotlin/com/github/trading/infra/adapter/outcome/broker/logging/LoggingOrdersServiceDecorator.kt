@@ -3,12 +3,14 @@ package com.github.trading.infra.adapter.outcome.broker.logging
 import org.slf4j.LoggerFactory
 import ru.tinkoff.piapi.contract.v1.OrderDirection
 import ru.tinkoff.piapi.contract.v1.OrderType
+import ru.tinkoff.piapi.contract.v1.OrdersServiceGrpc.OrdersServiceBlockingStub
+import ru.tinkoff.piapi.contract.v1.PostOrderRequest
 import ru.tinkoff.piapi.contract.v1.PostOrderResponse
 import ru.tinkoff.piapi.contract.v1.Quotation
-import ru.tinkoff.piapi.core.OrdersService
-import ru.tinkoff.piapi.core.utils.MapperUtils.moneyValueToBigDecimal
+import ru.ttech.piapi.core.connector.SyncStubWrapper
+import ru.ttech.piapi.core.helpers.NumberMapper.moneyValueToBigDecimal
 
-class LoggingOrdersServiceDecorator(private val brokerOrdersService: OrdersService) {
+class LoggingOrdersServiceDecorator(private val brokerOrdersServiceWrapper: SyncStubWrapper<OrdersServiceBlockingStub>) {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -18,7 +20,7 @@ class LoggingOrdersServiceDecorator(private val brokerOrdersService: OrdersServi
         price: Quotation,
         direction: OrderDirection,
         accountId: String,
-        type: OrderType,
+        orderType: OrderType,
         orderId: String
     ): PostOrderResponse {
         log.info(
@@ -29,19 +31,23 @@ class LoggingOrdersServiceDecorator(private val brokerOrdersService: OrdersServi
             price = $price
             direction = $direction
             accountId = $accountId
-            type = $type
+            type = $orderType
             orderId = $orderId
         """.trimIndent()
         )
-        val postOrderResponse = brokerOrdersService.postOrderSync(
-            instrumentId,
-            quantity,
-            price,
-            direction,
-            accountId,
-            type,
-            orderId
-        )
+        val postOrderResponse = brokerOrdersServiceWrapper.callSyncMethod { stub ->
+            stub.postOrder(
+                PostOrderRequest.newBuilder()
+                    .setInstrumentId(instrumentId)
+                    .setQuantity(quantity)
+                    .setPrice(price)
+                    .setDirection(direction)
+                    .setAccountId(accountId)
+                    .setOrderType(orderType)
+                    .setOrderId(orderId)
+                    .build()
+            )
+        }
         log.info(
             """
             Outgoing broker postOrderSync response with result

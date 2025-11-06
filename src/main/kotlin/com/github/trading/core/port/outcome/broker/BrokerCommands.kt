@@ -16,7 +16,7 @@ data class PostBestPriceSellOrderCommand(
     val quantity: Int
 )
 
-data class SubscribeCandlesOrderCommand(
+data class SubscribeCandlesCommand(
     val instrument: Instrument,
     val candleInterval: CandleInterval
 )

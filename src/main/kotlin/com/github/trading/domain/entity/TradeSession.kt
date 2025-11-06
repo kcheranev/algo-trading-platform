@@ -16,7 +16,6 @@ import com.github.trading.domain.entity.TradeSessionStatus.PENDING_EXIT
 import com.github.trading.domain.entity.TradeSessionStatus.STOPPED
 import com.github.trading.domain.entity.TradeSessionStatus.WAITING
 import com.github.trading.domain.exception.TradeSessionDomainException
-import com.github.trading.domain.mapper.domainModelMapper
 import com.github.trading.domain.model.Candle
 import com.github.trading.domain.model.CandleInterval
 import com.github.trading.domain.model.Instrument
@@ -60,7 +59,7 @@ data class TradeSession(
                 "Unable to process income candle: new candle date intersects trade session $about series dates"
             )
         }
-        strategy.addBar(domainModelMapper.map(candle))
+        strategy.addBar(candle)
         registerEvent(TradeStrategySeriesCandleAddedDomainEvent(this))
         executeStrategy()
     }

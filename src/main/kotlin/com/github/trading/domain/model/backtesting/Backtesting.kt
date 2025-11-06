@@ -6,11 +6,11 @@ import com.github.trading.core.strategy.factory.StrategyFactory
 import com.github.trading.domain.exception.BusinessException
 import com.github.trading.domain.mapper.domainModelMapper
 import com.github.trading.domain.model.Candle
-import com.github.trading.domain.model.CustomizedBarSeries
 import com.github.trading.domain.model.StrategyParameters
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
+import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseBarSeriesBuilder
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -25,26 +25,23 @@ class Backtesting(
     candles: List<Candle>
 ) {
 
-    private val series: CustomizedBarSeries =
-        CustomizedBarSeries(
-            BaseBarSeriesBuilder()
-                .withName("Trade session: $name")
-                .withBars(candles.map(domainModelMapper::map))
-                .build()
-        )
+    private val series: BarSeries =
+        BaseBarSeriesBuilder()
+            .withName("Trade session: $name")
+            .build()
 
     private val daysCount =
         candles.map { it.endDateTime.toLocalDate() }
             .distinct()
             .count()
 
-    fun analyzeStrategy(
-        strategyFactory: StrategyFactory,
-        parameters: StrategyParameters
-    ) = strategyFactory.initStrategy(parameters, series)
-        .analyze(commission)
+    init {
+        candles.forEach { candle ->
+            series.addBar(domainModelMapper.map(candle, series.barBuilder()))
+        }
+    }
 
-    fun analyzeStrategyParameters(
+    fun analyzeStrategy(
         strategyFactory: StrategyFactory,
         parameters: StrategyParameters,
         mutableParameters: StrategyParameters,
@@ -59,7 +56,7 @@ class Backtesting(
         val mutableParametersCartesianProduct = cartesianProduct(mutableParametersVariants)
         return runBlocking {
             mutableParametersCartesianProduct.map { paramVariant ->
-                async { analyzeParametersVariant(strategyFactory, paramVariant + parameters) }
+                async { analyzeStrategyVariant(strategyFactory, paramVariant + parameters) }
             }.awaitAll()
         }.asSequence()
             .filterNotNull()
@@ -134,12 +131,11 @@ class Backtesting(
                 }
             }
 
-    private fun analyzeParametersVariant(
-        strategyFactory: StrategyFactory,
-        parameters: Map<String, Number>
-    ): StrategyParametersAnalyzeResult? =
+    private fun analyzeStrategyVariant(strategyFactory: StrategyFactory, parameters: Map<String, Number>): StrategyParametersAnalyzeResult? =
         try {
-            StrategyParametersAnalyzeResult(analyzeStrategy(strategyFactory, StrategyParameters(parameters)), parameters)
+            strategyFactory.initStrategy(StrategyParameters(parameters), series)
+                .analyze(commission)
+                .let { result -> StrategyParametersAnalyzeResult(result, parameters) }
         } catch (_: Exception) {
             null
         }

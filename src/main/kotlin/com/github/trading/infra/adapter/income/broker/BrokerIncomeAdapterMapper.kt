@@ -1,26 +1,27 @@
 package com.github.trading.infra.adapter.income.broker
 
+import com.github.trading.common.date.utcAsMskLocalDateTime
 import com.github.trading.domain.model.Candle
 import com.github.trading.domain.model.CandleInterval
-import com.github.trading.infra.adapter.mapper.commonBrokerMapper
 import org.mapstruct.Mapper
 import org.mapstruct.factory.Mappers
 import ru.tinkoff.piapi.contract.v1.SubscriptionInterval
+import ru.ttech.piapi.core.impl.marketdata.wrapper.CandleWrapper
 
 @Mapper
 abstract class BrokerIncomeAdapterMapper {
 
-    fun map(source: ru.tinkoff.piapi.contract.v1.Candle): Candle =
+    fun map(source: CandleWrapper): Candle =
         with(source) {
             val candleInterval = map(interval)
             return Candle(
                 interval = candleInterval,
-                openPrice = commonBrokerMapper.map(open),
-                closePrice = commonBrokerMapper.map(close),
-                highestPrice = commonBrokerMapper.map(high),
-                lowestPrice = commonBrokerMapper.map(low),
+                openPrice = source.open,
+                closePrice = source.close,
+                highestPrice = source.high,
+                lowestPrice = source.low,
                 volume = volume,
-                endDateTime = commonBrokerMapper.map(time) + candleInterval.duration,
+                endDateTime = time.utcAsMskLocalDateTime() + candleInterval.duration,
                 instrumentId = instrumentUid
             )
         }

@@ -1,6 +1,6 @@
 package com.github.trading.test.integration
 
-import com.github.trading.common.date.toMskZonedDateTime
+import com.github.trading.common.date.toMskInstant
 import com.github.trading.core.port.income.marketdata.ProcessIncomeCandleCommand
 import com.github.trading.core.service.MarketDataProcessingService
 import com.github.trading.core.strategy.lotsquantity.LOTS_QUANTITY_STRATEGY_PARAMETER_NAME
@@ -11,6 +11,8 @@ import com.github.trading.domain.model.CandleInterval
 import com.github.trading.domain.model.Instrument
 import com.github.trading.domain.model.Position
 import com.github.trading.domain.model.TradeStrategy
+import com.github.trading.domain.model.subscription.CandleSubscription
+import com.github.trading.infra.adapter.outcome.broker.impl.CandleSubscriptionCacheHolder
 import com.github.trading.infra.adapter.outcome.persistence.entity.InstrumentEntity
 import com.github.trading.infra.adapter.outcome.persistence.entity.TradeOrderEntity
 import com.github.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
@@ -21,7 +23,6 @@ import com.github.trading.test.stub.grpc.OperationsBrokerGrpcStub
 import com.github.trading.test.stub.grpc.OrdersBrokerGrpcStub
 import com.github.trading.test.stub.grpc.UsersBrokerGrpcStub
 import com.github.trading.test.stub.http.TelegramNotificationHttpStub
-import com.github.trading.test.util.MarketDataSubscriptionInitializer
 import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
@@ -31,7 +32,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate
-import org.ta4j.core.BaseBar
 import org.ta4j.core.BaseBarSeriesBuilder
 import org.ta4j.core.Strategy
 import java.math.BigDecimal
@@ -44,7 +44,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
     private val marketDataProcessingService: MarketDataProcessingService,
     private val jdbcTemplate: JdbcAggregateTemplate,
     private val tradeStrategyCache: TradeStrategyCache,
-    private val marketDataSubscriptionInitializer: MarketDataSubscriptionInitializer,
+    private val candleSubscriptionCacheHolder: CandleSubscriptionCacheHolder,
     private val telegramNotificationHttpStub: TelegramNotificationHttpStub,
     private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
@@ -92,15 +92,15 @@ class EnterTradeSessionWithRetriesIntegrationTest(
             BaseBarSeriesBuilder().build()
                 .apply {
                     addBar(
-                        BaseBar(
-                            Duration.ofMinutes(1),
-                            LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
-                            BigDecimal(100),
-                            BigDecimal(102),
-                            BigDecimal(98),
-                            BigDecimal(102),
-                            BigDecimal(10)
-                        )
+                        barBuilder()
+                            .timePeriod(Duration.ofMinutes(1))
+                            .endTime(LocalDateTime.parse("2024-01-30T10:15:00").toMskInstant())
+                            .openPrice(BigDecimal(100))
+                            .highPrice(BigDecimal(102))
+                            .lowPrice(BigDecimal(98))
+                            .closePrice(BigDecimal(102))
+                            .volume(10)
+                            .build()
                     )
                 }
         val tradeStrategy =
@@ -109,9 +109,8 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 every { shouldExit(any(Position::class)) } returns false
             }
         tradeStrategyCache.put(tradeSessionId, tradeStrategy)
-        marketDataSubscriptionInitializer.addSubscription(
-            Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
-            CandleInterval.ONE_MIN
+        candleSubscriptionCacheHolder.add(
+            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"), CandleInterval.ONE_MIN)
         )
         val candle =
             Candle(
@@ -182,15 +181,15 @@ class EnterTradeSessionWithRetriesIntegrationTest(
             BaseBarSeriesBuilder().build()
                 .apply {
                     addBar(
-                        BaseBar(
-                            Duration.ofMinutes(1),
-                            LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
-                            BigDecimal(100),
-                            BigDecimal(102),
-                            BigDecimal(98),
-                            BigDecimal(102),
-                            BigDecimal(10)
-                        )
+                        barBuilder()
+                            .timePeriod(Duration.ofMinutes(1))
+                            .endTime(LocalDateTime.parse("2024-01-30T10:15:00").toMskInstant())
+                            .openPrice(BigDecimal(100))
+                            .highPrice(BigDecimal(102))
+                            .lowPrice(BigDecimal(98))
+                            .closePrice(BigDecimal(102))
+                            .volume(10)
+                            .build()
                     )
                 }
         val tradeStrategy =
@@ -199,9 +198,8 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 every { shouldExit(any(Position::class)) } returns false
             }
         tradeStrategyCache.put(tradeSessionId, tradeStrategy)
-        marketDataSubscriptionInitializer.addSubscription(
-            Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
-            CandleInterval.ONE_MIN
+        candleSubscriptionCacheHolder.add(
+            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"), CandleInterval.ONE_MIN)
         )
         val candle =
             Candle(
@@ -272,15 +270,15 @@ class EnterTradeSessionWithRetriesIntegrationTest(
             BaseBarSeriesBuilder().build()
                 .apply {
                     addBar(
-                        BaseBar(
-                            Duration.ofMinutes(1),
-                            LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
-                            BigDecimal(100),
-                            BigDecimal(102),
-                            BigDecimal(98),
-                            BigDecimal(102),
-                            BigDecimal(10)
-                        )
+                        barBuilder()
+                            .timePeriod(Duration.ofMinutes(1))
+                            .endTime(LocalDateTime.parse("2024-01-30T10:15:00").toMskInstant())
+                            .openPrice(BigDecimal(100))
+                            .highPrice(BigDecimal(102))
+                            .lowPrice(BigDecimal(98))
+                            .closePrice(BigDecimal(102))
+                            .volume(10)
+                            .build()
                     )
                 }
         val tradeStrategy =
@@ -289,9 +287,8 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 every { shouldExit(any(Position::class)) } returns false
             }
         tradeStrategyCache.put(tradeSessionId, tradeStrategy)
-        marketDataSubscriptionInitializer.addSubscription(
-            Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
-            CandleInterval.ONE_MIN
+        candleSubscriptionCacheHolder.add(
+            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"), CandleInterval.ONE_MIN)
         )
         val candle =
             Candle(
@@ -348,15 +345,15 @@ class EnterTradeSessionWithRetriesIntegrationTest(
             BaseBarSeriesBuilder().build()
                 .apply {
                     addBar(
-                        BaseBar(
-                            Duration.ofMinutes(1),
-                            LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
-                            BigDecimal(100),
-                            BigDecimal(102),
-                            BigDecimal(98),
-                            BigDecimal(102),
-                            BigDecimal(10)
-                        )
+                        barBuilder()
+                            .timePeriod(Duration.ofMinutes(1))
+                            .endTime(LocalDateTime.parse("2024-01-30T10:15:00").toMskInstant())
+                            .openPrice(BigDecimal(100))
+                            .highPrice(BigDecimal(102))
+                            .lowPrice(BigDecimal(98))
+                            .closePrice(BigDecimal(102))
+                            .volume(10)
+                            .build()
                     )
                 }
         val tradeStrategy =
@@ -365,9 +362,8 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 every { shouldExit(any(Position::class)) } returns false
             }
         tradeStrategyCache.put(tradeSessionId, tradeStrategy)
-        marketDataSubscriptionInitializer.addSubscription(
-            Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
-            CandleInterval.ONE_MIN
+        candleSubscriptionCacheHolder.add(
+            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"), CandleInterval.ONE_MIN)
         )
         val candle =
             Candle(
@@ -421,15 +417,15 @@ class EnterTradeSessionWithRetriesIntegrationTest(
             BaseBarSeriesBuilder().build()
                 .apply {
                     addBar(
-                        BaseBar(
-                            Duration.ofMinutes(1),
-                            LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
-                            BigDecimal(100),
-                            BigDecimal(102),
-                            BigDecimal(98),
-                            BigDecimal(102),
-                            BigDecimal(10)
-                        )
+                        barBuilder()
+                            .timePeriod(Duration.ofMinutes(1))
+                            .endTime(LocalDateTime.parse("2024-01-30T10:15:00").toMskInstant())
+                            .openPrice(BigDecimal(100))
+                            .highPrice(BigDecimal(102))
+                            .lowPrice(BigDecimal(98))
+                            .closePrice(BigDecimal(102))
+                            .volume(10)
+                            .build()
                     )
                 }
         val tradeStrategy =
@@ -438,9 +434,8 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 every { shouldExit(any(Position::class)) } returns false
             }
         tradeStrategyCache.put(tradeSessionId, tradeStrategy)
-        marketDataSubscriptionInitializer.addSubscription(
-            Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
-            CandleInterval.ONE_MIN
+        candleSubscriptionCacheHolder.add(
+            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"), CandleInterval.ONE_MIN)
         )
         val candle =
             Candle(

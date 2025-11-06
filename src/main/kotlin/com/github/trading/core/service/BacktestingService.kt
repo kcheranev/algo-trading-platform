@@ -38,7 +38,7 @@ class BacktestingService(
                 candles = candles
             )
         val strategyFactory = strategyFactoryProvider.getStrategyFactory(command.strategyType)
-        return backtesting.analyzeStrategyParameters(
+        return backtesting.analyzeStrategy(
             strategyFactory = strategyFactory,
             parameters = command.strategyParameters,
             mutableParameters = command.mutableStrategyParameters,
@@ -57,7 +57,7 @@ class BacktestingService(
                 candles = candles
             )
         val strategyFactory = strategyFactoryProvider.getStrategyFactory(command.strategyType)
-        return backtesting.analyzeStrategyParameters(
+        return backtesting.analyzeStrategy(
             strategyFactory = strategyFactory,
             parameters = command.strategyParameters,
             mutableParameters = command.mutableStrategyParameters,

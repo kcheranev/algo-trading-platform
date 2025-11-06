@@ -11,13 +11,15 @@ import com.github.trading.infra.config.properties.BrokerProperties
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Component
-import ru.tinkoff.piapi.core.UsersService
+import ru.tinkoff.piapi.contract.v1.GetAccountsRequest
+import ru.tinkoff.piapi.contract.v1.UsersServiceGrpc.UsersServiceBlockingStub
+import ru.ttech.piapi.core.connector.SyncStubWrapper
 
 private const val ACCOUNT_ID_CACHE = "accountId"
 
 @Component
 class UserServiceBrokerOutcomeAdapter(
-    private val brokerUsersService: UsersService,
+    private val brokerUsersServiceWrapper: SyncStubWrapper<UsersServiceBlockingStub>,
     brokerProperties: BrokerProperties,
     cacheManager: CacheManager
 ) : UserServiceBrokerPort {
@@ -33,9 +35,12 @@ class UserServiceBrokerOutcomeAdapter(
     override fun getTradingAccountId(): Either<BrokerIntegrationError, String> =
         catch {
             accountIdCache.getOrPut("accountId") {
-                brokerUsersService.accountsSync
-                    .first { it.name == tradingAccountName }
-                    .id
+                brokerUsersServiceWrapper.callSyncMethod { stub ->
+                    stub.getAccounts(GetAccountsRequest.newBuilder().build())
+                        .accountsList
+                        .first { it.name == tradingAccountName }
+                        .id
+                }
             }
         }.onLeft { ex -> log.error("An error has been occurred while getting trading account", ex) }
             .mapLeft { GetTradingAccountError }

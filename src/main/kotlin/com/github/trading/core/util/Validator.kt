@@ -2,7 +2,6 @@ package com.github.trading.core.util
 
 import arrow.core.Either
 import arrow.core.Either.Companion.catch
-import arrow.core.raise.Raise
 import arrow.core.raise.either
 import com.github.trading.core.error.ValidationError
 import com.github.trading.domain.exception.ValidationException
@@ -44,10 +43,6 @@ class Validator {
                     raise(ValidationError(validator.errors, validator.fieldErrors))
                 }
             }.onLeft { validationError -> log.warn(validationError.message) }
-
-        fun Raise<ValidationError>.validate(doValidate: Validator.() -> Unit) {
-            Validator.validate(doValidate).onLeft { error -> raise(error) }
-        }
 
         fun validateOrThrow(doValidate: Validator.() -> Unit) {
             validate(doValidate).onLeft { validationError -> throw ValidationException("Validation failed", validationError.errors) }
@@ -153,4 +148,3 @@ class FieldValidator(
     }
 
 }
-

@@ -34,7 +34,7 @@ class DepositPercentOrderLotsQuantityStrategy(
                 field("depositPercent") {
                     depositPercent.shouldBeLessThanOrEquals(BigDecimal("1.0"))
                 }
-            }
+            }.bind()
             val portfolio =
                 operationServiceBrokerPort.getPortfolio()
                     .mapLeft { OrderLotsQuantityCalculatingError }

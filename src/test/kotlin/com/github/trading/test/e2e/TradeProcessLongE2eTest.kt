@@ -27,9 +27,14 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.mockk.verify
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import org.springframework.http.HttpStatus
+import ru.tinkoff.piapi.contract.v1.SubscriptionInterval
+import ru.ttech.piapi.core.impl.marketdata.MarketDataStreamManager
+import ru.ttech.piapi.core.impl.marketdata.subscription.CandleSubscriptionSpec
+import ru.ttech.piapi.core.impl.marketdata.subscription.Instrument
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
@@ -39,6 +44,7 @@ class TradeProcessLongE2eTest(
     private val marketDataProcessingService: MarketDataProcessingService,
     private val testRestTemplate: TestRestTemplate,
     private val jdbcTemplate: JdbcAggregateTemplate,
+    private val marketDataStreamManager: MarketDataStreamManager,
     private val telegramNotificationHttpStub: TelegramNotificationHttpStub,
     private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
@@ -89,6 +95,13 @@ class TradeProcessLongE2eTest(
             CreateTradeSessionResponseDto::class.java
         )
         createTradeSessionResponse.statusCode shouldBe HttpStatus.OK
+        verify {
+            marketDataStreamManager.subscribeCandles(
+                setOf(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
+                any<CandleSubscriptionSpec>(),
+                any()
+            )
+        }
 
         //income candle event
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")

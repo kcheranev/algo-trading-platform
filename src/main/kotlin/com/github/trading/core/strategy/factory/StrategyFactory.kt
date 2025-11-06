@@ -1,6 +1,5 @@
 package com.github.trading.core.strategy.factory
 
-import com.github.trading.domain.model.CustomizedBarSeries
 import com.github.trading.domain.model.StrategyParameters
 import com.github.trading.domain.model.TradeStrategy
 import org.ta4j.core.BarSeries
@@ -8,10 +7,7 @@ import org.ta4j.core.Strategy
 
 interface StrategyFactory {
 
-    fun initStrategy(
-        parameters: StrategyParameters,
-        series: CustomizedBarSeries
-    ): TradeStrategy
+    fun initStrategy(parameters: StrategyParameters, series: BarSeries): TradeStrategy
 
     fun strategyType(): String
 

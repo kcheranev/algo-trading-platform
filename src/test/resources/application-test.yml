@@ -7,6 +7,10 @@ spring:
 wiremock:
   reset-mappings-after-each-test: true
 
+invest:
+  connector:
+    token: token
+
 application:
   trading:
     available-delayed-candles-count: 5

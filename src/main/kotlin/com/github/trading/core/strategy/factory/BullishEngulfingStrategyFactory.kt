@@ -2,11 +2,11 @@ package com.github.trading.core.strategy.factory
 
 import com.github.trading.core.strategy.rule.StopGainRule
 import com.github.trading.core.strategy.rule.StopLossRule
-import com.github.trading.domain.model.CustomizedBarSeries
 import com.github.trading.domain.model.StrategyParameter
 import com.github.trading.domain.model.StrategyParameters
 import com.github.trading.domain.model.TradeStrategy
 import org.springframework.stereotype.Component
+import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseStrategy
 import org.ta4j.core.indicators.candles.BullishEngulfingIndicator
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator
@@ -15,7 +15,7 @@ import org.ta4j.core.rules.BooleanIndicatorRule
 @Component
 class BullishEngulfingStrategyFactory : LongStrategyFactory() {
 
-    override fun initStrategy(parameters: StrategyParameters, series: CustomizedBarSeries): TradeStrategy {
+    override fun initStrategy(parameters: StrategyParameters, series: BarSeries): TradeStrategy {
         val gainPercentage = parameters.getAsBigDecimalOrThrow(BullishEngulfingStrategyLongParameter.GAIN_PERCENTAGE)
         val lossPercentage = parameters.getAsBigDecimalOrThrow(BullishEngulfingStrategyLongParameter.LOSS_PERCENTAGE)
 
@@ -29,7 +29,7 @@ class BullishEngulfingStrategyFactory : LongStrategyFactory() {
 
     override val strategyName = "BULLISH_ENGULFING"
 
-    override fun strategyParameterNames() = BullishEngulfingStrategyLongParameter.entries.map { it.alias() }
+    override fun strategyParameterNames() = BullishEngulfingStrategyLongParameter.entries.map(BullishEngulfingStrategyLongParameter::alias)
 
 }
 

@@ -1,7 +1,7 @@
 package com.github.trading.test.unit.domain
 
 import arrow.core.right
-import com.github.trading.common.date.toMskZonedDateTime
+import com.github.trading.common.date.toMskInstant
 import com.github.trading.core.config.TradingProperties
 import com.github.trading.core.config.TradingScheduleInterval
 import com.github.trading.core.strategy.lotsquantity.LOTS_QUANTITY_STRATEGY_PARAMETER_NAME
@@ -40,13 +40,13 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.spyk
 import io.mockk.unmockkObject
-import org.ta4j.core.BaseBar
 import org.ta4j.core.BaseBarSeriesBuilder
 import org.ta4j.core.Strategy
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneOffset
 import java.util.UUID
 
 class TradeSessionTest : FreeSpec({
@@ -126,15 +126,15 @@ class TradeSessionTest : FreeSpec({
             BaseBarSeriesBuilder().build()
                 .apply {
                     addBar(
-                        BaseBar(
-                            Duration.ofMinutes(1),
-                            LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
-                            BigDecimal(100),
-                            BigDecimal(102),
-                            BigDecimal(98),
-                            BigDecimal(102),
-                            BigDecimal(10)
-                        )
+                        barBuilder()
+                            .timePeriod(Duration.ofMinutes(1))
+                            .endTime(LocalDateTime.parse("2024-01-30T10:15:00").toMskInstant())
+                            .openPrice(BigDecimal(100))
+                            .highPrice(BigDecimal(102))
+                            .lowPrice(BigDecimal(98))
+                            .closePrice(BigDecimal(102))
+                            .volume(10)
+                            .build()
                     )
                 }
         val tradeStrategy =
@@ -177,7 +177,7 @@ class TradeSessionTest : FreeSpec({
         //then
         barSeries.barCount shouldBe 2
         val lastBar = barSeries.lastBar
-        lastBar.endTime shouldBe LocalDateTime.parse("2024-01-30T10:19:00").toMskZonedDateTime()
+        lastBar.endTime shouldBe LocalDateTime.parse("2024-01-30T07:19:00").toInstant(ZoneOffset.UTC)
     }
 
     "should pending enter trade session" {
@@ -186,15 +186,15 @@ class TradeSessionTest : FreeSpec({
             BaseBarSeriesBuilder().build()
                 .apply {
                     addBar(
-                        BaseBar(
-                            Duration.ofMinutes(1),
-                            LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
-                            BigDecimal(100),
-                            BigDecimal(102),
-                            BigDecimal(98),
-                            BigDecimal(102),
-                            BigDecimal(10)
-                        )
+                        barBuilder()
+                            .timePeriod(Duration.ofMinutes(1))
+                            .endTime(LocalDateTime.parse("2024-01-30T10:15:00").toMskInstant())
+                            .openPrice(BigDecimal(100))
+                            .highPrice(BigDecimal(102))
+                            .lowPrice(BigDecimal(98))
+                            .closePrice(BigDecimal(102))
+                            .volume(10)
+                            .build()
                     )
                 }
         val tradeStrategy =
@@ -249,15 +249,15 @@ class TradeSessionTest : FreeSpec({
             BaseBarSeriesBuilder().build()
                 .apply {
                     addBar(
-                        BaseBar(
-                            Duration.ofMinutes(1),
-                            LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
-                            BigDecimal(100),
-                            BigDecimal(102),
-                            BigDecimal(98),
-                            BigDecimal(102),
-                            BigDecimal(10)
-                        )
+                        barBuilder()
+                            .timePeriod(Duration.ofMinutes(1))
+                            .endTime(LocalDateTime.parse("2024-01-30T10:15:00").toMskInstant())
+                            .openPrice(BigDecimal(100))
+                            .highPrice(BigDecimal(102))
+                            .lowPrice(BigDecimal(98))
+                            .closePrice(BigDecimal(102))
+                            .volume(10)
+                            .build()
                     )
                 }
         val tradeStrategy =
@@ -476,15 +476,15 @@ class TradeSessionTest : FreeSpec({
             BaseBarSeriesBuilder().build()
                 .apply {
                     addBar(
-                        BaseBar(
-                            Duration.ofMinutes(1),
-                            LocalDateTime.parse("2024-01-30T10:15:00").toMskZonedDateTime(),
-                            BigDecimal(100),
-                            BigDecimal(102),
-                            BigDecimal(98),
-                            BigDecimal(102),
-                            BigDecimal(10)
-                        )
+                        barBuilder()
+                            .timePeriod(Duration.ofMinutes(1))
+                            .endTime(LocalDateTime.parse("2024-01-30T10:15:00").toMskInstant())
+                            .openPrice(BigDecimal(100))
+                            .highPrice(BigDecimal(102))
+                            .lowPrice(BigDecimal(98))
+                            .closePrice(BigDecimal(102))
+                            .volume(10)
+                            .build()
                     )
                 }
         val tradeStrategy = TradeStrategy(barSeries, false, mockk<Strategy>())

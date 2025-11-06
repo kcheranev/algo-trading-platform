@@ -8,10 +8,10 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.util.UUID
 
 data class CreateStrategyConfigurationRequestDto(
-    @Schema(description = "Name") val name: String,
-    @Schema(description = "Type") val type: String,
-    @Schema(description = "Candle interval") val candleInterval: CandleInterval,
-    @Schema(description = "Strategy parameters") val parameters: Map<String, Number>
+    @field:Schema(description = "Name") val name: String,
+    @field:Schema(description = "Type") val type: String,
+    @field:Schema(description = "Candle interval") val candleInterval: CandleInterval,
+    @field:Schema(description = "Strategy parameters") val parameters: Map<String, Number>
 )
 
 data class SearchStrategyConfigurationRequestDto(

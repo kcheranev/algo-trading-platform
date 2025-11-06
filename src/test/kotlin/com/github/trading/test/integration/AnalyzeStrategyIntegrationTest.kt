@@ -74,7 +74,7 @@ class AnalyzeStrategyIntegrationTest(
         strategyAnalyzeResult.strategyAnalyzeResultByMonth shouldHaveSize 1
         strategyAnalyzeResult.strategyAnalyzeResultByMonth.keys.first() shouldBe YearMonth.parse("2024-01")
         strategyAnalyzeResult.grossValue shouldBe BigDecimal("2.000000000")
-        strategyAnalyzeResult.netValue shouldBe BigDecimal("1.83680000000000")
+        strategyAnalyzeResult.netValue shouldBe BigDecimal("1.8368000000000")
         strategyAnalyzeResult.profitTradesCount shouldBe 1
         strategyAnalyzeResult.losingTradesCount shouldBe 1
         strategyAnalyzeResult.profitLossTradesRatio shouldBe BigDecimal("1.00000")
@@ -82,57 +82,57 @@ class AnalyzeStrategyIntegrationTest(
             strategyAnalyzeResult.strategyAnalyzeResultByMonth[YearMonth.parse("2024-01")]
         monthlyStrategyAnalyzeResult.shouldNotBeNull()
         monthlyStrategyAnalyzeResult.strategyAnalyzeResultByDay shouldHaveSize 1
-        monthlyStrategyAnalyzeResult.netProfit shouldBe BigDecimal("8.91560000000000")
+        monthlyStrategyAnalyzeResult.netProfit shouldBe BigDecimal("8.9156000000000")
         monthlyStrategyAnalyzeResult.grossProfit shouldBe BigDecimal("9.000000000")
-        monthlyStrategyAnalyzeResult.netLoss shouldBe BigDecimal("-7.07880000000000")
+        monthlyStrategyAnalyzeResult.netLoss shouldBe BigDecimal("-7.0788000000000")
         monthlyStrategyAnalyzeResult.grossLoss shouldBe BigDecimal("-7.000000000")
-        monthlyStrategyAnalyzeResult.netValue shouldBe BigDecimal("1.83680000000000")
+        monthlyStrategyAnalyzeResult.netValue shouldBe BigDecimal("1.8368000000000")
         monthlyStrategyAnalyzeResult.grossValue shouldBe BigDecimal("2.000000000")
         monthlyStrategyAnalyzeResult.profitTradesCount shouldBe 1
         monthlyStrategyAnalyzeResult.losingTradesCount shouldBe 1
         monthlyStrategyAnalyzeResult.tradesCount shouldBe 3
         with(monthlyStrategyAnalyzeResult.strategyAnalyzeResultByDay.values.first()) {
             tradesCount shouldBe 3
-            netProfit shouldBe BigDecimal("8.91560000000000")
+            netProfit shouldBe BigDecimal("8.9156000000000")
             grossProfit shouldBe BigDecimal("9.000000000")
-            netLoss shouldBe BigDecimal("-7.07880000000000")
+            netLoss shouldBe BigDecimal("-7.0788000000000")
             grossLoss shouldBe BigDecimal("-7.000000000")
             losingTradesCount shouldBe 1
             profitTradesCount shouldBe 1
             trades shouldHaveSize 3
-            netValue shouldBe BigDecimal("1.83680000000000")
+            netValue shouldBe BigDecimal("1.8368000000000")
             grossValue shouldBe BigDecimal("2.000000000")
             with(trades[0]) {
-                netValue shouldBe BigDecimal("8.91560000000000")
+                netValue shouldBe BigDecimal("8.9156000000000")
                 grossValue shouldBe BigDecimal("9.000000000")
-                netProfit shouldBe BigDecimal("8.91560000000000")
+                netProfit shouldBe BigDecimal("8.9156000000000")
                 grossProfit shouldBe BigDecimal("9.000000000")
                 netLoss shouldBe BigDecimal.ZERO
                 grossLoss shouldBe BigDecimal.ZERO
                 entry.date shouldBe LocalDateTime.parse("2024-01-30T10:18")
                 entry.direction shouldBe TradeDirection.BUY
                 entry.grossPrice shouldBe BigDecimal("101.000000000")
-                entry.netPrice shouldBe BigDecimal("101.04040000000000")
+                entry.netPrice shouldBe BigDecimal("101.0404000000000")
                 exit?.date shouldBe LocalDateTime.parse("2024-01-30T10:20")
                 exit?.direction shouldBe TradeDirection.SELL
                 exit?.grossPrice shouldBe BigDecimal("110.000000000")
-                exit?.netPrice shouldBe BigDecimal("109.95600000000000")
+                exit?.netPrice shouldBe BigDecimal("109.9560000000000")
             }
             with(trades[1]) {
-                netValue shouldBe BigDecimal("-7.07880000000000")
+                netValue shouldBe BigDecimal("-7.0788000000000")
                 grossValue shouldBe BigDecimal("-7.000000000")
                 netProfit shouldBe BigDecimal.ZERO
                 grossProfit shouldBe BigDecimal.ZERO
-                netLoss shouldBe BigDecimal("-7.07880000000000")
+                netLoss shouldBe BigDecimal("-7.0788000000000")
                 grossLoss shouldBe BigDecimal("-7.000000000")
                 entry.date shouldBe LocalDateTime.parse("2024-01-30T10:24")
                 entry.direction shouldBe TradeDirection.BUY
                 entry.grossPrice shouldBe BigDecimal("102.000000000")
-                entry.netPrice shouldBe BigDecimal("102.04080000000000")
+                entry.netPrice shouldBe BigDecimal("102.0408000000000")
                 exit?.date shouldBe LocalDateTime.parse("2024-01-30T10:26")
                 exit?.direction shouldBe TradeDirection.SELL
                 exit?.grossPrice shouldBe BigDecimal("95.000000000")
-                exit?.netPrice shouldBe BigDecimal("94.96200000000000")
+                exit?.netPrice shouldBe BigDecimal("94.9620000000000")
             }
             with(trades[2]) {
                 netLoss shouldBe BigDecimal.ZERO
@@ -144,7 +144,7 @@ class AnalyzeStrategyIntegrationTest(
                 entry.date shouldBe LocalDateTime.parse("2024-01-30T10:28")
                 entry.direction shouldBe TradeDirection.BUY
                 entry.grossPrice shouldBe BigDecimal("102.000000000")
-                entry.netPrice shouldBe BigDecimal("102.04080000000000")
+                entry.netPrice shouldBe BigDecimal("102.0408000000000")
                 exit.shouldBeNull()
             }
         }

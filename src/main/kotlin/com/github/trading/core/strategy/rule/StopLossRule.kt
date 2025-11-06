@@ -12,9 +12,9 @@ class StopLossRule(
     lossPercentage: BigDecimal
 ) : PositionDependentAbstractRule() {
 
-    private val hundred = closePrice.numOf(100)
+    private val hundred = closePrice.barSeries.numFactory().hundred()
 
-    private val lossPercentage = closePrice.numOf(lossPercentage)
+    private val lossPercentage = closePrice.barSeries.numFactory().numOf(lossPercentage)
 
     override fun isSatisfied(index: Int, currentPosition: Position?): Boolean {
         var satisfied = false

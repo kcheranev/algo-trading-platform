@@ -9,12 +9,15 @@ import com.github.trading.core.port.outcome.broker.OperationServiceBrokerPort
 import com.github.trading.domain.model.Portfolio
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import ru.tinkoff.piapi.core.OperationsService
+import ru.tinkoff.piapi.contract.v1.OperationsServiceGrpc.OperationsServiceBlockingStub
+import ru.tinkoff.piapi.contract.v1.PortfolioRequest
+import ru.ttech.piapi.core.connector.SyncStubWrapper
+import ru.ttech.piapi.core.helpers.NumberMapper.moneyValueToBigDecimal
 
 @Component
 class OperationServiceBrokerOutcomeAdapter(
     private val userServiceBrokerOutcomeAdapter: UserServiceBrokerOutcomeAdapter,
-    private val brokerOperationsService: OperationsService
+    private val brokerOperationsServiceWrapper: SyncStubWrapper<OperationsServiceBlockingStub>
 ) : OperationServiceBrokerPort {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -22,15 +25,22 @@ class OperationServiceBrokerOutcomeAdapter(
     override fun getPortfolio(): Either<BrokerIntegrationError, Portfolio> =
         either {
             val accountId = userServiceBrokerOutcomeAdapter.getTradingAccountId().bind()
-            catch { brokerOperationsService.getPortfolioSync(accountId) }
-                .onLeft { ex -> log.error("An error has been occurred while getting portfolio", ex) }
+            catch {
+                brokerOperationsServiceWrapper.callSyncMethod { stub ->
+                    stub.getPortfolio(
+                        PortfolioRequest.newBuilder()
+                            .setAccountId(accountId)
+                            .build()
+                    )
+                }
+            }.onLeft { ex -> log.error("An error has been occurred while getting portfolio", ex) }
                 .mapLeft { GetPortfolioError }
                 .bind()
                 .let { portfolioResponse ->
                     Portfolio(
-                        currencyAmount = portfolioResponse.totalAmountCurrencies.value,
-                        sharesAmount = portfolioResponse.totalAmountShares.value,
-                        totalPortfolioAmount = portfolioResponse.totalAmountPortfolio.value
+                        currencyAmount = moneyValueToBigDecimal(portfolioResponse.totalAmountCurrencies),
+                        sharesAmount = moneyValueToBigDecimal(portfolioResponse.totalAmountShares),
+                        totalPortfolioAmount = moneyValueToBigDecimal(portfolioResponse.totalAmountPortfolio)
                     )
                 }
         }

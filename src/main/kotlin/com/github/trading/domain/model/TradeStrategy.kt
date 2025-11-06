@@ -1,8 +1,10 @@
 package com.github.trading.domain.model
 
 import com.github.trading.common.date.DateSupplier
+import com.github.trading.common.date.toMstLocalDateTime
 import com.github.trading.core.config.TradingProperties.Companion.tradingProperties
 import com.github.trading.core.strategy.rule.isSatisfiedByType
+import com.github.trading.domain.mapper.domainModelMapper
 import com.github.trading.domain.model.backtesting.Order
 import com.github.trading.domain.model.backtesting.StrategyAnalyzeResult
 import com.github.trading.domain.model.backtesting.Trade
@@ -45,6 +47,10 @@ class TradeStrategy(
         series.addBar(bar)
     }
 
+    fun addBar(candle: Candle) {
+        addBar(domainModelMapper.map(candle, series.barBuilder()))
+    }
+
     fun shouldEnter() = shouldEnter(series.endIndex)
 
     fun shouldExit() = shouldExit(series.endIndex)
@@ -60,7 +66,7 @@ class TradeStrategy(
         } else {
             series.lastBar
                 .endTime
-                .toLocalDateTime()
+                .toMstLocalDateTime()
         }
 
     fun lastCandleClose(): BigDecimal? =
@@ -117,7 +123,7 @@ class TradeStrategy(
 
     private fun mapPositionTrade(trade: org.ta4j.core.Trade) =
         Order(
-            date = series.getBar(trade.index).beginTime.toLocalDateTime(),
+            date = series.getBar(trade.index).beginTime.toMstLocalDateTime(),
             direction = TradeDirection.valueOf(trade.type.name),
             netPrice = trade.netPrice.toBigDecimal(),
             grossPrice = trade.pricePerAsset.toBigDecimal()

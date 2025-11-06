@@ -5,8 +5,6 @@ import com.github.trading.core.port.outcome.broker.HistoricCandleBrokerPort
 import com.github.trading.core.port.service.TradeStrategyServicePort
 import com.github.trading.core.port.service.command.InitTradeStrategyCommand
 import com.github.trading.core.strategy.factory.StrategyFactoryProvider
-import com.github.trading.domain.mapper.domainModelMapper
-import com.github.trading.domain.model.CustomizedBarSeries
 import com.github.trading.domain.model.TradeStrategy
 import org.springframework.stereotype.Service
 import org.ta4j.core.BaseBarSeriesBuilder
@@ -29,10 +27,7 @@ class TradeStrategyService(
                 .withMaxBarCount(MAX_STRATEGY_BARS_COUNT)
                 .build()
         val tradeStrategy =
-            strategyFactory.initStrategy(
-                command.strategyParameters,
-                CustomizedBarSeries(series)
-            )
+            strategyFactory.initStrategy(command.strategyParameters, series)
         val initCandlesAmount =
             if (tradeStrategy.unstableBars == 0) {
                 DEFAULT_INIT_CANDLES_AMOUNT
@@ -43,7 +38,7 @@ class TradeStrategyService(
             historicCandleBrokerPort.getLastHistoricCandles(
                 GetLastHistoricCandlesCommand(command.instrument, command.candleInterval, initCandlesAmount)
             )
-        candles.forEach { tradeStrategy.addBar(domainModelMapper.map(it)) }
+        candles.forEach(tradeStrategy::addBar)
         return tradeStrategy
     }
 

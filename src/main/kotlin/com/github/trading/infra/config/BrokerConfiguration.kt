@@ -1,37 +1,45 @@
 package com.github.trading.infra.config
 
 import com.github.trading.infra.adapter.outcome.broker.logging.LoggingOrdersServiceDecorator
-import com.github.trading.infra.config.properties.BrokerProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import ru.tinkoff.piapi.core.OrdersService
+import ru.tinkoff.piapi.contract.v1.InstrumentsServiceGrpc
+import ru.tinkoff.piapi.contract.v1.InstrumentsServiceGrpc.InstrumentsServiceBlockingStub
+import ru.tinkoff.piapi.contract.v1.MarketDataServiceGrpc
+import ru.tinkoff.piapi.contract.v1.MarketDataServiceGrpc.MarketDataServiceBlockingStub
+import ru.tinkoff.piapi.contract.v1.OperationsServiceGrpc
+import ru.tinkoff.piapi.contract.v1.OperationsServiceGrpc.OperationsServiceBlockingStub
+import ru.tinkoff.piapi.contract.v1.OrdersServiceGrpc
+import ru.tinkoff.piapi.contract.v1.OrdersServiceGrpc.OrdersServiceBlockingStub
+import ru.tinkoff.piapi.contract.v1.UsersServiceGrpc
+import ru.tinkoff.piapi.contract.v1.UsersServiceGrpc.UsersServiceBlockingStub
+import ru.ttech.piapi.core.connector.ServiceStubFactory
+import ru.ttech.piapi.core.connector.SyncStubWrapper
 
 @Configuration
 class BrokerConfiguration {
 
-    @Bean(destroyMethod = "destroy")
-    fun brokerApi(brokerProperties: BrokerProperties) =
-        BrokerApi.init(brokerProperties.token, brokerProperties.appName)
+    @Bean
+    fun loggingOrderServiceDecorator(brokerOrdersServiceWrapper: SyncStubWrapper<OrdersServiceBlockingStub>) = LoggingOrdersServiceDecorator(brokerOrdersServiceWrapper)
 
     @Bean
-    fun loggingOrderServiceDecorator(ordersService: OrdersService) = LoggingOrdersServiceDecorator(ordersService)
+    fun brokerOrdersServiceWrapper(serviceStubFactory: ServiceStubFactory): SyncStubWrapper<OrdersServiceBlockingStub> =
+        serviceStubFactory.newSyncService(OrdersServiceGrpc::newBlockingStub)
 
     @Bean
-    fun brokerOrdersService(brokerApi: BrokerApi) = brokerApi.investApi.ordersService
+    fun brokerUsersServiceWrapper(serviceStubFactory: ServiceStubFactory): SyncStubWrapper<UsersServiceBlockingStub> =
+        serviceStubFactory.newSyncService(UsersServiceGrpc::newBlockingStub)
 
     @Bean
-    fun brokerUsersService(brokerApi: BrokerApi) = brokerApi.investApi.userService
+    fun brokerMarketDataServiceWrapper(serviceStubFactory: ServiceStubFactory): SyncStubWrapper<MarketDataServiceBlockingStub> =
+        serviceStubFactory.newSyncService(MarketDataServiceGrpc::newBlockingStub)
 
     @Bean
-    fun brokerMarketDataStreamService(brokerApi: BrokerApi) = brokerApi.investApi.marketDataStreamService
+    fun brokerOperationsServiceWrapper(serviceStubFactory: ServiceStubFactory): SyncStubWrapper<OperationsServiceBlockingStub> =
+        serviceStubFactory.newSyncService(OperationsServiceGrpc::newBlockingStub)
 
     @Bean
-    fun brokerMarketDataService(brokerApi: BrokerApi) = brokerApi.investApi.marketDataService
-
-    @Bean
-    fun brokerOperationsService(brokerApi: BrokerApi) = brokerApi.investApi.operationsService
-
-    @Bean
-    fun brokerInstrumentService(brokerApi: BrokerApi) = brokerApi.investApi.instrumentsService
+    fun brokerInstrumentServiceWrapper(serviceStubFactory: ServiceStubFactory): SyncStubWrapper<InstrumentsServiceBlockingStub> =
+        serviceStubFactory.newSyncService(InstrumentsServiceGrpc::newBlockingStub)
 
 }

@@ -4,7 +4,7 @@ import com.github.trading.test.stub.WireMockServers.grpcWireMockServer
 import com.github.trading.test.stub.WireMockServers.httpWireMockServer
 import io.kotest.core.listeners.AfterEachListener
 import io.kotest.core.test.TestCase
-import io.kotest.core.test.TestResult
+import io.kotest.engine.test.TestResult
 
 class ResetWireMockExtension : AfterEachListener {
 

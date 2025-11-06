@@ -11,9 +11,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.util.UUID
 
 data class CreateTradeSessionRequestDto(
-    @Schema(description = "Strategy configuration id") val strategyConfigurationId: UUID,
-    @Schema(description = "Order lots quantity strategy type") val orderLotsQuantityStrategyType: OrderLotsQuantityStrategyType,
-    @Schema(description = "Instrument") val instrument: InstrumentDto
+    @field:Schema(description = "Strategy configuration id") val strategyConfigurationId: UUID,
+    @field:Schema(description = "Order lots quantity strategy type") val orderLotsQuantityStrategyType: OrderLotsQuantityStrategyType,
+    @field:Schema(description = "Instrument") val instrument: InstrumentDto
 )
 
 data class SearchTradeSessionRequestDto(

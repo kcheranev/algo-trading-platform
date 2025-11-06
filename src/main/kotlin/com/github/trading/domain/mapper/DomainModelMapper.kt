@@ -1,26 +1,25 @@
 package com.github.trading.domain.mapper
 
-import com.github.trading.common.date.toMskZonedDateTime
+import com.github.trading.common.date.toMskInstant
 import com.github.trading.domain.model.Candle
 import org.mapstruct.Mapper
 import org.mapstruct.factory.Mappers
-import org.ta4j.core.BaseBar
-import java.math.BigDecimal
+import org.ta4j.core.Bar
+import org.ta4j.core.BarBuilder
 
 @Mapper
 abstract class DomainModelMapper {
 
-    fun map(candle: Candle): BaseBar {
+    fun map(candle: Candle, barBuilder: BarBuilder): Bar {
         return with(candle) {
-            BaseBar(
-                interval.duration,
-                endDateTime.toMskZonedDateTime(),
-                openPrice,
-                highestPrice,
-                lowestPrice,
-                closePrice,
-                BigDecimal(volume)
-            )
+            barBuilder.timePeriod(interval.duration)
+                .endTime(endDateTime.toMskInstant())
+                .openPrice(openPrice)
+                .highPrice(highestPrice)
+                .lowPrice(lowestPrice)
+                .closePrice(closePrice)
+                .volume(volume)
+                .build()
         }
     }
 

@@ -23,9 +23,13 @@ import io.kotest.matchers.maps.shouldContainKey
 import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.verify
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate
 import org.springframework.http.HttpStatus
+import ru.tinkoff.piapi.contract.v1.SubscriptionInterval
+import ru.ttech.piapi.core.impl.marketdata.MarketDataStreamManager
+import ru.ttech.piapi.core.impl.marketdata.subscription.CandleSubscriptionSpec
 import java.util.UUID
 
 @IntegrationTest
@@ -34,6 +38,7 @@ class CreateTradeSessionIntegrationTest(
     private val jdbcTemplate: JdbcAggregateTemplate,
     private val candleSubscriptionCacheHolder: CandleSubscriptionCacheHolder,
     private val tradeSessionCache: TradeStrategyCache,
+    private val marketDataStreamManager: MarketDataStreamManager,
     private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
 
@@ -76,7 +81,13 @@ class CreateTradeSessionIntegrationTest(
         }
 
         marketDataBrokerGrpcStub.verifyForGetCandles("get-candles.json")
-        marketDataBrokerGrpcStub.verifyForMarketDataStream("market-data-stream-subscribe.json")
+        verify {
+            marketDataStreamManager.subscribeCandles(
+                setOf(ru.ttech.piapi.core.impl.marketdata.subscription.Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
+                any<CandleSubscriptionSpec>(),
+                any()
+            )
+        }
 
         val tradeSessions = jdbcTemplate.findAll(TradeSessionEntity::class.java)
         tradeSessions shouldHaveSize 1

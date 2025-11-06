@@ -2,14 +2,14 @@ package com.github.trading.core.strategy.factory
 
 import com.github.trading.core.strategy.rule.StopGainRule
 import com.github.trading.core.strategy.rule.StopLossRule
-import com.github.trading.domain.model.CustomizedBarSeries
 import com.github.trading.domain.model.StrategyParameter
 import com.github.trading.domain.model.StrategyParameters
 import com.github.trading.domain.model.TradeStrategy
 import org.springframework.stereotype.Component
+import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseStrategy
 import org.ta4j.core.indicators.RSIIndicator
-import org.ta4j.core.indicators.SMAIndicator
+import org.ta4j.core.indicators.averages.SMAIndicator
 import org.ta4j.core.indicators.bollinger.BollingerBandsLowerIndicator
 import org.ta4j.core.indicators.bollinger.BollingerBandsMiddleIndicator
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator
@@ -20,7 +20,7 @@ import kotlin.math.max
 @Component
 class RsiBollingerStopGainLossLongStrategyFactory : LongStrategyFactory() {
 
-    override fun initStrategy(parameters: StrategyParameters, series: CustomizedBarSeries): TradeStrategy {
+    override fun initStrategy(parameters: StrategyParameters, series: BarSeries): TradeStrategy {
         val overSold = parameters.getAsIntOrThrow(RsiBollingerStopGainLossStrategyParameter.OVER_SOLD)
         val rsiLength = parameters.getAsIntOrThrow(RsiBollingerStopGainLossStrategyParameter.RSI_LENGTH)
         val bollingerLength = parameters.getAsIntOrThrow(RsiBollingerStopGainLossStrategyParameter.BOLLINGER_LENGTH)
@@ -43,7 +43,7 @@ class RsiBollingerStopGainLossLongStrategyFactory : LongStrategyFactory() {
 
     override val strategyName = "RSI_BOLLINGER_STOP_GAIN_LOSS"
 
-    override fun strategyParameterNames() = RsiBollingerStopGainLossStrategyParameter.entries.map { it.alias() }
+    override fun strategyParameterNames() = RsiBollingerStopGainLossStrategyParameter.entries.map(RsiBollingerStopGainLossStrategyParameter::alias)
 
 }
 

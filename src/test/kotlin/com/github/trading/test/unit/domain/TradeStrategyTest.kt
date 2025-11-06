@@ -1,6 +1,7 @@
 package com.github.trading.test.unit.domain
 
 import com.github.trading.common.date.DateSupplier
+import com.github.trading.common.date.toMskInstant
 import com.github.trading.core.config.TradingProperties
 import com.github.trading.core.config.TradingScheduleInterval
 import com.github.trading.domain.model.CandleInterval
@@ -57,7 +58,7 @@ class TradeStrategyTest : FreeSpec({
                 TradeStrategy(
                     series = mockk {
                         every { isEmpty } returns false
-                        every { lastBar.endTime.toLocalDateTime() } returns LocalDateTime.parse(lastCandleDateTime)
+                        every { lastBar.endTime } returns LocalDateTime.parse(lastCandleDateTime).toMskInstant()
                     },
                     margin = false,
                     strategy = mockk()

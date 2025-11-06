@@ -1,7 +1,7 @@
 package com.github.trading.core.eventprocessor
 
 import com.github.trading.core.port.outcome.broker.MarketDataStreamSubscriptionBrokerPort
-import com.github.trading.core.port.outcome.broker.SubscribeCandlesOrderCommand
+import com.github.trading.core.port.outcome.broker.SubscribeCandlesCommand
 import com.github.trading.domain.TradeSessionResumedDomainEvent
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -19,7 +19,7 @@ class TradeSessionResumedDomainEventProcessor(
         with(event.tradeSession) {
             log.info("Subscribe to the market data stream ticker=${instrument.ticker}, candleInterval=$candleInterval")
             marketDataStreamSubscriptionBrokerPort.subscribeCandles(
-                SubscribeCandlesOrderCommand(instrument, candleInterval)
+                SubscribeCandlesCommand(instrument, candleInterval)
             )
         }
     }

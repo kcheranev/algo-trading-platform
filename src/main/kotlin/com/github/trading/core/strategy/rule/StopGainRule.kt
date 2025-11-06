@@ -12,9 +12,9 @@ class StopGainRule(
     gainPercentage: BigDecimal
 ) : PositionDependentAbstractRule() {
 
-    private val hundred = closePrice.numOf(100)
+    private val hundred = closePrice.barSeries.numFactory().hundred()
 
-    private val gainPercentage = closePrice.numOf(gainPercentage)
+    private val gainPercentage = closePrice.barSeries.numFactory().numOf(gainPercentage)
 
     override fun isSatisfied(index: Int, currentPosition: Position?): Boolean {
         var satisfied = false

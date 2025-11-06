@@ -21,6 +21,11 @@ spring:
     deserialization:
       use-big-decimal-for-floats: true
 
+invest:
+  connector:
+    token: ${BROKER_TOKEN}
+    app-name: ${spring.application.name}
+
 application:
   backtesting:
     tempFileDirectory: ${TEMP_FILE_DIRECTORY}
@@ -38,8 +43,6 @@ application:
         to: "23:50:00"
   infra:
     broker:
-      token: ${BROKER_TOKEN}
-      app-name: ${spring.application.name}
       trading-account-name: trading_account
     notification.telegram:
       enabled: true

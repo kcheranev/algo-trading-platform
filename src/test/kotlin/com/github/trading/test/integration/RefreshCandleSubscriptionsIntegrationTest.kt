@@ -13,8 +13,6 @@ import com.github.trading.infra.adapter.outcome.persistence.entity.TradeSessionE
 import com.github.trading.infra.adapter.outcome.persistence.impl.TradeStrategyCache
 import com.github.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import com.github.trading.test.IntegrationTest
-import com.github.trading.test.stub.grpc.MarketDataBrokerGrpcStub
-import com.github.trading.test.util.MarketDataSubscriptionInitializer
 import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
@@ -22,17 +20,21 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldHaveSize
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate
+import ru.tinkoff.piapi.contract.v1.SubscriptionInterval
+import ru.ttech.piapi.core.impl.marketdata.MarketDataStreamManager
+import ru.ttech.piapi.core.impl.marketdata.subscription.CandleSubscriptionSpec
 import java.math.BigDecimal
 import java.util.UUID
 
 @IntegrationTest
 class RefreshCandleSubscriptionsIntegrationTest(
     private val refreshCandleSubscriptionsUseCase: RefreshCandleSubscriptionsUseCase,
-    private val marketDataSubscriptionInitializer: MarketDataSubscriptionInitializer,
     private val candleSubscriptionCacheHolder: CandleSubscriptionCacheHolder,
     private val tradeStrategyCache: TradeStrategyCache,
     private val jdbcTemplate: JdbcAggregateTemplate,
+    private val marketDataStreamManager: MarketDataStreamManager,
     private val resetTestContextExtensions: List<Extension>
 ) : StringSpec({
 
@@ -40,17 +42,13 @@ class RefreshCandleSubscriptionsIntegrationTest(
 
     val testName = "refresh-candle-subscriptions"
 
-    val marketDataBrokerGrpcStub = MarketDataBrokerGrpcStub(testName)
-
     "should delete unused subscription" {
         //given
-        marketDataSubscriptionInitializer.addSubscription(
-            Instrument("e6123145-9665-43e0-8413-cd61b8aa9b13", "SBER"),
-            CandleInterval.ONE_MIN
+        candleSubscriptionCacheHolder.add(
+            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b13", "SBER"), CandleInterval.ONE_MIN)
         )
-        marketDataSubscriptionInitializer.addSubscription(
-            Instrument("b993e814-9986-4434-ae88-b086066714a0", "WUSH"),
-            CandleInterval.ONE_MIN
+        candleSubscriptionCacheHolder.add(
+            CandleSubscription(Instrument("b993e814-9986-4434-ae88-b086066714a0", "WUSH"), CandleInterval.ONE_MIN)
         )
         val tradeStrategyId = UUID.randomUUID()
         jdbcTemplate.insert(
@@ -79,20 +77,20 @@ class RefreshCandleSubscriptionsIntegrationTest(
         //then
         val candleSubscriptions = candleSubscriptionCacheHolder.findAll()
         candleSubscriptions shouldHaveSize 1
-        candleSubscriptions shouldContain
-                CandleSubscription(
-                    Instrument("e6123145-9665-43e0-8413-cd61b8aa9b13", "SBER"),
-                    CandleInterval.ONE_MIN
-                )
+        candleSubscriptions shouldContain CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b13", "SBER"), CandleInterval.ONE_MIN)
 
-        marketDataBrokerGrpcStub.verifyForMarketDataStream("market-data-stream-unsubscribe.json")
+        verify {
+            marketDataStreamManager.unsubscribeCandles(
+                setOf(ru.ttech.piapi.core.impl.marketdata.subscription.Instrument("b993e814-9986-4434-ae88-b086066714a0", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
+                any<CandleSubscriptionSpec>()
+            )
+        }
     }
 
     "should add new subscription" {
         //given
-        marketDataSubscriptionInitializer.addSubscription(
-            Instrument("e6123145-9665-43e0-8413-cd61b8aa9b13", "SBER"),
-            CandleInterval.ONE_MIN
+        candleSubscriptionCacheHolder.add(
+            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b13", "SBER"), CandleInterval.ONE_MIN)
         )
         val tradeStrategyId1 = UUID.randomUUID()
         jdbcTemplate.insert(
@@ -139,17 +137,17 @@ class RefreshCandleSubscriptionsIntegrationTest(
         candleSubscriptions shouldHaveSize 2
         candleSubscriptions shouldContainExactlyInAnyOrder
                 listOf(
-                    CandleSubscription(
-                        Instrument("e6123145-9665-43e0-8413-cd61b8aa9b13", "SBER"),
-                        CandleInterval.ONE_MIN
-                    ),
-                    CandleSubscription(
-                        Instrument("b993e814-9986-4434-ae88-b086066714a0", "WUSH"),
-                        CandleInterval.ONE_MIN
-                    )
+                    CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b13", "SBER"), CandleInterval.ONE_MIN),
+                    CandleSubscription(Instrument("b993e814-9986-4434-ae88-b086066714a0", "WUSH"), CandleInterval.ONE_MIN)
                 )
 
-        marketDataBrokerGrpcStub.verifyForMarketDataStream("market-data-stream-subscribe.json")
+        verify {
+            marketDataStreamManager.subscribeCandles(
+                setOf(ru.ttech.piapi.core.impl.marketdata.subscription.Instrument("b993e814-9986-4434-ae88-b086066714a0", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
+                any<CandleSubscriptionSpec>(),
+                any()
+            )
+        }
     }
 
 })

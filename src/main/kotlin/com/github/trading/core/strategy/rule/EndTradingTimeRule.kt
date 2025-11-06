@@ -1,5 +1,6 @@
 package com.github.trading.core.strategy.rule
 
+import com.github.trading.common.date.toMskLocalTime
 import com.github.trading.domain.model.CandleInterval
 import org.ta4j.core.TradingRecord
 import org.ta4j.core.indicators.helpers.DateTimeIndicator
@@ -13,6 +14,6 @@ class EndTradingTimeRule(
 ) : AbstractRule() {
 
     override fun isSatisfied(index: Int, tradingRecord: TradingRecord?) =
-        timeIndicator.getValue(index).toLocalTime() > endTradingTime - candleInterval.duration.multipliedBy(2)
+        timeIndicator.getValue(index).toMskLocalTime() > endTradingTime - candleInterval.duration.multipliedBy(2)
 
 }

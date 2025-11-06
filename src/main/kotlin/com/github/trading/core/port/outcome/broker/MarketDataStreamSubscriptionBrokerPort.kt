@@ -4,7 +4,7 @@ import com.github.trading.domain.model.subscription.CandleSubscription
 
 interface MarketDataStreamSubscriptionBrokerPort {
 
-    fun subscribeCandles(command: SubscribeCandlesOrderCommand)
+    fun subscribeCandles(command: SubscribeCandlesCommand)
 
     fun unsubscribeCandles(command: UnsubscribeCandlesOrderCommand)
 

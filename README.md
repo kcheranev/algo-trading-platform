@@ -16,7 +16,7 @@ markets.
 
 ## 🧰 Technologies Used
 
-- **Broker API**: [Tinkoff Invest API](https://github.com/Tinkoff/investAPI) — for market data and order execution.
+- **Broker API**: [Tinkoff Invest API](https://github.com/RussianInvestments/invest-api-java-sdk) — for market data and order execution.
 - **Strategy Engine**: [ta4j](https://github.com/ta4j/ta4j) — powerful Java library for technical analysis and trading
   system development.
 
@@ -59,7 +59,7 @@ Interactive API documentation (Swagger UI) is available at:
 ### 1. Add an Instrument
 
 - Register the trading instrument in the instrument directory.
-- Use the broker identifier (e.g., FIGI) obtained via the Tinkoff API.
+- Use the broker identifier obtained via the Tinkoff API.
 
 ### 2. Create Strategy Configuration
 

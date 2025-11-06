@@ -6,7 +6,7 @@ import org.mapstruct.Mapper
 import org.mapstruct.factory.Mappers
 import ru.tinkoff.piapi.contract.v1.MoneyValue
 import ru.tinkoff.piapi.contract.v1.Quotation
-import ru.tinkoff.piapi.core.utils.MapperUtils
+import ru.ttech.piapi.core.helpers.NumberMapper
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDateTime
@@ -14,9 +14,9 @@ import java.time.LocalDateTime
 @Mapper
 abstract class CommonBrokerMapper {
 
-    fun map(source: Quotation): BigDecimal = MapperUtils.quotationToBigDecimal(source)
+    fun map(source: Quotation): BigDecimal = NumberMapper.quotationToBigDecimal(source)
 
-    fun map(source: MoneyValue): BigDecimal = MapperUtils.moneyValueToBigDecimal(source)
+    fun map(source: MoneyValue): BigDecimal = NumberMapper.moneyValueToBigDecimal(source)
 
     fun map(source: Timestamp): LocalDateTime =
         Instant.ofEpochSecond(source.seconds, source.nanos.toLong())
