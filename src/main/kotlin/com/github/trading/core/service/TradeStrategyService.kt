@@ -26,8 +26,7 @@ class TradeStrategyService(
                 .withName("Trade session: ticker=${command.instrument.ticker}, candleInterval=${command.candleInterval}")
                 .withMaxBarCount(MAX_STRATEGY_BARS_COUNT)
                 .build()
-        val tradeStrategy =
-            strategyFactory.initStrategy(command.strategyParameters, series)
+        val tradeStrategy = strategyFactory.initStrategy(command.strategyParameters, series)
         val initCandlesAmount =
             if (tradeStrategy.unstableBars == 0) {
                 DEFAULT_INIT_CANDLES_AMOUNT

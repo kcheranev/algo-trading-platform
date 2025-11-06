@@ -82,21 +82,21 @@ class TradeSessionPersistenceOutcomeAdapter(
 
     override fun getReadyForOrderTradeSessions() =
         tradeSessionRepository.getReadyForOrderTradeSessions()
-            .map {
+            .map { tradeSessionEntity ->
                 persistenceOutcomeAdapterMapper.map(
-                    it,
-                    getOrCreateTradeStrategy(it),
-                    getOrderLotsQuantityStrategy(it.orderLotsQuantityStrategyType)
+                    tradeSessionEntity,
+                    getOrCreateTradeStrategy(tradeSessionEntity),
+                    getOrderLotsQuantityStrategy(tradeSessionEntity.orderLotsQuantityStrategyType)
                 )
             }
 
     override fun getReadyForOrderTradeSessions(command: GetReadyToOrderTradeSessionsCommand) =
         tradeSessionRepository.getReadyForOrderTradeSessions(command.instrumentId, command.candleInterval)
-            .map {
+            .map { tradeSessionEntity ->
                 persistenceOutcomeAdapterMapper.map(
-                    it,
-                    getOrCreateTradeStrategy(it),
-                    getOrderLotsQuantityStrategy(it.orderLotsQuantityStrategyType)
+                    tradeSessionEntity,
+                    getOrCreateTradeStrategy(tradeSessionEntity),
+                    getOrderLotsQuantityStrategy(tradeSessionEntity.orderLotsQuantityStrategyType)
                 )
             }
 
@@ -105,7 +105,7 @@ class TradeSessionPersistenceOutcomeAdapter(
 
     private fun getOrCreateTradeStrategy(tradeSessionEntity: TradeSessionEntity): TradeStrategy =
         tradeStrategyCache.get(tradeSessionEntity.id)
-            ?.takeIf { it.isFreshCandleSeries(tradeSessionEntity.candleInterval) }
+            ?.takeIf { tradeStrategy -> tradeStrategy.isFreshCandleSeries(tradeSessionEntity.candleInterval) }
             ?: run {
                 log.info(
                     "Candle series for the subscription ticker=${tradeSessionEntity.ticker}, " +

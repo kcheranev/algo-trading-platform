@@ -3,7 +3,6 @@ package com.github.trading.test.unit.domain
 import com.github.trading.common.date.DateSupplier
 import com.github.trading.common.date.toMskInstant
 import com.github.trading.core.config.TradingProperties
-import com.github.trading.core.config.TradingScheduleInterval
 import com.github.trading.domain.model.CandleInterval
 import com.github.trading.domain.model.TradeStrategy
 import io.kotest.core.spec.style.FreeSpec
@@ -15,7 +14,6 @@ import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import java.math.BigDecimal
 import java.time.LocalDateTime
-import java.time.LocalTime
 
 class TradeStrategyTest : FreeSpec({
 
@@ -25,11 +23,7 @@ class TradeStrategyTest : FreeSpec({
                 TradingProperties(
                     availableDelayedCandlesCount = 5,
                     placeOrderRetryCount = 3,
-                    defaultCommission = BigDecimal("0.0004"),
-                    tradingSchedule = listOf(
-                        TradingScheduleInterval(LocalTime.parse("10:00:00"), LocalTime.parse("18:40:00")),
-                        TradingScheduleInterval(LocalTime.parse("19:05:00"), LocalTime.parse("23:50:00"))
-                    )
+                    defaultCommission = BigDecimal("0.0004")
                 )
     }
 

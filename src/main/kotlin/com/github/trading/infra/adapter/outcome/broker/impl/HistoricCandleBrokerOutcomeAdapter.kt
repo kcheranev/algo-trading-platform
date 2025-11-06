@@ -2,7 +2,6 @@ package com.github.trading.infra.adapter.outcome.broker.impl
 
 import com.github.trading.common.date.DateSupplier
 import com.github.trading.common.date.atEndOfDay
-import com.github.trading.common.date.isWeekend
 import com.github.trading.common.date.toMskInstant
 import com.github.trading.common.getOrPut
 import com.github.trading.core.port.outcome.broker.GetHistoricCandlesCommand
@@ -61,10 +60,6 @@ class HistoricCandleBrokerOutcomeAdapter(
         var currentDay = startDay
         val candles = mutableListOf<Candle>()
         while (currentDay <= endDay) {
-            if (currentDay.isWeekend()) {
-                currentDay = currentDay.plusDays(1)
-                continue
-            }
             candles +=
                 getHistoricCandles(
                     GetHistoricCandlesCommand(
@@ -93,9 +88,6 @@ class HistoricCandleBrokerOutcomeAdapter(
             )
         while (candles.size < command.quantity) {
             currentDay = currentDay.minusDays(1)
-            if (currentDay.isWeekend()) {
-                continue
-            }
             candles =
                 getHistoricCandles(
                     GetHistoricCandlesCommand(

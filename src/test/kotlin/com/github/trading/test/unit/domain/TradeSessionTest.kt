@@ -3,7 +3,6 @@ package com.github.trading.test.unit.domain
 import arrow.core.right
 import com.github.trading.common.date.toMskInstant
 import com.github.trading.core.config.TradingProperties
-import com.github.trading.core.config.TradingScheduleInterval
 import com.github.trading.core.strategy.lotsquantity.LOTS_QUANTITY_STRATEGY_PARAMETER_NAME
 import com.github.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategy
 import com.github.trading.domain.TradeSessionCreatedDomainEvent
@@ -45,7 +44,6 @@ import org.ta4j.core.Strategy
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.ZoneOffset
 import java.util.UUID
 
@@ -64,11 +62,7 @@ class TradeSessionTest : FreeSpec({
                 TradingProperties(
                     availableDelayedCandlesCount = 5,
                     placeOrderRetryCount = 3,
-                    defaultCommission = BigDecimal("0.0004"),
-                    tradingSchedule = listOf(
-                        TradingScheduleInterval(LocalTime.parse("10:00:00"), LocalTime.parse("18:40:00")),
-                        TradingScheduleInterval(LocalTime.parse("19:05:00"), LocalTime.parse("23:50:00"))
-                    )
+                    defaultCommission = BigDecimal("0.0004")
                 )
     }
 

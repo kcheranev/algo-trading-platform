@@ -1,6 +1,5 @@
 package com.github.trading.domain.entity
 
-import com.github.trading.common.date.isTradingTime
 import com.github.trading.core.strategy.lotsquantity.OrderLotsQuantityStrategy
 import com.github.trading.domain.TradeSessionCreatedDomainEvent
 import com.github.trading.domain.TradeSessionEnteredDomainEvent
@@ -72,12 +71,10 @@ data class TradeSession(
         }
     }
 
-    private fun shouldEnter() =
-        isTradingTime() && status.transitionAvailable(PENDING_ENTER) && strategy.shouldEnter()
+    private fun shouldEnter(): Boolean = status.transitionAvailable(PENDING_ENTER) && strategy.shouldEnter()
 
-    private fun shouldExit() =
-        isTradingTime() &&
-                status.transitionAvailable(PENDING_EXIT) &&
+    private fun shouldExit(): Boolean =
+        status.transitionAvailable(PENDING_EXIT) &&
                 strategy.shouldExit(
                     Position(
                         lotsQuantity = currentPosition.lotsQuantity,

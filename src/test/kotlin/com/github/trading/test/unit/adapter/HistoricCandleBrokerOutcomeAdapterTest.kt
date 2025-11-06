@@ -217,8 +217,8 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                         eq(
                             GetCandlesRequest.newBuilder()
                                 .setInstrumentId("e6123145-9665-43e0-8413-cd61b8aa9b1")
-                                .setFrom(instantToTimestamp(LocalDate.parse("2024-10-04").atStartOfDay().toMskInstant()))
-                                .setTo(instantToTimestamp(LocalDate.parse("2024-10-04").atEndOfDay().toMskInstant()))
+                                .setFrom(instantToTimestamp(LocalDate.parse("2024-10-06").atStartOfDay().toMskInstant()))
+                                .setTo(instantToTimestamp(LocalDate.parse("2024-10-06").atEndOfDay().toMskInstant()))
                                 .setInterval(ru.tinkoff.piapi.contract.v1.CandleInterval.CANDLE_INTERVAL_1_MIN)
                                 .setCandleSourceType(CandleSource.CANDLE_SOURCE_EXCHANGE)
                                 .build()
@@ -233,14 +233,14 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                                         low = BigDecimal("94"),
                                         open = BigDecimal("95"),
                                         close = BigDecimal("96"),
-                                        time = LocalDateTime.parse("2024-10-04T19:00:00")
+                                        time = LocalDateTime.parse("2024-10-06T19:00:00")
                                     ),
                                     buildCandle(
                                         high = BigDecimal("97"),
                                         low = BigDecimal("95"),
                                         open = BigDecimal("96"),
                                         close = BigDecimal("97"),
-                                        time = LocalDateTime.parse("2024-10-04T19:01:00")
+                                        time = LocalDateTime.parse("2024-10-06T19:01:00")
                                     )
                                 )
                             ).build()
@@ -266,7 +266,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                 highestPrice = BigDecimal("96.000000000"),
                 lowestPrice = BigDecimal("94.000000000"),
                 volume = 100,
-                endDateTime = LocalDateTime.parse("2024-10-04T19:01:00"),
+                endDateTime = LocalDateTime.parse("2024-10-06T19:01:00"),
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
             ),
             Candle(
@@ -276,7 +276,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                 highestPrice = BigDecimal("97.000000000"),
                 lowestPrice = BigDecimal("95.000000000"),
                 volume = 100,
-                endDateTime = LocalDateTime.parse("2024-10-04T19:02:00"),
+                endDateTime = LocalDateTime.parse("2024-10-06T19:02:00"),
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
             ),
             Candle(
