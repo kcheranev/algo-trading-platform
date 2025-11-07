@@ -108,6 +108,7 @@ class TradeProcessLongE2eTest(
         operationsBrokerGrpcStub.stubForGetPortfolio("get-portfolio.json")
         ordersBrokerGrpcStub.stubForPostBuyOrder("post-buy-order.json")
         ordersBrokerGrpcStub.stubForPostSellOrder("post-sell-order.json")
+        ordersBrokerGrpcStub.stubForGetMaxLots("get-max-lots.json")
         telegramNotificationHttpStub.stubForSendNotification()
 
         marketDataProcessingService.processIncomeCandle(

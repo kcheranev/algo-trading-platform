@@ -6,17 +6,19 @@ sealed interface AppError {
 
 }
 
-sealed interface DomainError : AppError
+sealed interface DomainError : AppError {
 
-data object OrderLotsQuantityCalculatingError : DomainError {
+    data object OrderLotsQuantityCalculatingError : DomainError {
 
-    override val message = "An error has been occurred while calculating lots quantity"
+        override val message = "An error has been occurred while calculating lots quantity"
 
-}
+    }
 
-data object NotEnoughMoneyOnDepositError : DomainError {
+    data object NotEnoughMoneyOnDepositError : DomainError {
 
-    override val message = "Not enough money on deposit"
+        override val message = "Not enough money on deposit"
+
+    }
 
 }
 
@@ -45,42 +47,52 @@ data class ValidationError(
 
 }
 
-sealed interface IntegrationError : AppError
+sealed interface IntegrationError : AppError {
 
-sealed interface BrokerIntegrationError : IntegrationError
+    sealed interface BrokerIntegrationError : IntegrationError {
 
-data object BestPriceBuyOrderExecutionError : BrokerIntegrationError {
+        data object BestPriceBuyOrderExecutionError : BrokerIntegrationError {
 
-    override val message = "An error has been occurred while executing best price buy order"
+            override val message = "An error has been occurred while executing best price buy order"
 
-}
+        }
 
-data object BestPriceSellOrderExecutionError : BrokerIntegrationError {
+        data object BestPriceSellOrderExecutionError : BrokerIntegrationError {
 
-    override val message = "An error has been occurred while executing best price sell order"
+            override val message = "An error has been occurred while executing best price sell order"
 
-}
+        }
 
-data object GetTradingAccountError : BrokerIntegrationError {
+        data object GetMaxLotsError : BrokerIntegrationError {
 
-    override val message = "An error has been occurred while getting trading account"
+            override val message = "An error has been occurred while getting max lots"
 
-}
+        }
 
-data object GetPortfolioError : BrokerIntegrationError {
+        data object GetTradingAccountError : BrokerIntegrationError {
 
-    override val message = "An error has been occurred while getting portfolio"
+            override val message = "An error has been occurred while getting trading account"
 
-}
+        }
 
-data object GetShareByIdError : BrokerIntegrationError {
+        data object GetPortfolioError : BrokerIntegrationError {
 
-    override val message = "An error has been occurred while getting share by id"
+            override val message = "An error has been occurred while getting portfolio"
 
-}
+        }
 
-data object NotificationError : IntegrationError {
+        data object GetShareByIdError : BrokerIntegrationError {
 
-    override val message = "An error has been occurred while sending a notification"
+            override val message = "An error has been occurred while getting share by id"
+
+        }
+
+    }
+
+    data object NotificationError : IntegrationError {
+
+        override val message = "An error has been occurred while sending a notification"
+
+    }
 
 }
