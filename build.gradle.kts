@@ -2,6 +2,7 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
 
 plugins {
     id("org.springframework.boot")
+    id("com.google.cloud.tools.jib")
     kotlin("jvm")
     kotlin("kapt")
     kotlin("plugin.spring")
@@ -65,7 +66,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
-    testImplementation("io.kotest:kotest-extensions-spring:${kotestVersion}")
+    testImplementation("io.kotest:kotest-extensions-spring:$kotestVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.wiremock:wiremock-standalone:$wiremockVersion")
     testImplementation("org.wiremock:wiremock-grpc-extension-standalone:$wiremockGrpcExtensionVersion")
@@ -76,4 +77,17 @@ tasks.test {
     useJUnitPlatform()
     systemProperty("kotest.framework.config.fqn", "com.github.trading.test.config.ProjectConfig")
     jvmArgs("--add-opens=java.base/java.util=ALL-UNNAMED", "--add-opens=java.base/java.lang=ALL-UNNAMED")
+}
+
+jib {
+    from {
+        image = "eclipse-temurin:21-jre"
+    }
+    to {
+        image = System.getProperty("docker.repository")
+        auth {
+            username = System.getProperty("docker.username")
+            password = System.getProperty("docker.password")
+        }
+    }
 }
