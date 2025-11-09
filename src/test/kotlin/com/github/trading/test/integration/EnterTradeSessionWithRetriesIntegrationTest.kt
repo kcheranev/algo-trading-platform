@@ -19,7 +19,6 @@ import com.github.trading.infra.adapter.outcome.persistence.entity.TradeSessionE
 import com.github.trading.infra.adapter.outcome.persistence.impl.TradeStrategyCache
 import com.github.trading.infra.adapter.outcome.persistence.model.MapWrapper
 import com.github.trading.test.IntegrationTest
-import com.github.trading.test.stub.grpc.OperationsBrokerGrpcStub
 import com.github.trading.test.stub.grpc.OrdersBrokerGrpcStub
 import com.github.trading.test.stub.grpc.UsersBrokerGrpcStub
 import com.github.trading.test.stub.http.TelegramNotificationHttpStub
@@ -56,8 +55,6 @@ class EnterTradeSessionWithRetriesIntegrationTest(
     val usersBrokerGrpcStub = UsersBrokerGrpcStub(testName)
 
     val ordersBrokerGrpcStub = OrdersBrokerGrpcStub(testName)
-
-    val operationsBrokerGrpcStub = OperationsBrokerGrpcStub(testName)
 
     beforeEach {
         jdbcTemplate.insert(
@@ -124,7 +121,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
-        operationsBrokerGrpcStub.stubForGetPortfolio("get-portfolio.json")
+        ordersBrokerGrpcStub.stubForGetMaxLots("get-max-lots.json")
         ordersBrokerGrpcStub.stubForPostBuyOrder(
             "post-buy-order-requested-10-executed-4.json",
             mapOf("quantity" to "10")
@@ -213,7 +210,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
-        operationsBrokerGrpcStub.stubForGetPortfolio("get-portfolio.json")
+        ordersBrokerGrpcStub.stubForGetMaxLots("get-max-lots.json")
         ordersBrokerGrpcStub.stubForPostBuyOrder(
             "post-buy-order-requested-10-executed-4.json",
             mapOf("quantity" to "10")
@@ -302,7 +299,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
-        operationsBrokerGrpcStub.stubForGetPortfolio("get-portfolio.json")
+        ordersBrokerGrpcStub.stubForGetMaxLots("get-max-lots.json")
         ordersBrokerGrpcStub.stubForPostBuyOrder(
             "post-buy-order-requested-10-executed-0.json",
             mapOf("quantity" to "10")
@@ -377,7 +374,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
-        operationsBrokerGrpcStub.stubForGetPortfolio("get-portfolio.json")
+        ordersBrokerGrpcStub.stubForGetMaxLots("get-max-lots.json")
         ordersBrokerGrpcStub.stubForPostOrderFailed()
         telegramNotificationHttpStub.stubForSendNotification()
 
@@ -449,7 +446,7 @@ class EnterTradeSessionWithRetriesIntegrationTest(
                 instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
-        operationsBrokerGrpcStub.stubForGetPortfolio("get-portfolio-zero-currency-amount.json")
+        ordersBrokerGrpcStub.stubForGetMaxLots("get-max-lots-buy-limit-exceeded.json")
         ordersBrokerGrpcStub.stubForPostBuyOrder(
             "post-buy-order-requested-10-executed-0.json",
             mapOf("quantity" to "10")

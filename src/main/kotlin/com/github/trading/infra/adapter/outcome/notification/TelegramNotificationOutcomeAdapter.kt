@@ -2,7 +2,7 @@ package com.github.trading.infra.adapter.outcome.notification
 
 import arrow.core.Either
 import arrow.core.Either.Companion.catch
-import com.github.trading.core.error.NotificationError
+import com.github.trading.core.error.IntegrationError
 import com.github.trading.core.port.outcome.notification.NotificationPort
 import com.github.trading.core.port.outcome.notification.SendNotificationCommand
 import com.github.trading.infra.config.properties.TelegramNotificationProperties
@@ -21,7 +21,7 @@ class TelegramNotificationOutcomeAdapter(
 
     private val chatId = telegramNotificationProperties.chatId
 
-    override fun sendNotification(command: SendNotificationCommand): Either<NotificationError, Unit> =
+    override fun sendNotification(command: SendNotificationCommand): Either<IntegrationError.NotificationError, Unit> =
         catch {
             if (enabled) {
                 restTemplate.postForLocation(
@@ -29,6 +29,6 @@ class TelegramNotificationOutcomeAdapter(
                     Unit
                 )
             }
-        }.mapLeft { NotificationError }
+        }.mapLeft { IntegrationError.NotificationError }
 
 }

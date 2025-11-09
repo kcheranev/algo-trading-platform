@@ -16,6 +16,10 @@ data class PostBestPriceSellOrderCommand(
     val quantity: Int
 )
 
+data class GetMaxLotsCommand(
+    val instrument: Instrument
+)
+
 data class SubscribeCandlesCommand(
     val instrument: Instrument,
     val candleInterval: CandleInterval

@@ -3,8 +3,7 @@ package com.github.trading.infra.adapter.outcome.broker.impl
 import arrow.core.Either
 import arrow.core.Either.Companion.catch
 import com.github.trading.common.getOrPut
-import com.github.trading.core.error.BrokerIntegrationError
-import com.github.trading.core.error.GetShareByIdError
+import com.github.trading.core.error.IntegrationError.BrokerIntegrationError
 import com.github.trading.core.port.outcome.broker.GetShareByIdCommand
 import com.github.trading.core.port.outcome.broker.InstrumentServiceBrokerPort
 import com.github.trading.domain.exception.InfrastructureException
@@ -44,6 +43,6 @@ class InstrumentBrokerOutcomeAdapter(
                 }.instrument
             }.let { share -> Share(id = share.uid, ticker = share.ticker, lot = share.lot) }
         }.onLeft { ex -> log.error("An error has been occurred while getting share by id", ex) }
-            .mapLeft { GetShareByIdError }
+            .mapLeft { BrokerIntegrationError.GetShareByIdError }
 
 }

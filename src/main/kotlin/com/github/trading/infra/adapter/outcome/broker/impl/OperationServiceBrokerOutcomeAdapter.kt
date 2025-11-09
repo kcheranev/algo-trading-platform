@@ -3,8 +3,7 @@ package com.github.trading.infra.adapter.outcome.broker.impl
 import arrow.core.Either
 import arrow.core.Either.Companion.catch
 import arrow.core.raise.either
-import com.github.trading.core.error.BrokerIntegrationError
-import com.github.trading.core.error.GetPortfolioError
+import com.github.trading.core.error.IntegrationError.BrokerIntegrationError
 import com.github.trading.core.port.outcome.broker.OperationServiceBrokerPort
 import com.github.trading.domain.model.Portfolio
 import org.slf4j.LoggerFactory
@@ -34,15 +33,14 @@ class OperationServiceBrokerOutcomeAdapter(
                     )
                 }
             }.onLeft { ex -> log.error("An error has been occurred while getting portfolio", ex) }
-                .mapLeft { GetPortfolioError }
+                .mapLeft { BrokerIntegrationError.GetPortfolioError }
                 .bind()
-                .let { portfolioResponse ->
-                    Portfolio(
-                        currencyAmount = moneyValueToBigDecimal(portfolioResponse.totalAmountCurrencies),
-                        sharesAmount = moneyValueToBigDecimal(portfolioResponse.totalAmountShares),
-                        totalPortfolioAmount = moneyValueToBigDecimal(portfolioResponse.totalAmountPortfolio)
-                    )
-                }
+        }.map { portfolioResponse ->
+            Portfolio(
+                currencyAmount = moneyValueToBigDecimal(portfolioResponse.totalAmountCurrencies),
+                sharesAmount = moneyValueToBigDecimal(portfolioResponse.totalAmountShares),
+                totalPortfolioAmount = moneyValueToBigDecimal(portfolioResponse.totalAmountPortfolio)
+            )
         }
 
 }

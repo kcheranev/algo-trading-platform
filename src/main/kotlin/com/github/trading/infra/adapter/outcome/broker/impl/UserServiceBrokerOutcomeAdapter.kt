@@ -3,8 +3,7 @@ package com.github.trading.infra.adapter.outcome.broker.impl
 import arrow.core.Either
 import arrow.core.Either.Companion.catch
 import com.github.trading.common.getOrPut
-import com.github.trading.core.error.BrokerIntegrationError
-import com.github.trading.core.error.GetTradingAccountError
+import com.github.trading.core.error.IntegrationError.BrokerIntegrationError
 import com.github.trading.core.port.outcome.broker.UserServiceBrokerPort
 import com.github.trading.domain.exception.InfrastructureException
 import com.github.trading.infra.config.properties.BrokerProperties
@@ -38,11 +37,11 @@ class UserServiceBrokerOutcomeAdapter(
                 brokerUsersServiceWrapper.callSyncMethod { stub ->
                     stub.getAccounts(GetAccountsRequest.newBuilder().build())
                         .accountsList
-                        .first { it.name == tradingAccountName }
+                        .first { account -> account.name == tradingAccountName }
                         .id
                 }
             }
         }.onLeft { ex -> log.error("An error has been occurred while getting trading account", ex) }
-            .mapLeft { GetTradingAccountError }
+            .mapLeft { BrokerIntegrationError.GetTradingAccountError }
 
 }

@@ -25,7 +25,7 @@ class LoggingOrdersServiceDecorator(private val brokerOrdersServiceWrapper: Sync
     ): PostOrderResponse {
         log.info(
             """
-            Outgoing broker postOrderSync request with parameters
+            Outgoing broker postOrder request with parameters
             instrumentId = $instrumentId
             quantity = $quantity
             price = $price
@@ -50,7 +50,7 @@ class LoggingOrdersServiceDecorator(private val brokerOrdersServiceWrapper: Sync
         }
         log.info(
             """
-            Outgoing broker postOrderSync response with result
+            Outgoing broker postOrder response with result
             orderId = ${postOrderResponse.orderId}
             executionReportStatus = ${postOrderResponse.executionReportStatus}
             lotsRequested = ${postOrderResponse.lotsRequested}
@@ -60,7 +60,6 @@ class LoggingOrdersServiceDecorator(private val brokerOrdersServiceWrapper: Sync
             totalOrderAmount = ${moneyValueToBigDecimal(postOrderResponse.totalOrderAmount)}
             initialCommission = ${moneyValueToBigDecimal(postOrderResponse.initialCommission)}
             executedCommission = ${moneyValueToBigDecimal(postOrderResponse.executedCommission)}
-            figi = ${postOrderResponse.figi}
             direction = ${postOrderResponse.direction}
             initialSecurityPrice = ${moneyValueToBigDecimal(postOrderResponse.initialSecurityPrice)}
             orderType = ${postOrderResponse.orderType}

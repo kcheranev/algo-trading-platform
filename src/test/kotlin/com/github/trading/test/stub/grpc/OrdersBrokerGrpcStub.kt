@@ -57,6 +57,15 @@ class OrdersBrokerGrpcStub(testName: String) : AbstractGrpcStub(testName) {
         )
     }
 
+    fun stubForGetMaxLots(fileName: String) {
+        ordersService.stubFor(
+            WireMockGrpc.method("GetMaxLots")
+                .willReturn(
+                    json(grpcResponse(fileName))
+                )
+        )
+    }
+
     fun verifyForPostBuyOrder(
         fileName: String,
         matchConditions: Map<String, String> = emptyMap(),

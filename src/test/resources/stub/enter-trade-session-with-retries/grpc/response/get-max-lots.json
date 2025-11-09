@@ -1,0 +1,23 @@
+{
+  "currency": "RUB",
+  "buyLimits": {
+    "buyMoneyAmount": {
+      "units": "1000"
+    },
+    "buyMaxLots": "10",
+    "buyMaxMarketLots": "10"
+  },
+  "buyMarginLimits": {
+    "buyMoneyAmount": {
+      "units": "10000"
+    },
+    "buyMaxLots": "10",
+    "buyMaxMarketLots": "10"
+  },
+  "sellLimits": {
+    "sellMaxLots": "10"
+  },
+  "sellMarginLimits": {
+    "sellMaxLots": "10"
+  }
+}
