@@ -14,6 +14,6 @@ fun LocalDateTime.toMskInstant(): Instant = atZone(mskZoneId).toInstant()
 
 fun LocalDateTime.toMskZonedDateTime(): ZonedDateTime = atZone(mskZoneId)
 
-fun Instant.toMstLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(this, mskZoneId)
+fun Instant.toMskLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(this, mskZoneId)
 
 fun Instant.toMskLocalTime(): LocalTime = LocalTime.ofInstant(this, mskZoneId)

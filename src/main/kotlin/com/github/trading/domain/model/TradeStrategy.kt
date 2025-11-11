@@ -1,7 +1,7 @@
 package com.github.trading.domain.model
 
 import com.github.trading.common.date.DateSupplier
-import com.github.trading.common.date.toMstLocalDateTime
+import com.github.trading.common.date.toMskLocalDateTime
 import com.github.trading.core.config.TradingProperties.Companion.tradingProperties
 import com.github.trading.core.strategy.rule.isSatisfiedByType
 import com.github.trading.domain.mapper.domainModelMapper
@@ -66,7 +66,7 @@ class TradeStrategy(
         } else {
             series.lastBar
                 .endTime
-                .toMstLocalDateTime()
+                .toMskLocalDateTime()
         }
 
     fun lastCandleClose(): BigDecimal? =
@@ -123,7 +123,7 @@ class TradeStrategy(
 
     private fun mapPositionTrade(trade: org.ta4j.core.Trade) =
         Order(
-            date = series.getBar(trade.index).beginTime.toMstLocalDateTime(),
+            date = series.getBar(trade.index).beginTime.toMskLocalDateTime(),
             direction = TradeDirection.valueOf(trade.type.name),
             netPrice = trade.netPrice.toBigDecimal(),
             grossPrice = trade.pricePerAsset.toBigDecimal()

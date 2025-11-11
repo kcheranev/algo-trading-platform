@@ -55,7 +55,7 @@ data class TradeSession(
             ?: throw TradeSessionDomainException("Trade session $about has an empty candle series")
         if (lastCandleDate >= candle.endDateTime) {
             throw TradeSessionDomainException(
-                "Unable to process income candle: new candle date intersects trade session $about series dates"
+                "Unable to process income candle ${candle.endDateTime}: new candle date intersects trade session $about candle series with last date $lastCandleDate"
             )
         }
         strategy.addBar(candle)

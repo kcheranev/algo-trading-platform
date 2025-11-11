@@ -84,7 +84,9 @@ jib {
         image = "eclipse-temurin:21-jre"
     }
     to {
-        image = System.getProperty("docker.repository")
+        val repository = System.getProperty("docker.repository")
+        val tag = System.getProperty("docker.tag", "latest")
+        image = "$repository:$tag"
         auth {
             username = System.getProperty("docker.username")
             password = System.getProperty("docker.password")

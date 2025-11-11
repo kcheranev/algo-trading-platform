@@ -23,6 +23,7 @@ class MarketDataProcessingService(
             GetReadyToOrderTradeSessionsCommand(candle.instrumentId, candle.interval)
         ).forEach { tradeSession ->
             try {
+                log.info("New candle for processing: $candle")
                 transactionalTemplate.execute {
                     tradeSession.processIncomeCandle(candle)
                     tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))
