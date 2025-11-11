@@ -87,16 +87,16 @@ class TradeSessionTest : FreeSpec({
         val tradeSession =
             TradeSession.create(
                 strategyConfiguration = strategyConfiguration,
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                ticker = "ABRD",
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                 orderLotsQuantityStrategy = orderLotsQuantityStrategy,
                 tradeStrategy = tradeStrategy
             )
 
         //then
         tradeSession.id.shouldNotBeNull()
-        tradeSession.ticker shouldBe "SBER"
-        tradeSession.instrumentId shouldBe "e6123145-9665-43e0-8413-cd61b8aa9b1"
+        tradeSession.ticker shouldBe "ABRD"
+        tradeSession.instrumentId shouldBe "926fdfbf-4b07-47c9-8928-f49858ca33f2"
         tradeSession.status shouldBe TradeSessionStatus.WAITING
         tradeSession.candleInterval shouldBe CandleInterval.ONE_MIN
         tradeSession.strategy shouldBe tradeStrategy
@@ -145,13 +145,13 @@ class TradeSessionTest : FreeSpec({
                 lowestPrice = BigDecimal(97),
                 volume = 10,
                 endDateTime = LocalDateTime.parse("2024-01-30T10:19:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             )
         val tradeSession =
             TradeSession(
                 id = TradeSessionId(UUID.randomUUID()),
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                ticker = "ABRD",
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
                 orderLotsQuantityStrategy = orderLotsQuantityStrategy,
@@ -199,8 +199,8 @@ class TradeSessionTest : FreeSpec({
         val tradeSession =
             TradeSession(
                 id = TradeSessionId(tradeSessionId),
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                ticker = "ABRD",
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
                 orderLotsQuantityStrategy = orderLotsQuantityStrategy,
@@ -222,7 +222,7 @@ class TradeSessionTest : FreeSpec({
                 lowestPrice = BigDecimal(97),
                 volume = 10,
                 endDateTime = LocalDateTime.parse("2024-01-30T10:19:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             )
 
         //when
@@ -263,8 +263,8 @@ class TradeSessionTest : FreeSpec({
         val tradeSession =
             TradeSession(
                 id = TradeSessionId(tradeSessionId),
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                ticker = "ABRD",
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                 status = TradeSessionStatus.IN_POSITION,
                 candleInterval = CandleInterval.ONE_MIN,
                 orderLotsQuantityStrategy = orderLotsQuantityStrategy,
@@ -287,7 +287,7 @@ class TradeSessionTest : FreeSpec({
                 lowestPrice = BigDecimal(97),
                 volume = 10,
                 endDateTime = LocalDateTime.parse("2024-01-30T10:19:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             )
 
         //when
@@ -309,8 +309,8 @@ class TradeSessionTest : FreeSpec({
         val tradeSession =
             TradeSession(
                 id = TradeSessionId(tradeSessionId),
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                ticker = "ABRD",
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                 status = TradeSessionStatus.PENDING_ENTER,
                 candleInterval = CandleInterval.ONE_MIN,
                 orderLotsQuantityStrategy = orderLotsQuantityStrategy,
@@ -346,8 +346,8 @@ class TradeSessionTest : FreeSpec({
         val tradeSession =
             TradeSession(
                 id = TradeSessionId(tradeSessionId),
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                ticker = "ABRD",
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                 status = TradeSessionStatus.PENDING_EXIT,
                 candleInterval = CandleInterval.ONE_MIN,
                 orderLotsQuantityStrategy = orderLotsQuantityStrategy,
@@ -398,8 +398,8 @@ class TradeSessionTest : FreeSpec({
             val tradeSession =
                 TradeSession(
                     id = TradeSessionId(tradeSessionId),
-                    ticker = "SBER",
-                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                    ticker = "ABRD",
+                    instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                     status = currentStatus,
                     candleInterval = CandleInterval.ONE_MIN,
                     orderLotsQuantityStrategy = orderLotsQuantityStrategy,
@@ -437,8 +437,8 @@ class TradeSessionTest : FreeSpec({
         val tradeSession =
             TradeSession(
                 id = TradeSessionId(tradeSessionId),
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                ticker = "ABRD",
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
                 orderLotsQuantityStrategy = orderLotsQuantityStrategy,
@@ -491,14 +491,14 @@ class TradeSessionTest : FreeSpec({
                 lowestPrice = BigDecimal(97),
                 volume = 10,
                 endDateTime = LocalDateTime.parse("2024-01-30T10:14:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             )
         val tradeSessionId = UUID.randomUUID()
         val tradeSession =
             TradeSession(
                 id = TradeSessionId(tradeSessionId),
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                ticker = "ABRD",
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
                 orderLotsQuantityStrategy = orderLotsQuantityStrategy,
@@ -516,8 +516,8 @@ class TradeSessionTest : FreeSpec({
         val ex = shouldThrow<TradeSessionDomainException> { tradeSession.processIncomeCandle(candle) }
 
         //then
-        ex shouldHaveMessage "Unable to process income candle: new candle date intersects trade session " +
-                "[id=$tradeSessionId, ticker=SBER, strategyType=DUMMY, candleInterval=ONE_MIN, status=WAITING] series dates"
+        ex shouldHaveMessage "Unable to process income candle 2024-01-30T10:14: new candle date intersects trade session " +
+                "[id=$tradeSessionId, ticker=ABRD, strategyType=DUMMY, candleInterval=ONE_MIN, status=WAITING] candle series with last date 2024-01-30T10:15"
     }
 
 })

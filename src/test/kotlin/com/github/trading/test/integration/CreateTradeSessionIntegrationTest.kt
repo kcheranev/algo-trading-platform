@@ -69,7 +69,7 @@ class CreateTradeSessionIntegrationTest(
             CreateTradeSessionRequestDto(
                 strategyConfiguration.id,
                 OrderLotsQuantityStrategyType.HARDCODED,
-                InstrumentDto("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
+                InstrumentDto("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD")
             ),
             CreateTradeSessionResponseDto::class.java
         )
@@ -83,7 +83,7 @@ class CreateTradeSessionIntegrationTest(
         marketDataBrokerGrpcStub.verifyForGetCandles("get-candles.json")
         verify {
             marketDataStreamManager.subscribeCandles(
-                setOf(ru.ttech.piapi.core.impl.marketdata.subscription.Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
+                setOf(ru.ttech.piapi.core.impl.marketdata.subscription.Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
                 any<CandleSubscriptionSpec>(),
                 any()
             )
@@ -92,8 +92,8 @@ class CreateTradeSessionIntegrationTest(
         val tradeSessions = jdbcTemplate.findAll(TradeSessionEntity::class.java)
         tradeSessions shouldHaveSize 1
         val tradeSession = tradeSessions.first()
-        tradeSession.ticker shouldBe "SBER"
-        tradeSession.instrumentId shouldBe "e6123145-9665-43e0-8413-cd61b8aa9b1"
+        tradeSession.ticker shouldBe "ABRD"
+        tradeSession.instrumentId shouldBe "926fdfbf-4b07-47c9-8928-f49858ca33f2"
         tradeSession.status shouldBe TradeSessionStatus.WAITING
         tradeSession.candleInterval shouldBe CandleInterval.ONE_MIN
         tradeSession.orderLotsQuantityStrategyType shouldBe OrderLotsQuantityStrategyType.HARDCODED
@@ -106,7 +106,7 @@ class CreateTradeSessionIntegrationTest(
         val candleSubscriptions = candleSubscriptionCacheHolder.findAll()
         candleSubscriptions shouldHaveSize 1
         val candleSubscription = candleSubscriptions.first()
-        candleSubscription.instrument shouldBe Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
+        candleSubscription.instrument shouldBe Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD")
         candleSubscription.candleInterval shouldBe CandleInterval.ONE_MIN
     }
 

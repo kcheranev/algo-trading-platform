@@ -13,9 +13,11 @@ import com.github.trading.infra.adapter.outcome.broker.brokerOutcomeAdapterMappe
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import ru.tinkoff.piapi.contract.v1.GetCandlesRequest.CandleSource
+import ru.ttech.piapi.core.connector.streaming.listeners.OnNextListener
 import ru.ttech.piapi.core.impl.marketdata.MarketDataStreamManager
 import ru.ttech.piapi.core.impl.marketdata.subscription.CandleSubscriptionSpec
 import ru.ttech.piapi.core.impl.marketdata.subscription.Instrument
+import ru.ttech.piapi.core.impl.marketdata.wrapper.CandleWrapper
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -31,6 +33,13 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
 
     private val lock = ReentrantLock()
 
+    private val onCandleListener: OnNextListener<CandleWrapper> =
+        OnNextListener<CandleWrapper> { candleWrapper ->
+            processCandleUseCase.processIncomeCandle(
+                ProcessIncomeCandleCommand(brokerIncomeAdapterMapper.map(candleWrapper))
+            )
+        }
+
     init {
         marketDataStreamManager.start()
     }
@@ -43,12 +52,9 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapter(
                 log.info("Activate subscription for the trade session, ticker=${instrument.ticker}, candleInterval=$candleInterval")
                 marketDataStreamManager.subscribeCandles(
                     setOf(Instrument(instrument.id, brokerOutcomeAdapterMapper.mapToSubscriptionInterval(candleInterval))),
-                    CandleSubscriptionSpec(CandleSource.CANDLE_SOURCE_EXCHANGE)
-                ) { candleWrapper ->
-                    processCandleUseCase.processIncomeCandle(
-                        ProcessIncomeCandleCommand(brokerIncomeAdapterMapper.map(candleWrapper))
-                    )
-                }
+                    CandleSubscriptionSpec(CandleSource.CANDLE_SOURCE_EXCHANGE),
+                    onCandleListener
+                )
                 candleSubscriptionCacheHolder.add(candleSubscription)
             }
         }

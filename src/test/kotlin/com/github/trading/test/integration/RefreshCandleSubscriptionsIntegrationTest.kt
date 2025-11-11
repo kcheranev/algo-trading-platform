@@ -45,7 +45,7 @@ class RefreshCandleSubscriptionsIntegrationTest(
     "should delete unused subscription" {
         //given
         candleSubscriptionCacheHolder.add(
-            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b13", "SBER"), CandleInterval.ONE_MIN)
+            CandleSubscription(Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"), CandleInterval.ONE_MIN)
         )
         candleSubscriptionCacheHolder.add(
             CandleSubscription(Instrument("b993e814-9986-4434-ae88-b086066714a0", "WUSH"), CandleInterval.ONE_MIN)
@@ -54,8 +54,8 @@ class RefreshCandleSubscriptionsIntegrationTest(
         jdbcTemplate.insert(
             TradeSessionEntity(
                 id = tradeStrategyId,
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b13",
+                ticker = "ABRD",
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                 status = TradeSessionStatus.IN_POSITION,
                 candleInterval = CandleInterval.ONE_MIN,
                 orderLotsQuantityStrategyType = OrderLotsQuantityStrategyType.HARDCODED,
@@ -77,7 +77,7 @@ class RefreshCandleSubscriptionsIntegrationTest(
         //then
         val candleSubscriptions = candleSubscriptionCacheHolder.findAll()
         candleSubscriptions shouldHaveSize 1
-        candleSubscriptions shouldContain CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b13", "SBER"), CandleInterval.ONE_MIN)
+        candleSubscriptions shouldContain CandleSubscription(Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"), CandleInterval.ONE_MIN)
 
         verify {
             marketDataStreamManager.unsubscribeCandles(
@@ -90,14 +90,14 @@ class RefreshCandleSubscriptionsIntegrationTest(
     "should add new subscription" {
         //given
         candleSubscriptionCacheHolder.add(
-            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b13", "SBER"), CandleInterval.ONE_MIN)
+            CandleSubscription(Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"), CandleInterval.ONE_MIN)
         )
         val tradeStrategyId1 = UUID.randomUUID()
         jdbcTemplate.insert(
             TradeSessionEntity(
                 id = tradeStrategyId1,
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b13",
+                ticker = "ABRD",
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                 status = TradeSessionStatus.IN_POSITION,
                 candleInterval = CandleInterval.ONE_MIN,
                 orderLotsQuantityStrategyType = OrderLotsQuantityStrategyType.HARDCODED,
@@ -137,7 +137,7 @@ class RefreshCandleSubscriptionsIntegrationTest(
         candleSubscriptions shouldHaveSize 2
         candleSubscriptions shouldContainExactlyInAnyOrder
                 listOf(
-                    CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b13", "SBER"), CandleInterval.ONE_MIN),
+                    CandleSubscription(Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"), CandleInterval.ONE_MIN),
                     CandleSubscription(Instrument("b993e814-9986-4434-ae88-b086066714a0", "WUSH"), CandleInterval.ONE_MIN)
                 )
 

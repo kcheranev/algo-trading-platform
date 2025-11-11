@@ -41,8 +41,8 @@ class DepositPercentOrderLotsQuantityStrategyTest : FreeSpec({
                     every { getByBrokerInstrumentId(any()) } returns
                             Instrument(
                                 id = InstrumentId(UUID.randomUUID()),
-                                name = "Сбербанк",
-                                ticker = "SBER",
+                                name = "АбрауДюрсо",
+                                ticker = "ABRD",
                                 lot = 5,
                                 brokerInstrumentId = "12345"
                             )
@@ -83,8 +83,8 @@ class DepositPercentOrderLotsQuantityStrategyTest : FreeSpec({
                 every { getByBrokerInstrumentId(any()) } returns
                         Instrument(
                             id = InstrumentId(UUID.randomUUID()),
-                            name = "Сбербанк",
-                            ticker = "SBER",
+                            name = "АбрауДюрсо",
+                            ticker = "ABRD",
                             lot = 5,
                             brokerInstrumentId = "12345"
                         )

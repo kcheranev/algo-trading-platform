@@ -76,10 +76,10 @@ class TradeProcessLongE2eTest(
         jdbcTemplate.insert(
             InstrumentEntity(
                 id = UUID.randomUUID(),
-                name = "Сбербанк",
-                ticker = "SBER",
+                name = "АбрауДюрсо",
+                ticker = "ABRD",
                 lot = 1,
-                brokerInstrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                brokerInstrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             )
         )
 
@@ -90,14 +90,14 @@ class TradeProcessLongE2eTest(
             CreateTradeSessionRequestDto(
                 strategyConfiguration.id,
                 OrderLotsQuantityStrategyType.HARDCODED,
-                InstrumentDto("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER")
+                InstrumentDto("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD")
             ),
             CreateTradeSessionResponseDto::class.java
         )
         createTradeSessionResponse.statusCode shouldBe HttpStatus.OK
         verify {
             marketDataStreamManager.subscribeCandles(
-                setOf(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
+                setOf(Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
                 any<CandleSubscriptionSpec>(),
                 any()
             )
@@ -121,7 +121,7 @@ class TradeProcessLongE2eTest(
                     lowestPrice = BigDecimal(98),
                     volume = 10,
                     endDateTime = LocalDateTime.parse("2024-01-30T10:17:00"),
-                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                    instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
                 )
             )
         )
@@ -136,7 +136,7 @@ class TradeProcessLongE2eTest(
                     lowestPrice = BigDecimal(99),
                     volume = 10,
                     endDateTime = LocalDateTime.parse("2024-01-30T10:18:00"),
-                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                    instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
                 )
             )
         )
@@ -151,7 +151,7 @@ class TradeProcessLongE2eTest(
                     lowestPrice = BigDecimal(100),
                     volume = 10,
                     endDateTime = LocalDateTime.parse("2024-01-30T10:19:00"),
-                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                    instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
                 )
             )
         )
@@ -166,7 +166,7 @@ class TradeProcessLongE2eTest(
                     lowestPrice = BigDecimal(101),
                     volume = 10,
                     endDateTime = LocalDateTime.parse("2024-01-30T10:20:00"),
-                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                    instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
                 )
             )
         )
@@ -181,7 +181,7 @@ class TradeProcessLongE2eTest(
                     lowestPrice = BigDecimal(102),
                     volume = 10,
                     endDateTime = LocalDateTime.parse("2024-01-30T10:21:00"),
-                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                    instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
                 )
             )
         )
@@ -194,8 +194,8 @@ class TradeProcessLongE2eTest(
         orders shouldHaveSize 2
         val buyOrder = orders[0]
         with(buyOrder) {
-            ticker shouldBe "SBER"
-            instrumentId shouldBe "e6123145-9665-43e0-8413-cd61b8aa9b1"
+            ticker shouldBe "ABRD"
+            instrumentId shouldBe "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             date shouldBe LocalDateTime.parse("2024-01-30T10:15:30")
             lotsQuantity shouldBe 4
             totalPrice shouldBe BigDecimal("413.000000000")
@@ -205,8 +205,8 @@ class TradeProcessLongE2eTest(
         }
         val sellOrder = orders[1]
         with(sellOrder) {
-            ticker shouldBe "SBER"
-            instrumentId shouldBe "e6123145-9665-43e0-8413-cd61b8aa9b1"
+            ticker shouldBe "ABRD"
+            instrumentId shouldBe "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             date shouldBe LocalDateTime.parse("2024-01-30T10:15:30")
             lotsQuantity shouldBe 4
             totalPrice shouldBe BigDecimal("434.000000000")

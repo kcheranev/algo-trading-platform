@@ -19,11 +19,11 @@ class MarketDataProcessingService(
 
     override fun processIncomeCandle(command: ProcessIncomeCandleCommand) {
         val candle = command.candle
+        log.info("New candle for processing: $candle")
         tradeSessionPersistencePort.getReadyForOrderTradeSessions(
             GetReadyToOrderTradeSessionsCommand(candle.instrumentId, candle.interval)
         ).forEach { tradeSession ->
             try {
-                log.info("New candle for processing: $candle")
                 transactionalTemplate.execute {
                     tradeSession.processIncomeCandle(candle)
                     tradeSessionPersistencePort.save(SaveTradeSessionCommand(tradeSession))

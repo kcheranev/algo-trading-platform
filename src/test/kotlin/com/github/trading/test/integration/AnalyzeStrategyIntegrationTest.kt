@@ -57,7 +57,7 @@ class AnalyzeStrategyIntegrationTest(
                     tradesByDayCountFactor = BigDecimal(1)
                 ),
                 profitTypeSort = ProfitTypeSort.GROSS,
-                instrument = InstrumentDto("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
+                instrument = InstrumentDto("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"),
                 candleInterval = CandleInterval.ONE_MIN,
                 from = LocalDate.parse("2024-01-30"),
                 to = LocalDate.parse("2024-01-30")

@@ -36,7 +36,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         //when
         adapter.subscribeCandles(
             SubscribeCandlesCommand(
-                Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
+                Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"),
                 CandleInterval.ONE_MIN
             )
         )
@@ -44,11 +44,11 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         //then
         val subscriptions = candleSubscriptionCacheHolder.findAll()
         subscriptions shouldHaveSize 1
-        subscriptions shouldContain CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"), CandleInterval.ONE_MIN)
+        subscriptions shouldContain CandleSubscription(Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"), CandleInterval.ONE_MIN)
 
         verify {
             marketDataStreamManager.subscribeCandles(
-                setOf(ru.ttech.piapi.core.impl.marketdata.subscription.Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
+                setOf(ru.ttech.piapi.core.impl.marketdata.subscription.Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
                 any<CandleSubscriptionSpec>(),
                 any()
             )
@@ -60,7 +60,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         val marketDataStreamManager = mockk<MarketDataStreamManager>(relaxed = true)
         val candleSubscriptionCacheHolder = CandleSubscriptionCacheHolder()
         candleSubscriptionCacheHolder.add(
-            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"), CandleInterval.ONE_MIN)
+            CandleSubscription(Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"), CandleInterval.ONE_MIN)
         )
         val adapter =
             MarketDataStreamSubscriptionBrokerOutcomeAdapter(
@@ -73,7 +73,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         //when
         adapter.subscribeCandles(
             SubscribeCandlesCommand(
-                Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
+                Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"),
                 CandleInterval.ONE_MIN
             )
         )
@@ -81,11 +81,11 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         //then
         val subscriptions = candleSubscriptionCacheHolder.findAll()
         subscriptions shouldHaveSize 1
-        subscriptions shouldContain CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"), CandleInterval.ONE_MIN)
+        subscriptions shouldContain CandleSubscription(Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"), CandleInterval.ONE_MIN)
 
         verify(inverse = true) {
             marketDataStreamManager.subscribeCandles(
-                setOf(ru.ttech.piapi.core.impl.marketdata.subscription.Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
+                setOf(ru.ttech.piapi.core.impl.marketdata.subscription.Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
                 any<CandleSubscriptionSpec>(),
                 any()
             )
@@ -97,7 +97,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         val marketDataStreamManager = mockk<MarketDataStreamManager>(relaxed = true)
         val candleSubscriptionCacheHolder = CandleSubscriptionCacheHolder()
         candleSubscriptionCacheHolder.add(
-            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"), CandleInterval.ONE_MIN)
+            CandleSubscription(Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"), CandleInterval.ONE_MIN)
         )
         val tradeSessionPersistencePort =
             mockk<TradeSessionPersistencePort> {
@@ -114,7 +114,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         //when
         adapter.unsubscribeCandles(
             UnsubscribeCandlesOrderCommand(
-                Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
+                Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"),
                 CandleInterval.ONE_MIN
             )
         )
@@ -125,7 +125,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
 
         verify {
             marketDataStreamManager.unsubscribeCandles(
-                setOf(ru.ttech.piapi.core.impl.marketdata.subscription.Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
+                setOf(ru.ttech.piapi.core.impl.marketdata.subscription.Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
                 any<CandleSubscriptionSpec>()
             )
         }
@@ -136,7 +136,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         val marketDataStreamManager = mockk<MarketDataStreamManager>(relaxed = true)
         val candleSubscriptionCacheHolder = CandleSubscriptionCacheHolder()
         candleSubscriptionCacheHolder.add(
-            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"), CandleInterval.ONE_MIN)
+            CandleSubscription(Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"), CandleInterval.ONE_MIN)
         )
         val tradeSessionPersistencePort =
             mockk<TradeSessionPersistencePort> {
@@ -153,7 +153,7 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         //when
         adapter.unsubscribeCandles(
             UnsubscribeCandlesOrderCommand(
-                Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
+                Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"),
                 CandleInterval.ONE_MIN
             )
         )
@@ -161,11 +161,11 @@ class MarketDataStreamSubscriptionBrokerOutcomeAdapterTest : StringSpec({
         //then
         val subscriptions = candleSubscriptionCacheHolder.findAll()
         subscriptions shouldHaveSize 1
-        subscriptions shouldContain CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"), CandleInterval.ONE_MIN)
+        subscriptions shouldContain CandleSubscription(Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"), CandleInterval.ONE_MIN)
 
         verify(inverse = true) {
             marketDataStreamManager.unsubscribeCandles(
-                setOf(ru.ttech.piapi.core.impl.marketdata.subscription.Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
+                setOf(ru.ttech.piapi.core.impl.marketdata.subscription.Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
                 any<CandleSubscriptionSpec>()
             )
         }

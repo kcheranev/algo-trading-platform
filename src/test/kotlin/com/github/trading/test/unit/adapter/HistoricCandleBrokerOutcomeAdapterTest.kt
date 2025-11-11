@@ -70,7 +70,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                     getCandles(
                         eq(
                             GetCandlesRequest.newBuilder()
-                                .setInstrumentId("e6123145-9665-43e0-8413-cd61b8aa9b1")
+                                .setInstrumentId("926fdfbf-4b07-47c9-8928-f49858ca33f2")
                                 .setFrom(instantToTimestamp(LocalDate.parse("2024-01-30").atStartOfDay().toMskInstant()))
                                 .setTo(instantToTimestamp(now.toMskInstant()))
                                 .setInterval(ru.tinkoff.piapi.contract.v1.CandleInterval.CANDLE_INTERVAL_1_MIN)
@@ -119,7 +119,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
         val candles =
             adapter.getLastHistoricCandles(
                 GetLastHistoricCandlesCommand(
-                    instrument = Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
+                    instrument = Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"),
                     candleInterval = CandleInterval.ONE_MIN,
                     quantity = 4
                 )
@@ -135,7 +135,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                 lowestPrice = BigDecimal("94.000000000"),
                 volume = 100,
                 endDateTime = LocalDateTime.parse("2024-01-30T07:13:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             ),
             Candle(
                 interval = CandleInterval.ONE_MIN,
@@ -145,7 +145,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                 lowestPrice = BigDecimal("95.000000000"),
                 volume = 100,
                 endDateTime = LocalDateTime.parse("2024-01-30T07:14:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             ),
             Candle(
                 interval = CandleInterval.ONE_MIN,
@@ -155,7 +155,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                 lowestPrice = BigDecimal("96.000000000"),
                 volume = 100,
                 endDateTime = LocalDateTime.parse("2024-01-30T07:15:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             ),
             Candle(
                 interval = CandleInterval.ONE_MIN,
@@ -165,7 +165,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                 lowestPrice = BigDecimal("97.000000000"),
                 volume = 100,
                 endDateTime = LocalDateTime.parse("2024-01-30T07:16:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             )
         )
     }
@@ -184,7 +184,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                     getCandles(
                         eq(
                             GetCandlesRequest.newBuilder()
-                                .setInstrumentId("e6123145-9665-43e0-8413-cd61b8aa9b1")
+                                .setInstrumentId("926fdfbf-4b07-47c9-8928-f49858ca33f2")
                                 .setFrom(instantToTimestamp(LocalDate.parse("2024-10-07").atStartOfDay().toMskInstant()))
                                 .setTo(instantToTimestamp(now.toMskInstant()))
                                 .setInterval(ru.tinkoff.piapi.contract.v1.CandleInterval.CANDLE_INTERVAL_1_MIN)
@@ -216,7 +216,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                     getCandles(
                         eq(
                             GetCandlesRequest.newBuilder()
-                                .setInstrumentId("e6123145-9665-43e0-8413-cd61b8aa9b1")
+                                .setInstrumentId("926fdfbf-4b07-47c9-8928-f49858ca33f2")
                                 .setFrom(instantToTimestamp(LocalDate.parse("2024-10-06").atStartOfDay().toMskInstant()))
                                 .setTo(instantToTimestamp(LocalDate.parse("2024-10-06").atEndOfDay().toMskInstant()))
                                 .setInterval(ru.tinkoff.piapi.contract.v1.CandleInterval.CANDLE_INTERVAL_1_MIN)
@@ -251,7 +251,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
         val candles =
             adapter.getLastHistoricCandles(
                 GetLastHistoricCandlesCommand(
-                    instrument = Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"),
+                    instrument = Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"),
                     candleInterval = CandleInterval.ONE_MIN,
                     quantity = 4
                 )
@@ -267,7 +267,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                 lowestPrice = BigDecimal("94.000000000"),
                 volume = 100,
                 endDateTime = LocalDateTime.parse("2024-10-06T19:01:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             ),
             Candle(
                 interval = CandleInterval.ONE_MIN,
@@ -277,7 +277,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                 lowestPrice = BigDecimal("95.000000000"),
                 volume = 100,
                 endDateTime = LocalDateTime.parse("2024-10-06T19:02:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             ),
             Candle(
                 interval = CandleInterval.ONE_MIN,
@@ -287,7 +287,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                 lowestPrice = BigDecimal("96.000000000"),
                 volume = 100,
                 endDateTime = LocalDateTime.parse("2024-10-07T07:13:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             ),
             Candle(
                 interval = CandleInterval.ONE_MIN,
@@ -297,7 +297,7 @@ class HistoricCandleBrokerOutcomeAdapterTest : StringSpec({
                 lowestPrice = BigDecimal("97.000000000"),
                 volume = 100,
                 endDateTime = LocalDateTime.parse("2024-10-07T07:14:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             )
         )
     }

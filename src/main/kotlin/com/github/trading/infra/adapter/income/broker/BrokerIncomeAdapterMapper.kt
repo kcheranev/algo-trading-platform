@@ -16,10 +16,10 @@ abstract class BrokerIncomeAdapterMapper {
             val candleInterval = map(interval)
             return Candle(
                 interval = candleInterval,
-                openPrice = source.open,
-                closePrice = source.close,
-                highestPrice = source.high,
-                lowestPrice = source.low,
+                openPrice = open,
+                closePrice = close,
+                highestPrice = high,
+                lowestPrice = low,
                 volume = volume,
                 endDateTime = time.utcAsMskLocalDateTime() + candleInterval.duration,
                 instrumentId = instrumentUid

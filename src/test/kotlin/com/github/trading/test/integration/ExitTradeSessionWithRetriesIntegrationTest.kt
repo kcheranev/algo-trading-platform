@@ -62,8 +62,8 @@ class ExitTradeSessionWithRetriesIntegrationTest(
         jdbcTemplate.insert(
             TradeSessionEntity(
                 id = tradeSessionId,
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                ticker = "ABRD",
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                 status = TradeSessionStatus.IN_POSITION,
                 candleInterval = CandleInterval.ONE_MIN,
                 orderLotsQuantityStrategyType = OrderLotsQuantityStrategyType.HARDCODED,
@@ -95,7 +95,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
             }
         tradeStrategyCache.put(tradeSessionId, tradeStrategy)
         candleSubscriptionCacheHolder.add(
-            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"), CandleInterval.ONE_MIN)
+            CandleSubscription(Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"), CandleInterval.ONE_MIN)
         )
         val candle =
             Candle(
@@ -106,7 +106,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
                 lowestPrice = BigDecimal(97),
                 volume = 10,
                 endDateTime = LocalDateTime.parse("2024-01-30T10:19:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
         ordersBrokerGrpcStub.stubForPostSellOrder(
@@ -153,8 +153,8 @@ class ExitTradeSessionWithRetriesIntegrationTest(
         jdbcTemplate.insert(
             TradeSessionEntity(
                 id = tradeSessionId,
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                ticker = "ABRD",
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                 status = TradeSessionStatus.IN_POSITION,
                 candleInterval = CandleInterval.ONE_MIN,
                 orderLotsQuantityStrategyType = OrderLotsQuantityStrategyType.HARDCODED,
@@ -186,7 +186,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
             }
         tradeStrategyCache.put(tradeSessionId, tradeStrategy)
         candleSubscriptionCacheHolder.add(
-            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"), CandleInterval.ONE_MIN)
+            CandleSubscription(Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"), CandleInterval.ONE_MIN)
         )
         val candle =
             Candle(
@@ -197,7 +197,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
                 lowestPrice = BigDecimal(97),
                 volume = 10,
                 endDateTime = LocalDateTime.parse("2024-01-30T10:19:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
         ordersBrokerGrpcStub.stubForPostSellOrder(
@@ -244,8 +244,8 @@ class ExitTradeSessionWithRetriesIntegrationTest(
         jdbcTemplate.insert(
             TradeSessionEntity(
                 id = tradeSessionId,
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                ticker = "ABRD",
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                 status = TradeSessionStatus.IN_POSITION,
                 candleInterval = CandleInterval.ONE_MIN,
                 orderLotsQuantityStrategyType = OrderLotsQuantityStrategyType.HARDCODED,
@@ -277,7 +277,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
             }
         tradeStrategyCache.put(tradeSessionId, tradeStrategy)
         candleSubscriptionCacheHolder.add(
-            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"), CandleInterval.ONE_MIN)
+            CandleSubscription(Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"), CandleInterval.ONE_MIN)
         )
         val candle =
             Candle(
@@ -288,7 +288,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
                 lowestPrice = BigDecimal(97),
                 volume = 10,
                 endDateTime = LocalDateTime.parse("2024-01-30T10:19:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
         ordersBrokerGrpcStub.stubForPostSellOrder(
@@ -318,8 +318,8 @@ class ExitTradeSessionWithRetriesIntegrationTest(
         jdbcTemplate.insert(
             TradeSessionEntity(
                 id = tradeSessionId,
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                ticker = "ABRD",
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                 status = TradeSessionStatus.IN_POSITION,
                 candleInterval = CandleInterval.ONE_MIN,
                 orderLotsQuantityStrategyType = OrderLotsQuantityStrategyType.HARDCODED,
@@ -351,7 +351,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
             }
         tradeStrategyCache.put(tradeSessionId, tradeStrategy)
         candleSubscriptionCacheHolder.add(
-            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"), CandleInterval.ONE_MIN)
+            CandleSubscription(Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"), CandleInterval.ONE_MIN)
         )
         val candle =
             Candle(
@@ -362,7 +362,7 @@ class ExitTradeSessionWithRetriesIntegrationTest(
                 lowestPrice = BigDecimal(97),
                 volume = 10,
                 endDateTime = LocalDateTime.parse("2024-01-30T10:19:00"),
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1"
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2"
             )
         usersBrokerGrpcStub.stubForGetAccounts("get-accounts.json")
         ordersBrokerGrpcStub.stubForPostOrderFailed()

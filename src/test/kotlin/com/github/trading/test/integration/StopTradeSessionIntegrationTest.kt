@@ -57,8 +57,8 @@ class StopTradeSessionIntegrationTest(
         jdbcTemplate.insert(
             TradeSessionEntity(
                 id = tradeSessionId,
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                ticker = "ABRD",
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
                 orderLotsQuantityStrategyType = OrderLotsQuantityStrategyType.HARDCODED,
@@ -85,7 +85,7 @@ class StopTradeSessionIntegrationTest(
                 }
         tradeStrategyCache.put(tradeSessionId, TradeStrategy(barSeries, false, mockk<Strategy>()))
         candleSubscriptionCacheHolder.add(
-            CandleSubscription(Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", "SBER"), CandleInterval.ONE_MIN)
+            CandleSubscription(Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", "ABRD"), CandleInterval.ONE_MIN)
         )
 
         //when
@@ -101,7 +101,7 @@ class StopTradeSessionIntegrationTest(
 
         verify {
             marketDataStreamManager.unsubscribeCandles(
-                setOf(ru.ttech.piapi.core.impl.marketdata.subscription.Instrument("e6123145-9665-43e0-8413-cd61b8aa9b1", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
+                setOf(ru.ttech.piapi.core.impl.marketdata.subscription.Instrument("926fdfbf-4b07-47c9-8928-f49858ca33f2", SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE)),
                 any<CandleSubscriptionSpec>()
             )
         }

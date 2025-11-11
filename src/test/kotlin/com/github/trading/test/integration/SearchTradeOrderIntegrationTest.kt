@@ -46,8 +46,8 @@ class SearchTradeOrderIntegrationTest(
         jdbcTemplate.insert(
             TradeSessionEntity(
                 id = tradeSession1Id,
-                ticker = "SBER",
-                instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                ticker = "ABRD",
+                instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                 status = TradeSessionStatus.WAITING,
                 candleInterval = CandleInterval.ONE_MIN,
                 orderLotsQuantityStrategyType = OrderLotsQuantityStrategyType.HARDCODED,
@@ -76,8 +76,8 @@ class SearchTradeOrderIntegrationTest(
             listOf(
                 TradeOrderEntity(
                     id = UUID.randomUUID(),
-                    ticker = "SBER",
-                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                    ticker = "ABRD",
+                    instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                     date = LocalDateTime.parse("2024-01-01T10:15:35"),
                     lotsQuantity = 10,
                     totalPrice = BigDecimal(100),
@@ -87,8 +87,8 @@ class SearchTradeOrderIntegrationTest(
                 ),
                 TradeOrderEntity(
                     id = UUID.randomUUID(),
-                    ticker = "SBER",
-                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                    ticker = "ABRD",
+                    instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                     date = LocalDateTime.parse("2024-01-01T10:15:40"),
                     lotsQuantity = 11,
                     totalPrice = BigDecimal(100),
@@ -98,8 +98,8 @@ class SearchTradeOrderIntegrationTest(
                 ),
                 TradeOrderEntity(
                     id = UUID.randomUUID(),
-                    ticker = "SBER",
-                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                    ticker = "ABRD",
+                    instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                     date = LocalDateTime.parse("2024-01-01T10:15:45"),
                     lotsQuantity = 12,
                     totalPrice = BigDecimal(110),
@@ -109,8 +109,8 @@ class SearchTradeOrderIntegrationTest(
                 ),
                 TradeOrderEntity(
                     id = UUID.randomUUID(),
-                    ticker = "SBER",
-                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                    ticker = "ABRD",
+                    instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                     date = LocalDateTime.parse("2024-01-01T10:15:50"),
                     lotsQuantity = 13,
                     totalPrice = BigDecimal(120),
@@ -120,8 +120,8 @@ class SearchTradeOrderIntegrationTest(
                 ),
                 TradeOrderEntity(
                     id = UUID.randomUUID(),
-                    ticker = "SBER",
-                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                    ticker = "ABRD",
+                    instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                     date = LocalDateTime.parse("2024-01-01T10:15:55"),
                     lotsQuantity = 14,
                     totalPrice = BigDecimal(130),
@@ -131,8 +131,8 @@ class SearchTradeOrderIntegrationTest(
                 ),
                 TradeOrderEntity(
                     id = UUID.randomUUID(),
-                    ticker = "SBER",
-                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                    ticker = "ABRD",
+                    instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                     date = LocalDateTime.parse("2024-01-01T10:16:00"),
                     lotsQuantity = 15,
                     totalPrice = BigDecimal(140),
@@ -142,8 +142,8 @@ class SearchTradeOrderIntegrationTest(
                 ),
                 TradeOrderEntity(
                     id = UUID.randomUUID(),
-                    ticker = "SBER",
-                    instrumentId = "e6123145-9665-43e0-8413-cd61b8aa9b1",
+                    ticker = "ABRD",
+                    instrumentId = "926fdfbf-4b07-47c9-8928-f49858ca33f2",
                     date = LocalDateTime.parse("2024-01-01T10:16:05"),
                     lotsQuantity = 16,
                     totalPrice = BigDecimal(150),
