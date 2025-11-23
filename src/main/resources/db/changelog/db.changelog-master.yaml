@@ -2,4 +2,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/ddl/init-schema.sql
   - include:
+      file: db/changelog/ddl/add-backtesting-task.sql
+  - include:
       file: db/changelog/dml/add-instruments.sql
