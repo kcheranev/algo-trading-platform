@@ -4,6 +4,7 @@ import com.github.trading.domain.model.CandleInterval
 import com.github.trading.domain.model.Instrument
 import com.github.trading.domain.model.backtesting.MutableParameter
 import com.github.trading.domain.model.backtesting.ProfitTypeSort
+import com.github.trading.domain.model.backtesting.StrategyParametersMutation
 import org.springframework.core.io.Resource
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -37,7 +38,3 @@ data class StrategyAnalyzeResultFilter(
     val tradesByDayCountFactor: BigDecimal?
 )
 
-data class StrategyParametersMutation(
-    var divisionFactor: BigDecimal,
-    var variantsCount: Int
-)
