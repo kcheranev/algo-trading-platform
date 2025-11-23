@@ -7,6 +7,7 @@ import com.github.trading.domain.entity.StrategyConfigurationId
 import com.github.trading.infra.adapter.income.web.ui.NotFoundException
 import com.github.trading.infra.adapter.income.web.ui.model.mapper.strategyConfigurationWebIncomeAdapterUiMapper
 import com.github.trading.infra.adapter.income.web.ui.model.request.CreateStrategyConfigurationRequestUiDto
+import com.github.trading.infra.adapter.income.web.ui.model.response.StrategyConfigurationUiDto
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.validation.BindingResult
@@ -40,6 +41,7 @@ class StrategyConfigurationUiController(
         val strategyConfigurationDtoList =
             searchStrategyConfigurationUseCase.search(SearchStrategyConfigurationCommand())
                 .map(strategyConfigurationWebIncomeAdapterUiMapper::map)
+                .sortedBy(StrategyConfigurationUiDto::type)
         model.addAttribute("strategyConfigurations", strategyConfigurationDtoList)
         return "strategy-configurations"
     }

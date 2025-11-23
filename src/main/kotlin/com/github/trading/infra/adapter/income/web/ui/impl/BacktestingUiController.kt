@@ -8,6 +8,7 @@ import com.github.trading.core.port.income.strategy.GetStrategyTypesUseCase
 import com.github.trading.core.util.Validator.Companion.validate
 import com.github.trading.domain.model.CandleInterval
 import com.github.trading.domain.model.Instrument
+import com.github.trading.domain.model.backtesting.MutationDirection
 import com.github.trading.domain.model.backtesting.ProfitTypeSort
 import com.github.trading.infra.adapter.income.web.ui.model.mapper.backtestingWebIncomeAdapterUiMapper
 import com.github.trading.infra.adapter.income.web.ui.model.mapper.instrumentWebIncomeAdapterUiMapper
@@ -58,6 +59,9 @@ class BacktestingUiController(
     @ModelAttribute("instruments")
     fun instruments() = findAllInstrumentsUseCase.findAll().map(instrumentWebIncomeAdapterUiMapper::map)
 
+    @ModelAttribute("mutationDirections")
+    fun mutationDirections() = MutationDirection.entries.map(MutationDirection::name)
+
     @GetMapping
     fun analyzeStrategyParameters(model: Model): String {
         model.addAttribute("strategyAnalyzeRequest", StrategyAnalyzeRequestUiDto())
@@ -74,7 +78,7 @@ class BacktestingUiController(
         validate {
             with(request) {
                 field("strategyType") { strategyType.shouldNotBeNull("Strategy type field must be filled in") }
-                strategyParameters.forEach { fieldName, fieldValue ->
+                strategyParameters.forEach { (fieldName, fieldValue) ->
                     field(fieldName) { fieldValue.value.shouldNotBeNull("$fieldName field must be filled in") }
                 }
                 when (candlesSeriesSource) {
@@ -126,10 +130,7 @@ class BacktestingUiController(
                             FileSystemResource("$tempFileDirectory/${model.getAttribute("candlesSeriesSystemFileName")}")
                         }
                     strategyAnalyzeUseCase.analyzeStrategyOnStoredData(
-                        backtestingWebIncomeAdapterUiMapper.mapToStrategyAnalyzeOnStoredDataCommand(
-                            request,
-                            candlesSeriesFileResource
-                        )
+                        backtestingWebIncomeAdapterUiMapper.mapToStrategyAnalyzeOnStoredDataCommand(request, candlesSeriesFileResource)
                     ).map(backtestingWebIncomeAdapterUiMapper::map)
                 }
 

@@ -6,7 +6,6 @@ import com.github.trading.core.port.outcome.broker.MarketDataStreamSubscriptionB
 import com.github.trading.core.port.outcome.broker.SubscribeCandlesCommand
 import com.github.trading.core.port.outcome.broker.UnsubscribeCandlesOrderCommand
 import com.github.trading.core.port.outcome.persistence.tradesession.TradeSessionPersistencePort
-import com.github.trading.domain.model.subscription.CandleSubscription
 import org.springframework.stereotype.Service
 
 @Service
@@ -19,8 +18,7 @@ class SubscriptionService(
     override fun refreshCandleSubscriptions() {
         val activeCandleSubscriptions = marketDataStreamSubscriptionBrokerPort.findAllCandleSubscriptions()
         val expectedCandleSubscriptions =
-            tradeSessionPersistencePort.getReadyForOrderTradeSessions()
-                .map { CandleSubscription(it.instrument, it.candleInterval) }
+            tradeSessionPersistencePort.getActiveCandleSubscriptions()
                 .toSet()
         activeCandleSubscriptions.minus(expectedCandleSubscriptions)
             .forEach {

@@ -18,6 +18,7 @@ class SubscriptionUiController(
         val candleSubscriptionDtoList =
             searchCandleSubscriptionUseCase.findAllCandleSubscriptions()
                 .map(subscriptionWebIncomeAdapterUiMapper::map)
+                .sortedBy { candleSubscription -> candleSubscription.instrument.ticker }
         model.addAttribute("candleSubscriptions", candleSubscriptionDtoList)
         return "subscriptions"
     }

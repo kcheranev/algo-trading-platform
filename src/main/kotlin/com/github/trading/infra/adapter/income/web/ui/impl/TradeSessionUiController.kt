@@ -11,6 +11,7 @@ import com.github.trading.domain.entity.TradeSessionId
 import com.github.trading.infra.adapter.income.web.ui.NotFoundException
 import com.github.trading.infra.adapter.income.web.ui.model.mapper.tradeSessionWebIncomeAdapterUiMapper
 import com.github.trading.infra.adapter.income.web.ui.model.request.CreateTradeSessionRequestUiDto
+import com.github.trading.infra.adapter.income.web.ui.model.response.TradeSessionUiDto
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.validation.BindingResult
@@ -56,6 +57,7 @@ class TradeSessionUiController(
         val tradeSessionDtoList =
             searchTradeSessionUseCase.search(SearchTradeSessionCommand())
                 .map(tradeSessionWebIncomeAdapterUiMapper::map)
+                .sortedBy(TradeSessionUiDto::ticker)
         model.addAttribute("tradeSessions", tradeSessionDtoList)
         return "trade-sessions"
     }

@@ -1,6 +1,7 @@
 package com.github.trading.infra.adapter.income.web.ui.model.request
 
 import com.github.trading.domain.model.CandleInterval
+import com.github.trading.domain.model.backtesting.MutationDirection
 import com.github.trading.domain.model.backtesting.ProfitTypeSort
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -27,7 +28,8 @@ data class StrategyAnalyzeRequestUiDto(
 
 data class StrategyParameterUiDto(
     val value: Number? = null,
-    val mutable: Boolean = false
+    val mutable: Boolean = false,
+    val mutationDirection: MutationDirection = MutationDirection.BOTH
 )
 
 data class CheckedValueUiDto(

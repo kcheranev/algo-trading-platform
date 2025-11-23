@@ -153,36 +153,59 @@
                     </select>
                 </div>
                 <div class="w-100 gy-0"></div>
-                <div class="col-6">
+                <div class="col-12">
                     <div id="strategyParameters" class="row gy-3">
                         <th:block th:if="*{not #maps.isEmpty(strategyParameters)}">
                             <div class="col-12">
                                 <h5>Strategy parameters</h5>
-                                <small class="text-body-secondary">Check for mutable</small>
                             </div>
-                            <th:block th:each="strategyParameter,strategyParameterStat : *{strategyParameters}">
-                                <div class="col-12">
-                                    <label class="form-label" th:text="${strategyParameter.key}"
-                                           th:for="${strategyParameter.key}"></label>
-                                    <div class="input-group"
-                                         th:with="hasError=${validationErrors != null && validationErrors.fieldErrors.containsKey(strategyParameter.key)}">
-                                        <div class="input-group-text">
+                            <table class="table align-middle">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Value</th>
+                                    <th scope="col">Mutable</th>
+                                    <th scope="col">Mutable direction</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <th:block th:each="strategyParameter,strategyParameterStat : *{strategyParameters}">
+                                    <tr>
+                                        <td>
+                                            <label class="form-label" th:text="${strategyParameter.key}"
+                                                   th:for="${strategyParameter.key}"></label>
+                                        </td>
+                                        <td th:with="hasError=${validationErrors != null && validationErrors.fieldErrors.containsKey(strategyParameter.key)}">
+                                            <input class="form-control" th:id="${strategyParameter.key}"
+                                                   th:field="*{strategyParameters[__${strategyParameter.key}__].value}"
+                                                   th:classappend="${hasError} ? 'is-invalid' : ''"
+                                                   th:attr="aria-describedby=${hasError} ? ${strategyParameter.key} + 'Error' : null"
+                                                   type="number" step="any">
+                                            <div th:if="${hasError}" th:id="${strategyParameter.key} + 'Error'"
+                                                 class="invalid-feedback">
+                                                <div th:each="err : ${validationErrors.fieldErrors.get(strategyParameter.key)}"
+                                                     th:text="${err}" class="error"/>
+                                            </div>
+                                        </td>
+                                        <td>
                                             <input class="form-check-input mt-0" type="checkbox"
                                                    th:field="*{strategyParameters[__${strategyParameter.key}__].mutable}">
-                                        </div>
-                                        <input class="form-control" th:id="${strategyParameter.key}"
-                                               th:field="*{strategyParameters[__${strategyParameter.key}__].value}"
-                                               th:classappend="${hasError} ? 'is-invalid' : ''"
-                                               th:attr="aria-describedby=${hasError} ? ${strategyParameter.key} + 'Error' : null"
-                                               type="number" step="any">
-                                        <div th:if="${hasError}" th:id="${strategyParameter.key} + 'Error'"
-                                             class="invalid-feedback">
-                                            <div th:each="err : ${validationErrors.fieldErrors.get(strategyParameter.key)}"
-                                                 th:text="${err}" class="error"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </th:block>
+                                        </td>
+                                        <td>
+                                            <select th:id="${strategyParameter.key} + MutationDirection"
+                                                    class="form-select"
+                                                    th:field="*{strategyParameters[__${strategyParameter.key}__].mutationDirection}">
+                                                <option th:each="mutationDirection : ${mutationDirections}"
+                                                        th:value="${mutationDirection}"
+                                                        th:text="${mutationDirection}">
+                                                    Strategy type
+                                                </option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                                </tbody>
+                            </table>
                             <div class="col-12 mt-4">
                                 <button type="submit" class="btn btn-primary">Analyze</button>
                             </div>

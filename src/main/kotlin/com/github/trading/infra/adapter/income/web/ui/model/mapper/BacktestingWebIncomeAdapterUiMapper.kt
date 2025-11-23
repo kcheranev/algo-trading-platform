@@ -3,8 +3,9 @@ package com.github.trading.infra.adapter.income.web.ui.model.mapper
 import com.github.trading.core.port.income.backtesting.StrategyAnalyzeOnBrokerDataCommand
 import com.github.trading.core.port.income.backtesting.StrategyAnalyzeOnStoredDataCommand
 import com.github.trading.domain.model.Instrument
-import com.github.trading.domain.model.StrategyParameters
 import com.github.trading.domain.model.backtesting.DailyStrategyAnalyzeResult
+import com.github.trading.domain.model.backtesting.MutableParameter
+import com.github.trading.domain.model.backtesting.MutationDirection
 import com.github.trading.domain.model.backtesting.StrategyAnalyzeResult
 import com.github.trading.domain.model.backtesting.StrategyParametersAnalyzeResult
 import com.github.trading.infra.adapter.income.web.ui.model.request.CheckedValueUiDto
@@ -54,16 +55,19 @@ abstract class BacktestingWebIncomeAdapterUiMapper {
     ): StrategyAnalyzeOnStoredDataCommand
 
     @Named("mapNoMutableStrategyParameters")
-    fun mapNoMutableStrategyParameters(source: MutableMap<String, StrategyParameterUiDto>) =
-        source.filter { !it.value.mutable }
-            .mapValues { it.value.value!! }
-            .let(::StrategyParameters)
+    fun mapNoMutableStrategyParameters(source: MutableMap<String, StrategyParameterUiDto>): Map<String, Number> =
+        source.filter { parameterEntry -> !parameterEntry.value.mutable }
+            .mapValues { parameterEntry -> parameterEntry.value.value!! }
 
     @Named("mapMutableStrategyParameters")
-    fun mapMutableStrategyParameters(source: MutableMap<String, StrategyParameterUiDto>) =
-        source.filter { it.value.mutable }
-            .mapValues { it.value.value!! }
-            .let(::StrategyParameters)
+    fun mapMutableStrategyParameters(source: MutableMap<String, StrategyParameterUiDto>): Map<String, MutableParameter> =
+        source.filter { parameterEntry -> parameterEntry.value.mutable }
+            .mapValues { parameterEntry ->
+                MutableParameter(
+                    value = parameterEntry.value.value!!,
+                    direction = parameterEntry.value.mutationDirection ?: MutationDirection.BOTH
+                )
+            }
 
     fun mapCheckedValue(source: CheckedValueUiDto) = if (source.checked) source.value else null
 

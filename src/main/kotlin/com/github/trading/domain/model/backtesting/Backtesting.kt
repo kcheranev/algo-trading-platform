@@ -3,7 +3,6 @@ package com.github.trading.domain.model.backtesting
 import com.github.trading.core.port.income.backtesting.StrategyAnalyzeResultFilter
 import com.github.trading.core.port.income.backtesting.StrategyParametersMutation
 import com.github.trading.core.strategy.factory.StrategyFactory
-import com.github.trading.domain.exception.BusinessException
 import com.github.trading.domain.mapper.domainModelMapper
 import com.github.trading.domain.model.Candle
 import com.github.trading.domain.model.StrategyParameters
@@ -13,7 +12,6 @@ import kotlinx.coroutines.runBlocking
 import org.ta4j.core.BarSeries
 import org.ta4j.core.BaseBarSeriesBuilder
 import java.math.BigDecimal
-import java.math.RoundingMode
 
 const val BACKTESTING_RESULT_SCALE = 5
 
@@ -43,15 +41,15 @@ class Backtesting(
 
     fun analyzeStrategy(
         strategyFactory: StrategyFactory,
-        parameters: StrategyParameters,
-        mutableParameters: StrategyParameters,
+        parameters: Map<String, Number>,
+        mutableParameters: Map<String, MutableParameter>,
         parametersMutation: StrategyParametersMutation,
         resultFilter: StrategyAnalyzeResultFilter?,
         profitTypeSort: ProfitTypeSort?
     ): List<StrategyParametersAnalyzeResult> {
         val mutableParametersVariants =
-            mutableParameters.mapValues { (_, paramValue) ->
-                buildParameterVariants(paramValue, parametersMutation.divisionFactor, parametersMutation.variantsCount)
+            mutableParameters.mapValues { (_, mutableParameter) ->
+                mutableParameter.getParameterVariants(parametersMutation.divisionFactor, parametersMutation.variantsCount)
             }
         val mutableParametersCartesianProduct = cartesianProduct(mutableParametersVariants)
         return runBlocking {
@@ -81,46 +79,6 @@ class Backtesting(
             .take(resultFilter?.resultsLimit ?: DEFAULT_BACKTESTING_RESULTS_LIMIT)
             .toList()
     }
-
-    private fun buildParameterVariants(
-        paramValue: Number,
-        divisionFactor: BigDecimal,
-        variantsCount: Int
-    ): List<Number> =
-        when (paramValue) {
-            is Int -> {
-                val minParamValue =
-                    BigDecimal(paramValue)
-                        .divide(divisionFactor, BACKTESTING_RESULT_SCALE, RoundingMode.HALF_UP)
-                        .toInt()
-                val maxParamValue = BigDecimal(paramValue).multiply(divisionFactor).toInt()
-                val paramValueStep =
-                    ((maxParamValue - minParamValue) / (variantsCount - 1))
-                        .let { if (it == 0) 1 else it }
-                val paramVariants = mutableListOf(paramValue)
-                for (paramVariant in minParamValue..maxParamValue step paramValueStep) {
-                    paramVariants.add(paramVariant)
-                }
-                paramVariants.distinct()
-            }
-
-            is BigDecimal -> {
-                val minParamValue = paramValue.divide(divisionFactor, BACKTESTING_RESULT_SCALE, RoundingMode.HALF_UP)
-                val maxParamValue = paramValue.multiply(divisionFactor)
-                val paramValueStep =
-                    (maxParamValue - minParamValue)
-                        .divide(BigDecimal(variantsCount - 1), BACKTESTING_RESULT_SCALE, RoundingMode.HALF_UP)
-                val paramVariants = mutableListOf(paramValue)
-                var paramVariant = minParamValue
-                while (paramVariant <= maxParamValue) {
-                    paramVariants.add(paramVariant)
-                    paramVariant += paramValueStep
-                }
-                paramVariants.distinct()
-            }
-
-            else -> throw BusinessException("Unexpected parameter $paramValue value type")
-        }
 
     private fun cartesianProduct(paramVariants: Map<String, List<Number>>): List<Map<String, Number>> =
         paramVariants.entries

@@ -16,6 +16,8 @@ import com.github.trading.domain.entity.TradeSessionStatus
 import com.github.trading.domain.model.Instrument
 import com.github.trading.domain.model.StrategyParameters
 import com.github.trading.domain.model.TradeStrategy
+import com.github.trading.domain.model.subscription.CandleSubscription
+import com.github.trading.domain.model.view.TradeSessionView
 import com.github.trading.infra.adapter.outcome.persistence.PersistenceNotFoundException
 import com.github.trading.infra.adapter.outcome.persistence.entity.TradeSessionEntity
 import com.github.trading.infra.adapter.outcome.persistence.persistenceOutcomeAdapterMapper
@@ -76,21 +78,20 @@ class TradeSessionPersistenceOutcomeAdapter(
         )
     }
 
-    override fun search(command: SearchTradeSessionCommand) =
+    override fun search(command: SearchTradeSessionCommand): List<TradeSessionView> =
         tradeSessionRepository.search(command)
             .map(persistenceOutcomeAdapterMapper::map)
 
-    override fun getReadyForOrderTradeSessions() =
+    override fun getActiveCandleSubscriptions(): List<CandleSubscription> =
         tradeSessionRepository.getReadyForOrderTradeSessions()
             .map { tradeSessionEntity ->
-                persistenceOutcomeAdapterMapper.map(
-                    tradeSessionEntity,
-                    getOrCreateTradeStrategy(tradeSessionEntity),
-                    getOrderLotsQuantityStrategy(tradeSessionEntity.orderLotsQuantityStrategyType)
+                CandleSubscription(
+                    instrument = Instrument(id = tradeSessionEntity.instrumentId, ticker = tradeSessionEntity.ticker),
+                    candleInterval = tradeSessionEntity.candleInterval
                 )
             }
 
-    override fun getReadyForOrderTradeSessions(command: GetReadyToOrderTradeSessionsCommand) =
+    override fun getReadyForOrderTradeSessions(command: GetReadyToOrderTradeSessionsCommand): List<TradeSession> =
         tradeSessionRepository.getReadyForOrderTradeSessions(command.instrumentId, command.candleInterval)
             .map { tradeSessionEntity ->
                 persistenceOutcomeAdapterMapper.map(
@@ -100,7 +101,7 @@ class TradeSessionPersistenceOutcomeAdapter(
                 )
             }
 
-    override fun isReadyForOrderTradeSessionExists(command: IsReadyToOrderTradeSessionExistsCommand) =
+    override fun isReadyForOrderTradeSessionExists(command: IsReadyToOrderTradeSessionExistsCommand): Boolean =
         tradeSessionRepository.isReadyForOrderTradeSessionExists(command.instrumentId, command.candleInterval)
 
     private fun getOrCreateTradeStrategy(tradeSessionEntity: TradeSessionEntity): TradeStrategy =
@@ -111,17 +112,14 @@ class TradeSessionPersistenceOutcomeAdapter(
                     "Candle series for the subscription ticker=${tradeSessionEntity.ticker}, " +
                             "candleInterval=${tradeSessionEntity.candleInterval} has been expired. Reinitializing..."
                 )
-                val tradeStrategy =
-                    tradeStrategyServicePort.initTradeStrategy(
-                        InitTradeStrategyCommand(
-                            strategyType = tradeSessionEntity.strategyType,
-                            instrument = Instrument(tradeSessionEntity.instrumentId, tradeSessionEntity.ticker),
-                            candleInterval = tradeSessionEntity.candleInterval,
-                            strategyParameters = StrategyParameters(tradeSessionEntity.strategyParameters.value)
-                        )
+                tradeStrategyServicePort.initTradeStrategy(
+                    InitTradeStrategyCommand(
+                        strategyType = tradeSessionEntity.strategyType,
+                        instrument = Instrument(tradeSessionEntity.instrumentId, tradeSessionEntity.ticker),
+                        candleInterval = tradeSessionEntity.candleInterval,
+                        strategyParameters = StrategyParameters(tradeSessionEntity.strategyParameters.value)
                     )
-                tradeStrategyCache.put(tradeSessionEntity.id, tradeStrategy)
-                return@run tradeStrategy
+                ).also { tradeStrategy -> tradeStrategyCache.put(tradeSessionEntity.id, tradeStrategy) }
             }
 
 }

@@ -1,6 +1,7 @@
 package com.github.trading.core.port.outcome.persistence.tradesession
 
 import com.github.trading.domain.entity.TradeSession
+import com.github.trading.domain.model.subscription.CandleSubscription
 import com.github.trading.domain.model.view.TradeSessionView
 
 interface TradeSessionPersistencePort {
@@ -13,7 +14,7 @@ interface TradeSessionPersistencePort {
 
     fun search(command: SearchTradeSessionCommand): List<TradeSessionView>
 
-    fun getReadyForOrderTradeSessions(): List<TradeSession>
+    fun getActiveCandleSubscriptions(): List<CandleSubscription>
 
     fun getReadyForOrderTradeSessions(command: GetReadyToOrderTradeSessionsCommand): List<TradeSession>
 
